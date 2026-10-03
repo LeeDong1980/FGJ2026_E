@@ -8,6 +8,7 @@ Game Jam 3D 遊戲專案（玩法尚未決定，見 docs/design.md）。多人�
 
 ## 資料夾結構
 - `scenes/main/`：主場景。
+- `scenes/dungeon_room/`：地牢房間，包含 dungeon 模型實例、材質、碰撞、燈光與攝影機。
 - `scenes/red_dragon/`：紅龍模型子場景。
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
 - `Models/`：模型與貼圖素材。

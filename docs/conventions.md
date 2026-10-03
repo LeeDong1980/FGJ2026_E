@@ -40,6 +40,8 @@ autoload/          全域單例
 - `res://scenes/red_dragon/red_dragon.tscn` @Codex
 - `res://scenes/platforms/cube_platform.tscn` @Codex
 - `res://scenes/platforms/platform_layout.tscn` @Codex
+- `res://scenes/dungeon_room/dungeon_room.tscn` @Codex
+- `res://scenes/main/dragon_platform_showcase.tscn` @Codex
 
 ## Git
 - `.import` 和 `.uid` 檔要 commit，`.godot/` 不要 commit

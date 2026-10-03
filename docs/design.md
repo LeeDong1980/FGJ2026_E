@@ -67,6 +67,11 @@
                                     ↑ 龍只在三層之間上下移動
 ```
 
+### 美術參考房間
+
+- `scenes/dungeon_room/dungeon_room.tscn` 使用 dungeon 素材建立地牢房間，含石牆、地板、柱子、桌椅與煉金用品、木箱、火把、燭光與藥液光源。
+- `main.tscn` 目前實例化此房間作為美術展示；原紅龍平台展示保留在 `scenes/main/dragon_platform_showcase.tscn`。
+
 ## 5. 遊戲規則
 
 ### 5.1 食材
