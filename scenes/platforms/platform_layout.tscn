@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/platforms/cube_platform.tscn" id="1_platform"]
+
+[node name="PlatformLayout" type="Node3D"]
+
+[node name="LeftRow" type="Node3D" parent="."]
+
+[node name="CubePlatform01" parent="LeftRow" instance=ExtResource("1_platform")]
+position = Vector3(-3.8, -0.08, -6)
+
+[node name="CubePlatform02" parent="LeftRow" instance=ExtResource("1_platform")]
+position = Vector3(-3.8, -0.08, -3)
+
+[node name="CubePlatform03" parent="LeftRow" instance=ExtResource("1_platform")]
+position = Vector3(-3.8, -0.08, 0)
+
+[node name="CubePlatform04" parent="LeftRow" instance=ExtResource("1_platform")]
+position = Vector3(-3.8, -0.08, 3)
+
+[node name="CubePlatform05" parent="LeftRow" instance=ExtResource("1_platform")]
+position = Vector3(-3.8, -0.08, 6)
+
+[node name="RightRow" type="Node3D" parent="."]
+
+[node name="CubePlatform01" parent="RightRow" instance=ExtResource("1_platform")]
+position = Vector3(3.8, -0.08, -6)
+
+[node name="CubePlatform02" parent="RightRow" instance=ExtResource("1_platform")]
+position = Vector3(3.8, -0.08, -3)
+
+[node name="CubePlatform03" parent="RightRow" instance=ExtResource("1_platform")]
+position = Vector3(3.8, -0.08, 0)
+
+[node name="CubePlatform04" parent="RightRow" instance=ExtResource("1_platform")]
+position = Vector3(3.8, -0.08, 3)
+
+[node name="CubePlatform05" parent="RightRow" instance=ExtResource("1_platform")]
+position = Vector3(3.8, -0.08, 6)

@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Shader" path="res://scenes/platforms/platform_checker.gdshader" id="1_checker"]
+
+[sub_resource type="ShaderMaterial" id="Material_checker"]
+shader = ExtResource("1_checker")
+
+[sub_resource type="BoxMesh" id="Mesh_platform"]
+material = SubResource("Material_checker")
+size = Vector3(3.2, 0.16, 2)
+
+[sub_resource type="BoxShape3D" id="Shape_platform"]
+size = Vector3(3.2, 0.16, 2)
+
+[node name="CubePlatform" type="StaticBody3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh_platform")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("Shape_platform")
