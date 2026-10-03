@@ -4,10 +4,16 @@ Game Jam 3D 遊戲專案（玩法尚未決定，見 docs/design.md）。多人�
 
 ## 環境
 - Godot 4.7，Forward Plus 渲染器，3D 物理用 Jolt
-- 執行：用 Godot 編輯器開啟 `project.godot`，按 F5。主場景還沒設定，設定之前請用 F6 執行目前開啟的場景。
+- 執行：用 Godot 編輯器開啟 `project.godot`，按 F5 執行主場景，按 F6 執行目前開啟的場景。
 
 ## 資料夾結構
-目前只有 `project.godot`、`icon.svg` 和 `docs/`。新資料夾依 docs/conventions.md 的規則建立，建好後更新這一節。
+- `scenes/main/`：主場景。
+- `scenes/red_dragon/`：紅龍模型子場景。
+- `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
+- `Models/`：模型與貼圖素材。
+- `docs/`：設計、開發慣例與任務清單。
+
+新資料夾依 docs/conventions.md 的規則建立，建好後更新這一節。
 
 ## 文件
 - `docs/tasks.md`：任務清單。**每次開始任務前都要讀**。

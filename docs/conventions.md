@@ -36,6 +36,10 @@ autoload/          全域單例
 
 ### 歸屬表
 <!-- 一行一個場景，格式：- `res://路徑.tscn` @負責人 -->
+- `res://scenes/main/main.tscn` @Codex
+- `res://scenes/red_dragon/red_dragon.tscn` @Codex
+- `res://scenes/platforms/cube_platform.tscn` @Codex
+- `res://scenes/platforms/platform_layout.tscn` @Codex
 
 ## Git
 - `.import` 和 `.uid` 檔要 commit，`.godot/` 不要 commit
