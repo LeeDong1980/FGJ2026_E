@@ -12,6 +12,10 @@ var current_lane: int = 0
 
 
 func _ready() -> void:
+	# 單獨執行 dragon.tscn（F6）時沒有 LaneLayout，只顯示模型、不移動。
+	if lane_layout == null:
+		set_process(false)
+		return
 	reset_position()
 
 
@@ -30,6 +34,11 @@ func reset_position() -> void:
 	if current_lane != target_lane:
 		current_lane = target_lane
 		current_lane_changed.emit(current_lane)
+
+
+## 嘴部掛點，給特效（DragonEffects.bind_dragon）使用。
+func get_mouth_anchor() -> Marker3D:
+	return ($Model as RedDragon).get_mouth_anchor()
 
 
 func set_target_lane(lane: int) -> void:

@@ -38,7 +38,9 @@ signal game_lost
 @export var ingredient_speed: float = 2.0
 @export var ingredient_spacing: float = 0.6
 @export var max_ingredients_per_lane: int = 5
-## 食材出生的 x 座標（畫面左側外面）。
+## 開啟時 spawn_x、front_x 改讀最低層房間的 QueueSpawnAnchor、QueueFrontAnchor。
+@export var use_room_anchors: bool = true
+## 食材出生的 x 座標（LaneLayout 的本地座標）。
 @export var spawn_x: float = -13.0
 ## 隊伍最前端停下的 x 座標（最靠近龍）。
 @export var front_x: float = -2.5
@@ -75,6 +77,9 @@ var _round: int = 0
 
 
 func _ready() -> void:
+	if use_room_anchors:
+		spawn_x = lane_layout.get_anchor_position(0, &"QueueSpawnAnchor").x
+		front_x = lane_layout.get_anchor_position(0, &"QueueFrontAnchor").x
 	_setup_round()
 
 
@@ -127,6 +132,11 @@ func spit_pressed() -> void:
 func spit_released() -> void:
 	is_spitting = false
 	_spit_used_for_pot = false
+
+
+## 正在喊「吐」且胃袋空著（噴火中）。這次按下已經吐進鍋子時回傳 false。
+func is_breathing_fire() -> bool:
+	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null
 
 
 ## 最前端的食材已經走到停止位置才回傳，否則回傳 null。

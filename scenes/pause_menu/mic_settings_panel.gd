@@ -19,6 +19,9 @@ const INACTIVE_ALPHA := 0.35
 
 @onready var _controller: MicController = MicInput
 @onready var _close_button: Button = %CloseButton
+@onready var _mic_enabled_check: CheckButton = %MicEnabledCheck
+@onready var _retry_button: Button = %RetryButton
+@onready var _status_label: Label = %StatusLabel
 @onready var _device_option: OptionButton = %DeviceOption
 
 @onready var _volume_title: Label = %VolumeTitle
@@ -48,6 +51,10 @@ const INACTIVE_ALPHA := 0.35
 func _ready() -> void:
 	_close_button.visible = show_close_button
 	_close_button.pressed.connect(close_requested.emit)
+	_mic_enabled_check.toggled.connect(_controller.set_mic_enabled)
+	_retry_button.pressed.connect(_controller.restart_microphone)
+	_controller.mic_status_changed.connect(_on_mic_status_changed)
+	_on_mic_status_changed(_controller.mic_status)
 	_setup_devices()
 	_setup_meters()
 	_setup_hold_sliders()
@@ -63,6 +70,17 @@ func _process(_delta: float) -> void:
 	_update_outputs()
 
 
+## 依麥克風收音狀態更新開關、重新偵測按鈕與警告文字。
+func _on_mic_status_changed(status: MicController.MicStatus) -> void:
+	_mic_enabled_check.set_pressed_no_signal(status != MicController.MicStatus.DISABLED)
+	_retry_button.disabled = status == MicController.MicStatus.DISABLED
+	_status_label.visible = status != MicController.MicStatus.LISTENING
+	match status:
+		MicController.MicStatus.NO_SIGNAL:
+			_status_label.text = "⚠ 沒有收到麥克風訊號，已停止收音（裝置不支援、被系統封鎖或權限未允許）。請換一個輸入裝置，或按「重新偵測」。"
+		MicController.MicStatus.DISABLED:
+			_status_label.text = "麥克風已停用。"
+
 func _setup_devices() -> void:
 	var devices: PackedStringArray = AudioServer.get_input_device_list()
 	for i in devices.size():
@@ -73,7 +91,7 @@ func _setup_devices() -> void:
 
 
 func _on_device_selected(index: int) -> void:
-	AudioServer.input_device = _device_option.get_item_text(index)
+	_controller.set_input_device(_device_option.get_item_text(index))
 
 
 ## 把控制器目前的設定灌進把手，並把拖曳結果寫回控制器。

@@ -81,11 +81,14 @@ func _on_action_changed(action: StringName) -> void:
 | `pitch_hz` | float | 目前音高（Hz），沒有明確音高時為 0 |
 | `action` | StringName | 目前按住的動作：`&"inhale"`、`&"exhale"`，沒有則 `&""` |
 | `last_action` | StringName | 最後一次按住的動作，放開後仍保留；還沒有過則為 `&""`。給 UI 顯示「最後辨識到的字音」用 |
+| `mic_status` | `MicController.MicStatus` | 麥克風收音狀態：`LISTENING` 收音中、`NO_SIGNAL` 一直收不到訊號而停止、`DISABLED` 已停用 |
+| `mic_enabled` | bool | 麥克風開關（會存檔），用 `set_mic_enabled()` 切換 |
 | `voicedness` | float 0～100 | 氣音軸即時值（0 = 嘶聲、100 = 母音），供畫面或除錯用 |
 
 | Signal | 說明 |
 |---|---|
 | `action_changed(action: StringName)` | `action` 改變時發出，放開時 `action` 為 `&""` |
+| `mic_status_changed(status)` | `mic_status` 改變時發出 |
 
 常數：`MicController.INHALE`、`MicController.EXHALE`。
 
@@ -115,6 +118,18 @@ func _on_action_changed(action: StringName) -> void:
 4. `voicedness <= inhale_max` 為吸區，輸出 `inhale`；`>= exhale_min` 為吐區，輸出 `exhale`；兩者之間不輸出。
 5. 落在某一區至少 `action_min_seconds` 才輸出，用來忽略爆音和過短的聲音。
 6. 同一次發音內，不會從吸切到吐（或反過來）。聲音中斷超過 `segment_gap_seconds` 才算新的一次發音。
+
+## 4.1 麥克風無法使用時
+
+開始收音後 1.5 秒（`NO_SIGNAL_TIMEOUT`）內一直收不到任何訊號（取樣全是 0），控制器會停止收音、發出一則 `push_warning`，並把 `mic_status` 改為 `NO_SIGNAL`。
+設定面板這時會顯示警告文字；玩家可以換輸入裝置（自動重新收音）或按「重新偵測」。面板上的「啟用麥克風」開關可以完全停用麥克風，停用狀態會存檔。
+
+相關函式：`start_microphone()`、`stop_microphone()`、`restart_microphone()`、`set_mic_enabled(enabled)`、`set_input_device(device)`。換輸入裝置請用 `set_input_device()`，不要直接改 `AudioServer.input_device`，否則不會重新收音。
+
+### Windows 的「unsupported channel count in microphone!」
+
+部分 Windows 裝置（例如多聲道的陣列麥克風、虛擬音效裝置）的聲道數 Godot 不支援，Godot 的 WASAPI 驅動會每個迴圈印一次 `thread_func: WASAPI: unsupported channel count in microphone!`，導致上萬則錯誤。這個訊息來自引擎 C++ 層，GDScript 無法關掉，所以做法是偵測到沒有訊號就停止收音，讓錯誤只出現很短一陣。
+要真正解決，請換一個輸入裝置（例如耳機麥克風），或在 Windows「聲音」設定裡把該麥克風的預設格式改成 1 或 2 聲道。
 
 ## 5. 設定參數
 
@@ -194,4 +209,4 @@ func _on_action_changed(action: StringName) -> void:
 - 開局音量校正（design.md 3.1：以遊戲開始時測到的音量作為基準）。
 - 雙麥克風（玩家 A、玩家 B）的裝置選擇與收音干擾處理（MIC-03）。
 - 用真人聲音實測並調整吸／吐的預設參數。
-- 輸出尚未接進正式遊戲場景（龍的移動、吸與吐的動作）。
+- 單機保底版已接進 game.tscn：`scenes/game/pitch_lane_input.gd` 用音高切三段控制龍的層（鍵盤 1／2／3 保留備援），吸／吐用鍵盤 J／K。`VoiceActionInput` 接語音吸／吐，左下角 `VoiceTogglePanel` 可分別開關音高與語音吸吐（`MicInput.pitch_input_enabled`／`action_input_enabled`）。音量換層尚未接。

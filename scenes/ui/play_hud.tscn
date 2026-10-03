@@ -1,0 +1,182 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/play_hud.gd" id="1_script"]
+[ext_resource type="Script" path="res://scenes/ui/volume_meter.gd" id="2_meter"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar"]
+content_margin_left = 40.0
+content_margin_top = 8.0
+content_margin_right = 40.0
+content_margin_bottom = 8.0
+bg_color = Color(0.08, 0.067, 0.125, 0.9)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 42
+corner_radius_top_right = 42
+corner_radius_bottom_right = 42
+corner_radius_bottom_left = 42
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 20.0
+content_margin_top = 18.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.08, 0.067, 0.125, 0.9)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="PlayHud" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="PotInfoContainer" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -320.0
+offset_top = 24.0
+offset_right = 320.0
+offset_bottom = 108.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bar")
+
+[node name="Row" type="HBoxContainer" parent="TopBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="CompletedLabel" type="Label" parent="TopBar/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+text = "完成 0 / 6"
+
+[node name="Divider" type="VSeparator" parent="TopBar/Row"]
+layout_mode = 2
+
+[node name="ClearedLabel" type="Label" parent="TopBar/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.48, 0.49, 1)
+theme_override_font_sizes/font_size = 38
+text = "✕ 清空 0 / 3"
+
+[node name="CountdownPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 120.0
+offset_right = 150.0
+offset_bottom = 184.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bar")
+
+[node name="CountdownLabel" type="Label" parent="CountdownPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "剩餘時間 1:00"
+horizontal_alignment = 1
+
+[node name="PlayerAPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = -480.0
+offset_right = 316.0
+offset_bottom = -30.0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Content" type="VBoxContainer" parent="PlayerAPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="PlayerAPanel/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_font_sizes/font_size = 30
+text = "玩家 A｜高度"
+horizontal_alignment = 1
+
+[node name="VolumeMeter" type="Control" parent="PlayerAPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+script = ExtResource("2_meter")
+
+[node name="PlayerBPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -316.0
+offset_top = -280.0
+offset_right = -36.0
+offset_bottom = -30.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Content" type="VBoxContainer" parent="PlayerBPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="PlayerBPanel/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_font_sizes/font_size = 30
+text = "玩家 B｜吸 / 吐"
+horizontal_alignment = 1
+
+[node name="WordLabel" type="Label" parent="PlayerBPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.75, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 88
+horizontal_alignment = 1
+vertical_alignment = 1

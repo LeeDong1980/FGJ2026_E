@@ -12,16 +12,23 @@ extends Node
 ## 這是 autoload（全域名稱 MicInput）：切換場景時設定與狀態都保留，設定也會存到 user://mic_settings.cfg。
 
 signal action_changed(action: StringName)
+## 麥克風收音狀態改變（LISTENING 收音中、NO_SIGNAL 一直收不到訊號而停止、DISABLED 已停用）
+signal mic_status_changed(status: MicStatus)
+
+enum MicStatus { LISTENING, NO_SIGNAL, DISABLED }
 
 const BUS_NAME := "MicInput"
 const SETTINGS_PATH := "user://mic_settings.cfg"
 ## 會被存檔的設定
 const SAVED_PROPERTIES: PackedStringArray = [
 	"volume_min_db", "volume_max_db", "volume_release_seconds",
-	"pitch_min_hz", "pitch_max_hz", "pitch_release_seconds",
+	"pitch_min_hz", "pitch_max_hz", "pitch_release_seconds", "pitch_gate_db",
 	"action_gate_db", "inhale_max", "exhale_min", "action_release_seconds",
+	"mic_enabled", "pitch_input_enabled", "action_input_enabled",
 ]
 const MIN_DB := -60.0
+## 開始收音後這麼久都沒有任何訊號，就視為麥克風無法使用並停止收音
+const NO_SIGNAL_TIMEOUT := 1.5
 const INHALE := &"inhale"
 const EXHALE := &"exhale"
 
@@ -44,7 +51,7 @@ const DETECT_MAX_HZ := 1000.0
 @export var pitch_max_hz: float = 500.0
 @export var pitch_release_seconds: float = 0.1
 ## 低於此音量不做音高判定（避免環境噪音誤判）
-@export var pitch_gate_db: float = -45.0
+@export var pitch_gate_db: float = -35.0
 ## 自相關峰值（0~1）低於此值視為沒有明確音高
 @export_range(0.0, 1.0) var min_correlation: float = 0.5
 
@@ -79,8 +86,17 @@ var voicedness: float = 100.0
 var action: StringName = &""
 ## 最後一次按住的動作，放開後仍保留（給 UI 顯示最後辨識到的字音）
 var last_action: StringName = &""
+## 麥克風收音狀態與開關（開關會存檔）
+var mic_status: MicStatus = MicStatus.LISTENING
+var mic_enabled: bool = true
+## 遊戲端是否採用音高（換層）與吸／吐（語音）輸出；只是給遊戲橋接讀的開關，不影響收音與分析，會存檔
+var pitch_input_enabled: bool = true
+var action_input_enabled: bool = true
 
 var _capture: AudioEffectCapture
+var _mic_player: AudioStreamPlayer
+var _silent_seconds: float = 0.0
+var _heard_signal: bool = false
 var _window: PackedFloat32Array = PackedFloat32Array()
 var _chunk_zcr: float = 0.0
 var _chunk_seconds: float = 0.0
@@ -100,11 +116,16 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	load_settings()
 	_setup_bus()
+	if mic_enabled:
+		start_microphone()
+	else:
+		mic_status = MicStatus.DISABLED
 
 
 func _process(delta: float) -> void:
 	if _consume_capture():
 		_on_chunk(_chunk_zcr, volume_db, _chunk_seconds)
+	_watch_for_signal(delta)
 	_update_outputs(delta)
 
 
@@ -134,7 +155,8 @@ func load_settings() -> void:
 	if device in AudioServer.get_input_device_list():
 		AudioServer.input_device = device
 
-## 建立靜音的 MicInput bus，掛 Capture 效果取得原始取樣，並由麥克風串流播放進去。
+
+## 建立靜音的 MicInput bus，掛 Capture 效果取得原始取樣；麥克風串流由 start_microphone() 開始播放。
 func _setup_bus() -> void:
 	var bus_index: int = AudioServer.get_bus_index(BUS_NAME)
 	if bus_index == -1:
@@ -145,11 +167,69 @@ func _setup_bus() -> void:
 		AudioServer.set_bus_mute(bus_index, true)
 	_capture = AudioServer.get_bus_effect(bus_index, 0) as AudioEffectCapture
 
-	var player := AudioStreamPlayer.new()
-	player.stream = AudioStreamMicrophone.new()
-	player.bus = BUS_NAME
-	add_child(player)
-	player.play()
+	_mic_player = AudioStreamPlayer.new()
+	_mic_player.stream = AudioStreamMicrophone.new()
+	_mic_player.bus = BUS_NAME
+	add_child(_mic_player)
+
+
+## 開始（或重新開始）收音，並重新計算「有沒有訊號」的等待時間。
+func start_microphone() -> void:
+	_mic_player.stop()
+	_capture.clear_buffer()
+	_silent_seconds = 0.0
+	_heard_signal = false
+	_mic_player.play()
+	_set_mic_status(MicStatus.LISTENING)
+
+
+## 停止收音。停止後 Godot 不會再向系統索取麥克風，也就不會繼續印出驅動層的錯誤。
+func stop_microphone(status: MicStatus = MicStatus.DISABLED) -> void:
+	_mic_player.stop()
+	_capture.clear_buffer()
+	_window.clear()
+	volume_db = MIN_DB
+	_set_mic_status(status)
+
+
+## 啟用或停用麥克風（會存檔）。
+func set_mic_enabled(enabled: bool) -> void:
+	mic_enabled = enabled
+	if enabled:
+		start_microphone()
+	else:
+		stop_microphone(MicStatus.DISABLED)
+
+
+## 重新偵測：停用中則不動作，否則重新開始收音。
+func restart_microphone() -> void:
+	if mic_enabled:
+		start_microphone()
+
+
+## 切換輸入裝置並重新開始收音。
+func set_input_device(device: String) -> void:
+	AudioServer.input_device = device
+	restart_microphone()
+
+
+func _set_mic_status(status: MicStatus) -> void:
+	if status == mic_status:
+		return
+	mic_status = status
+	mic_status_changed.emit(status)
+
+
+## 開始收音後一直收不到任何訊號（取樣全是 0）就停止收音。
+## 部分裝置（例如 Windows 上聲道數不支援的麥克風）會讓 Godot 的音訊驅動每個迴圈都印一次錯誤，
+## 這種情況下取樣永遠是 0；及早停止收音，錯誤就只會出現很短一陣，並留下一則警告。
+func _watch_for_signal(delta: float) -> void:
+	if mic_status != MicStatus.LISTENING or _heard_signal:
+		return
+	_silent_seconds += delta
+	if _silent_seconds >= NO_SIGNAL_TIMEOUT:
+		push_warning("MicInput: %.1f 秒內沒有收到任何麥克風訊號，已停止收音。可能是裝置不支援、被系統封鎖或權限未允許；請在暫停選單換輸入裝置或按「重新偵測」。" % NO_SIGNAL_TIMEOUT)
+		stop_microphone(MicStatus.NO_SIGNAL)
 
 
 ## 取出 capture buffer 內目前所有取樣：更新音量（RMS，dB）、零交越率，並推進音高分析視窗。
@@ -160,15 +240,19 @@ func _consume_capture() -> bool:
 	var buffer: PackedVector2Array = _capture.get_buffer(frames)
 	var sum_squares: float = 0.0
 	var crossings: int = 0
+	var peak: float = 0.0
 	var mono := PackedFloat32Array()
 	mono.resize(buffer.size())
 	for i in buffer.size():
 		var sample: float = (buffer[i].x + buffer[i].y) * 0.5
 		mono[i] = sample
 		sum_squares += sample * sample
+		peak = maxf(peak, absf(sample))
 		if i > 0 and (sample >= 0.0) != (mono[i - 1] >= 0.0):
 			crossings += 1
 	volume_db = maxf(linear_to_db(sqrt(sum_squares / buffer.size())), MIN_DB)
+	if peak > 0.0:
+		_heard_signal = true
 	_chunk_zcr = float(crossings) / buffer.size()
 	_chunk_seconds = buffer.size() / AudioServer.get_mix_rate()
 

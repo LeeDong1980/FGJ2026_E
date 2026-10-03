@@ -1,9 +1,12 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://c5ry0dajlv2f1"]
 
-[ext_resource type="Script" path="res://scenes/dragon/dragon.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bmsulwdyrcjd8" path="res://scenes/dragon/dragon.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/red_dragon/red_dragon.tscn" id="2_model"]
 
-[node name="Dragon" type="Node3D"]
+[node name="Dragon" type="Node3D" unique_id=1477901791]
+transform = Transform3D(4.5, 0, 0, 0, 4.5, 0, 0, 0, 4.5, 0, 0, 0)
 script = ExtResource("1_script")
 
-[node name="Model" parent="." instance=ExtResource("2_model")]
+[node name="Model" parent="." unique_id=1855008541 instance=ExtResource("2_model")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.92229396, 0)
+base_animation = &"fly"
