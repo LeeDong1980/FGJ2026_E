@@ -225,6 +225,7 @@ UIRoot (CanvasLayer)          UI 根節點，負責依遊戲狀態開關底下�
 | ThresholdLines | Control | 依各層門檻在音量條上畫線並標示層名 |
 | PlayerBPanel | PanelContainer | 玩家 B 面板 |
 | WordLabel | Label | 最後辨識到的字音「吸」或「吐」 |
+| CountdownPanel | PanelContainer | 倒數計時「剩餘時間 0:59」，在上方資訊列下方。**僅測試用**：正式遊戲不限時間，預設隱藏 |
 
 **需要的資料：**
 

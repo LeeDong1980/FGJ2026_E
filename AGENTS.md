@@ -14,8 +14,9 @@ Game Jam 3D 遊戲專案（玩法尚未決定，見 docs/design.md）。多人�
 - `scenes/ingredient/`：食材種類、食材資料與暫時食材模型。
 - `scenes/red_dragon/`：紅龍模型子場景。
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
+- `scenes/ui/`：UI 根場景與三個介面（遊戲開始、遊玩狀態、遊戲結束），以及疊在遊戲場景上的 UI 預覽場景、只測介面流程的 UI 測試場景（`ui_test.tscn`）。
 - `Models/`：模型與貼圖素材。
-- `docs/`：設計、開發慣例與任務清單。
+- `docs/`：設計、開發慣例與任務清單；`docs/images/` 放企劃書用的示意圖。
 
 新資料夾依 docs/conventions.md 的規則建立，建好後更新這一節。
 

@@ -45,6 +45,13 @@ autoload/          全域單例
 - `res://scenes/ingredient/ingredient_model.tscn` @露柑
 - `res://scenes/dungeon_room/dungeon_room.tscn` @Codex
 - `res://scenes/main/dragon_platform_showcase.tscn` @Codex
+- `res://scenes/ui/ui_root.tscn` @GMF
+- `res://scenes/ui/start_screen.tscn` @GMF
+- `res://scenes/ui/play_hud.tscn` @GMF
+- `res://scenes/ui/pot_info.tscn` @GMF
+- `res://scenes/ui/result_screen.tscn` @GMF
+- `res://scenes/ui/ui_preview.tscn` @GMF
+- `res://scenes/ui/ui_test.tscn` @GMF
 
 ## Git
 - `.import` 和 `.uid` 檔要 commit，`.godot/` 不要 commit
