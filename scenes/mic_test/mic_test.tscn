@@ -1,6 +1,8 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/mic_test/mic_test.gd" id="1_mic"]
+[ext_resource type="Script" path="res://scenes/mic_test/mic_controller.gd" id="2_ctrl"]
+[ext_resource type="Script" path="res://scenes/mic_test/range_meter.gd" id="3_meter"]
 
 [node name="MicTest" type="Control"]
 layout_mode = 3
@@ -11,6 +13,10 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mic")
 
+[node name="MicController" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_ctrl")
+
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -18,65 +24,211 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 48
-theme_override_constants/margin_top = 48
-theme_override_constants/margin_right = 48
-theme_override_constants/margin_bottom = 48
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
 
-[node name="VBox" type="VBoxContainer" parent="Margin"]
+[node name="Root" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="Margin/VBox"]
+[node name="Header" type="HBoxContainer" parent="Margin/Root"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Root/Header"]
 layout_mode = 2
 text = "麥克風輸入實驗"
 
-[node name="DeviceOption" type="OptionButton" parent="Margin/VBox"]
+[node name="DeviceOption" type="OptionButton" parent="Margin/Root/Header"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="VolumeBar" type="ProgressBar" parent="Margin/VBox"]
+[node name="Columns" type="HBoxContainer" parent="Margin/Root"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="SettingsPanel" type="VBoxContainer" parent="Margin/Root/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="SettingsTitle" type="Label" parent="Margin/Root/Columns/SettingsPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "觀察與設定（拖曳把手調整）"
+
+[node name="VolumeTitle" type="Label" parent="Margin/Root/Columns/SettingsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "音量"
+
+[node name="VolumeMeter" type="Control" parent="Margin/Root/Columns/SettingsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("3_meter")
+min_axis = -60.0
+max_axis = 0.0
+low_color = Color(0.22, 0.22, 0.25, 1)
+mid_color = Color(0.3, 0.6, 0.35, 1)
+high_color = Color(0.22, 0.22, 0.25, 1)
+
+[node name="VolumeHoldRow" type="HBoxContainer" parent="Margin/Root/Columns/SettingsPanel"]
+layout_mode = 2
+
+[node name="Caption" type="Label" parent="Margin/Root/Columns/SettingsPanel/VolumeHoldRow"]
+layout_mode = 2
+text = "持續按鍵：放開延遲"
+
+[node name="VolumeHold" type="HSlider" parent="Margin/Root/Columns/SettingsPanel/VolumeHoldRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+
+[node name="VolumeHoldLabel" type="Label" parent="Margin/Root/Columns/SettingsPanel/VolumeHoldRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+text = "0.10 秒"
+
+[node name="PitchTitle" type="Label" parent="Margin/Root/Columns/SettingsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "音高"
+
+[node name="PitchMeter" type="Control" parent="Margin/Root/Columns/SettingsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("3_meter")
+low_color = Color(0.22, 0.22, 0.25, 1)
+mid_color = Color(0.55, 0.4, 0.7, 1)
+high_color = Color(0.22, 0.22, 0.25, 1)
+
+[node name="PitchHoldRow" type="HBoxContainer" parent="Margin/Root/Columns/SettingsPanel"]
+layout_mode = 2
+
+[node name="Caption" type="Label" parent="Margin/Root/Columns/SettingsPanel/PitchHoldRow"]
+layout_mode = 2
+text = "持續按鍵：放開延遲"
+
+[node name="PitchHold" type="HSlider" parent="Margin/Root/Columns/SettingsPanel/PitchHoldRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+
+[node name="PitchHoldLabel" type="Label" parent="Margin/Root/Columns/SettingsPanel/PitchHoldRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+text = "0.10 秒"
+
+[node name="GateTitle" type="Label" parent="Margin/Root/Columns/SettingsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "吸／吐 音量閥值"
+
+[node name="GateMeter" type="Control" parent="Margin/Root/Columns/SettingsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("3_meter")
+min_axis = -60.0
+max_axis = 0.0
+two_handles = false
+low_color = Color(0.22, 0.22, 0.25, 1)
+high_color = Color(0.3, 0.6, 0.35, 1)
+
+[node name="ZoneTitle" type="Label" parent="Margin/Root/Columns/SettingsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "氣音區間（左 = 嘶聲 → 吸區，右 = 母音 → 吐區）"
+
+[node name="ZoneMeter" type="Control" parent="Margin/Root/Columns/SettingsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("3_meter")
+low_color = Color(0.9, 0.7, 0.1, 1)
+mid_color = Color(0.3, 0.3, 0.33, 1)
+high_color = Color(0.25, 0.55, 1, 1)
+
+[node name="ZoneHoldRow" type="HBoxContainer" parent="Margin/Root/Columns/SettingsPanel"]
+layout_mode = 2
+
+[node name="Caption" type="Label" parent="Margin/Root/Columns/SettingsPanel/ZoneHoldRow"]
+layout_mode = 2
+text = "持續按鍵：放開延遲"
+
+[node name="ZoneHold" type="HSlider" parent="Margin/Root/Columns/SettingsPanel/ZoneHoldRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+
+[node name="ZoneHoldLabel" type="Label" parent="Margin/Root/Columns/SettingsPanel/ZoneHoldRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+text = "0.10 秒"
+
+[node name="VSeparator" type="VSeparator" parent="Margin/Root/Columns"]
+layout_mode = 2
+
+[node name="OutputPanel" type="VBoxContainer" parent="Margin/Root/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="OutputTitle" type="Label" parent="Margin/Root/Columns/OutputPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "輸出結果"
+
+[node name="VolumeOutLabel" type="Label" parent="Margin/Root/Columns/OutputPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "音量"
+
+[node name="VolumeOutBar" type="ProgressBar" parent="Margin/Root/Columns/OutputPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
+step = 0.1
 show_percentage = false
 
-[node name="VolumeLabel" type="Label" parent="Margin/VBox"]
+[node name="PitchOutLabel" type="Label" parent="Margin/Root/Columns/OutputPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "-60.0 dB"
+text = "音高"
 
-[node name="PitchBar" type="ProgressBar" parent="Margin/VBox"]
+[node name="PitchOutBar" type="ProgressBar" parent="Margin/Root/Columns/OutputPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
-step = 0.001
+step = 0.1
 show_percentage = false
 
-[node name="PitchLabel" type="Label" parent="Margin/VBox"]
+[node name="ActionOutLabel" type="Label" parent="Margin/Root/Columns/OutputPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "--"
+theme_override_font_sizes/font_size = 28
+text = "吸／吐：--"
 
-[node name="ZcrBar" type="ProgressBar" parent="Margin/VBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 32)
-layout_mode = 2
-step = 0.001
-show_percentage = false
-
-[node name="ZcrLabel" type="Label" parent="Margin/VBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "ZCR 0.000"
-
-[node name="SyllableBars" type="HBoxContainer" parent="Margin/VBox"]
+[node name="ActionBars" type="HBoxContainer" parent="Margin/Root/Columns/OutputPanel"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="InhaleBar" type="ProgressBar" parent="Margin/VBox/SyllableBars"]
+[node name="InhaleBar" type="ProgressBar" parent="Margin/Root/Columns/OutputPanel/ActionBars"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 1.0
@@ -84,17 +236,11 @@ step = 0.001
 fill_mode = 1
 show_percentage = false
 
-[node name="ExhaleBar" type="ProgressBar" parent="Margin/VBox/SyllableBars"]
+[node name="ExhaleBar" type="ProgressBar" parent="Margin/Root/Columns/OutputPanel/ActionBars"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 1.0
 step = 0.001
 show_percentage = false
-
-[node name="SyllableLabel" type="Label" parent="Margin/VBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "--"
