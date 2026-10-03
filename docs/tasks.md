@@ -14,7 +14,7 @@
 - [x] 建立主場景並設為 main scene @Codex
 - [ ] 在 Input Map 設定操作按鍵（等操作方式確定）
 - [ ] 匯出 Windows 與 Web 版本測試效能，決定目標平台（Web 版可能要改用 Compatibility 渲染器）
-- [ ] 整理目前未提交改動，依功能分批 commit 並 push @Codex
+- [x] 整理目前未提交改動，依功能分批 commit 並 push @Codex
 
 ### 程式
 
