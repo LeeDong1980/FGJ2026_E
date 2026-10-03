@@ -1,0 +1,35 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/red_dragon/red_dragon.tscn" id="1_dragon"]
+[ext_resource type="PackedScene" path="res://scenes/platforms/platform_layout.tscn" id="2_platforms"]
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 1
+background_color = Color(0.12, 0.13, 0.15, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.78, 0.85, 1, 1)
+ambient_light_energy = 0.7
+reflected_light_source = 2
+tonemap_mode = 2
+
+[node name="DragonPlatformShowcase" type="Node3D"]
+
+[node name="RedDragon" parent="." instance=ExtResource("1_dragon")]
+position = Vector3(0, 0, -2.5)
+
+[node name="PlatformLayout" parent="." instance=ExtResource("2_platforms")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.9, -0.6, 0)
+light_color = Color(1, 0.91, 0.8, 1)
+light_energy = 1.4
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(0, 10, 14)
+rotation = Vector3(-0.6, 0, 0)
+current = true
+fov = 52.0

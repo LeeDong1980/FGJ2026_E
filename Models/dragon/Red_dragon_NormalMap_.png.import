@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2kdnfrqged7p"
+uid="uid://bbce2s6ipllgy"
 path.s3tc="res://.godot/imported/Red_dragon_NormalMap_.png-09e2f79c9e5cd64312567df8305a2585.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
@@ -30,7 +30,7 @@ compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=1
-roughness/src_normal="res://Models/Red_dragon_NormalMap_.png"
+roughness/src_normal="res://Models/dragon/Red_dragon_NormalMap_.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

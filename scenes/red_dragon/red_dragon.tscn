@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="PackedScene" uid="uid://dw5b1o2c20mkm" path="res://Models/dungeon/Red_dragon.glb" id="1_dragon"]
+[ext_resource type="PackedScene" uid="uid://dw5b1o2c20mkm" path="res://Models/dragon/Red_dragon.glb" id="1_dragon"]
 
 [node name="RedDragon" type="Node3D"]
 

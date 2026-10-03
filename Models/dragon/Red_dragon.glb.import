@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dgxbnjdkmr5f2"
-path="res://.godot/imported/Red_dragon.glb-e0968280da369f76b44ba0e886dcce5c.scn"
+uid="uid://dw5b1o2c20mkm"
+path="res://.godot/imported/Red_dragon.glb-f5661a0b762a08b051a0e4c801d3a0f5.scn"
 
 [deps]
 
-source_file="res://Models/Red_dragon.glb"
-dest_files=["res://.godot/imported/Red_dragon.glb-e0968280da369f76b44ba0e886dcce5c.scn"]
+source_file="res://Models/dragon/Red_dragon.glb"
+dest_files=["res://.godot/imported/Red_dragon.glb-f5661a0b762a08b051a0e4c801d3a0f5.scn"]
 
 [params]
 

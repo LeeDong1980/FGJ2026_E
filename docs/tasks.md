@@ -19,6 +19,7 @@
 - [x] SET-01 建立主場景並設為 main scene @Codex
 - [ ] SET-02 在 Input Map 設定操作按鍵（等操作方式確定）
 - [ ] SET-03 匯出 Windows 與 Web 版本測試效能，決定目標平台（Web 版可能要改用 Compatibility 渲染器）
+- [x] SET-04 整理目前未提交改動，依功能分批 commit 並 push @Codex
 
 ### 程式
 
@@ -34,6 +35,8 @@
 - [x] ART-02 修正模型搬移後的紅龍場景引用，使用 Models/dungeon/Red_dragon.glb @Codex
 - [x] ART-03 依參考圖在主場景排列左右各五個 Cube 平台，保留中央紅龍通道 @Codex
 - [x] ART-04 更新紅龍搬至 Models/dragon 後的場景及貼圖引用，檢查主場景與素材載入 @Codex
+- [x] ART-05 使用 Models/dungeon 素材建立參考圖風格的地牢房間，配置家具、燈光與攝影機 @Codex
+- [x] ART-06 製作地下城與龍族撫育幼龍房的概念美術供確認 @Codex
 
 ### 音效與 UI
 
