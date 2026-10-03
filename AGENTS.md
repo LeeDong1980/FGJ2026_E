@@ -9,6 +9,9 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 ## 資料夾結構
 - `scenes/main/`：主場景。
 - `scenes/dungeon_room/`：地牢房間，包含 dungeon 模型實例、材質、碰撞、燈光與攝影機。
+- `scenes/game/`：遊戲場景，含 GameManager（遊戲狀態）、樓層產生（LaneLayout）、食材畫面與鍵盤測試輸入。
+- `scenes/dragon/`：可操控的龍（移動腳本＋紅龍模型）。
+- `scenes/ingredient/`：食材種類、食材資料與暫時食材模型。
 - `scenes/red_dragon/`：紅龍模型子場景。
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
 - `scenes/rooms/`：prototype 勇者挑戰房、幼龍哺育房、通用天花板與垂直樓層子場景。
@@ -22,6 +25,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `docs/tasks.md`：任務清單。**每次開始任務前都要讀**。
 - `docs/design.md`：玩法、操作、勝敗條件、範圍。實作遊戲功能前先讀。
 - `docs/conventions.md`：命名、資料夾、場景歸屬規則。新增或修改檔案、場景前先讀。
+- `docs/api.md`：遊戲機制對外的函式與 signal（給 UI 與麥克風輸入）。
 - `docs/art_asset_needs.md`：prototype 缺素材表、派工進度與模組接口。美術總監在素材到位、交付及進度回報時更新。
 - `docs/asset_credits.md`：第三方資源清單。記錄模型、素材的來源連結與授權。
 
