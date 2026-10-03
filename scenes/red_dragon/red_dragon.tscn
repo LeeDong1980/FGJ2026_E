@@ -1,9 +1,22 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="PackedScene" uid="uid://dw5b1o2c20mkm" path="res://Models/dragon/Red_dragon.glb" id="1_dragon"]
+[ext_resource type="Script" uid="uid://c46k8miq8xpyr" path="res://scenes/red_dragon/red_dragon.gd" id="2_animation"]
 
 [node name="RedDragon" type="Node3D"]
+script = ExtResource("2_animation")
 
 [node name="Model" parent="." instance=ExtResource("1_dragon")]
 position = Vector3(0, 0.005511, 1.488613)
 scale = Vector3(0.05, 0.05, 0.05)
+
+[node name="MouthAttachment" type="BoneAttachment3D" parent="Model/Armature/Skeleton3D"]
+bone_name = "head2"
+bone_idx = 17
+
+[node name="MouthAnchor" type="Marker3D" parent="Model/Armature/Skeleton3D/MouthAttachment"]
+unique_name_in_owner = true
+position = Vector3(-0.057775, 4.813392, -0.658379)
+rotation = Vector3(1.5707963, 0, 0)
+
+[editable path="Model"]
