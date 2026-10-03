@@ -24,6 +24,9 @@
 ### 程式
 
 #### 麥克風輸入（山雷）
+- [ ] MIC-01 玩家 A 麥克風音量輸入：取樣音量、開局校正、輸出層級（高／中／低） @山雷
+- [ ] MIC-02 玩家 B 字音辨識：辨識「吸」「吐」並發出對應 signal @山雷
+- [ ] MIC-03 雙麥克風裝置選擇與收音干擾處理 @山雷
 
 #### 遊戲機制（露柑）
 - [ ] GM-01 建立 `scenes/game/game.tscn` 與獨立的 LaneLayout 節點：依 `@export` 的層數與層距產生各層左右平台（實例化 cube_platform.tscn），提供 `get_lane_position(i)`、`get_lane_at(z)` @露柑
