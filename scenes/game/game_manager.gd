@@ -12,7 +12,7 @@ signal ingredient_swallowed(lane: int, ingredient: IngredientState)
 signal ingredient_burned(lane: int, ingredient: IngredientState)
 ## 胃裡的食材吐進了鍋子。
 signal ingredient_spat(lane: int, ingredient: IngredientState)
-## 喊了吸或吐，但沒有效果。
+## 喊了吸或吐，但沒有效果（噴火時是一開始就沒有可以燒的食材）。
 signal suck_missed(lane: int)
 signal spit_missed(lane: int)
 ## 胃袋內容改變，胃空時 ingredient 為 null。
@@ -27,6 +27,8 @@ signal game_won
 signal game_lost
 
 @export var lane_layout: LaneLayout
+## 吸與吐都作用在龍目前所在的層。
+@export var dragon: Dragon
 
 @export_group("食材隊伍")
 @export var ingredient_speed: float = 2.0
@@ -45,6 +47,10 @@ signal game_lost
 ## 舊小龍離開到新小龍到位的秒數。
 @export var baby_swap_time: float = 2.0
 
+@export_group("噴火")
+## 持續噴火多少秒才會燒掉一個食材。
+@export var burn_time: float = 1.0
+
 @export_group("勝敗")
 @export var pots_to_win: int = 6
 @export var clears_to_lose: int = 3
@@ -55,6 +61,10 @@ var stomach: IngredientState = null
 var completed_count: int = 0
 var cleared_count: int = 0
 var is_game_over: bool = false
+## 玩家正在持續喊「吐」。
+var is_spitting: bool = false
+## 這次按下「吐」已經把食材吐進鍋子，放開前不會接著噴火。
+var _spit_used_for_pot: bool = false
 
 
 func _ready() -> void:
@@ -70,12 +80,14 @@ func _process(delta: float) -> void:
 	for i in lanes.size():
 		_advance_queue(lanes[i], delta)
 		_try_spawn(i)
+	_update_burning(delta)
 
 
 ## 胃袋空著時，把所在層最前端的食材吞進胃袋。
-func suck(lane: int) -> void:
+func suck() -> void:
 	if is_game_over:
 		return
+	var lane := dragon.current_lane
 	var ingredient: IngredientState = get_front(lane) if stomach == null else null
 	if ingredient == null:
 		suck_missed.emit(lane)
@@ -86,14 +98,23 @@ func suck(lane: int) -> void:
 	stomach_changed.emit(stomach)
 
 
-## 胃袋有食材就吐進所在層的鍋子，胃袋空著就噴火燒掉最前端的食材。
-func spit(lane: int) -> void:
+## 開始喊「吐」。胃袋有食材就立刻吐進所在層的鍋子；胃袋空著就開始噴火，持續到 spit_released()。
+func spit_pressed() -> void:
 	if is_game_over:
 		return
-	if stomach == null:
-		_burn(lane)
-	else:
+	is_spitting = true
+	var lane := dragon.current_lane
+	if stomach != null:
+		_spit_used_for_pot = true
 		_spit_into_pot(lane)
+	elif get_front(lane) == null:
+		spit_missed.emit(lane)
+
+
+## 停止喊「吐」。
+func spit_released() -> void:
+	is_spitting = false
+	_spit_used_for_pot = false
 
 
 ## 最前端的食材已經走到停止位置才回傳，否則回傳 null。
@@ -108,13 +129,18 @@ func get_pot(lane: int) -> PotState:
 	return pots[lane]
 
 
-func _burn(lane: int) -> void:
+## 持續噴火時，累計所在層最前端食材的燒毀進度。
+func _update_burning(delta: float) -> void:
+	if not is_spitting or _spit_used_for_pot or stomach != null or is_game_over:
+		return
+	var lane := dragon.current_lane
 	var ingredient := get_front(lane)
 	if ingredient == null:
-		spit_missed.emit(lane)
 		return
-	_take_front(lane)
-	ingredient_burned.emit(lane, ingredient)
+	ingredient.burn_progress = minf(ingredient.burn_progress + delta / burn_time, 1.0)
+	if ingredient.burn_progress >= 1.0:
+		_take_front(lane)
+		ingredient_burned.emit(lane, ingredient)
 
 
 func _spit_into_pot(lane: int) -> void:

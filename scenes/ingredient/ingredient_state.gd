@@ -4,6 +4,8 @@ extends RefCounted
 
 var type: IngredientType.Type
 var x: float
+## 被噴火燒的進度，0～1，到 1 就燒掉。中途停止噴火不會歸零。
+var burn_progress: float = 0.0
 
 
 func _init(p_type: IngredientType.Type, p_x: float) -> void:

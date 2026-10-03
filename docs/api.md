@@ -17,12 +17,14 @@
 | 呼叫 | 用途 |
 |---|---|
 | `dragon.set_target_lane(lane: int)` | 設定目標層，龍會等速飛過去。0 是最低層 |
-| `game_manager.suck(dragon.current_lane)` | 玩家 B 喊「吸」 |
-| `game_manager.spit(dragon.current_lane)` | 玩家 B 喊「吐」 |
+| `game_manager.suck()` | 玩家 B 喊「吸」 |
+| `game_manager.spit_pressed()` | 玩家 B 開始喊「吐」 |
+| `game_manager.spit_released()` | 玩家 B 停止喊「吐」 |
 
-- 吸和吐一律傳 `dragon.current_lane`（龍目前位置所在的層），不是目標層。
+- 吸和吐一律作用在龍目前位置所在的層（`dragon.current_lane`），不需要傳層的編號。
+- 「吐」要回報開始和結束：胃袋有食材時，`spit_pressed()` 一呼叫就吐進鍋子；胃袋空著時是噴火，要持續到 `spit_released()`，累計 `burn_time` 秒（預設 1 秒）才燒掉一個食材。
 - 層數：`game_manager.lane_layout.lane_count`。
-- 鍵盤測試輸入 `scenes/game/keyboard_input.gd` 就是用這三個呼叫，可以當作範例。
+- 鍵盤測試輸入 `scenes/game/keyboard_input.gd` 就是用這些呼叫（按住 K 噴火），可以當作範例。
 
 ## 給 UI：查詢資料
 
@@ -37,6 +39,8 @@
 | `game_manager.completed_count` / `pots_to_win` | `int` | 完成鍋數 / 成功需要的鍋數 |
 | `game_manager.cleared_count` / `clears_to_lose` | `int` | 清空次數 / 失敗需要的次數 |
 | `game_manager.is_game_over` | `bool` | 遊戲是否已結束 |
+| `game_manager.is_spitting` | `bool` | 玩家 B 正在持續喊「吐」 |
+| `IngredientState.burn_progress` | `float` | 食材被燒的進度，0～1；中途停止噴火不會歸零 |
 | `dragon.current_lane` | `int` | 龍目前所在的層 |
 | `IngredientType.NAMES[type]` | `String` | 食材的中文名稱 |
 
@@ -56,7 +60,7 @@
 | `ingredient_swallowed(lane, ingredient)` | 食材被吞進胃袋 |
 | `ingredient_spat(lane, ingredient)` | 胃裡的食材吐進鍋子 |
 | `ingredient_burned(lane, ingredient)` | 食材被噴火燒掉 |
-| `suck_missed(lane)` / `spit_missed(lane)` | 喊了吸或吐但沒有效果（可以用來播放空動作） |
+| `suck_missed(lane)` / `spit_missed(lane)` | 喊了吸或吐但沒有效果（可以用來播放空動作）。噴火時只在一開始沒有可燒的食材才會發出 |
 
 `Dragon`：
 

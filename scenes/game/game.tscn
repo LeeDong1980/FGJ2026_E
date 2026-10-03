@@ -17,9 +17,10 @@ ambient_light_energy = 0.7
 reflected_light_source = 2
 tonemap_mode = 2
 
-[node name="Game" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout")]
+[node name="Game" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
 script = ExtResource("4_manager")
 lane_layout = NodePath("LaneLayout")
+dragon = NodePath("Dragon")
 
 [node name="LaneLayout" type="Node3D" parent="." unique_id=835830840]
 script = ExtResource("1_lanes")
