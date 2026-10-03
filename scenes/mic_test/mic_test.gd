@@ -12,8 +12,8 @@ const EXHALE := &"exhale"
 const INHALE_COLOR := Color(1.0, 0.8, 0.1)
 const EXHALE_COLOR := Color(0.25, 0.55, 1.0)
 
-## 辨認結果在指示條上停留的秒數
-const RESULT_HOLD_SECONDS := 1.5
+## 辨認成功後指示條顯示的秒數，時間到立刻歸零
+const RESULT_HOLD_SECONDS := 0.5
 
 ## 低於此音量不做音高判定（避免環境噪音誤判）
 @export var pitch_gate_db: float = -40.0
@@ -224,7 +224,7 @@ func _note_name(hz: float) -> String:
 
 
 
-## 依目前 chunk 推進發音分段：開始、累積、結束時分類。進行中時即時更新指示條。
+## 依目前 chunk 推進發音分段：開始、累積、結束時分類。
 func _update_syllable() -> void:
 	if _segment.is_empty():
 		if _volume_db >= syllable_onset_db:
@@ -240,13 +240,6 @@ func _update_syllable() -> void:
 			_quiet_seconds = 0.0
 		if _quiet_seconds >= syllable_release_seconds:
 			_finish_segment()
-			return
-
-	# 進行中：氣音比例越高越偏左（吸），越低越偏右（吐）
-	var ratio: float = _segment_stats().x
-	_inhale_level = ratio
-	_exhale_level = 1.0 - ratio
-	_hold_seconds = 0.0
 
 
 ## 目前這段發音的統計，回傳 Vector3(氣音比例, 有效秒數, 峰值 dB)。
@@ -270,14 +263,13 @@ func _segment_stats() -> Vector3:
 	return Vector3(ratio, total_seconds, peak_db)
 
 
-## 發音結束：分類並輸出 signal，指示條停留在最終結果。
+## 發音結束：分類並輸出 signal，只有辨認成功才點亮指示條。
 func _finish_segment() -> void:
 	var stats: Vector3 = _segment_stats()
 	_segment.clear()
 	_quiet_seconds = 0.0
 	if stats.y < syllable_min_seconds:
-		_inhale_level = 0.0
-		_exhale_level = 0.0
+		_syllable_label.text = "太短（%.2f 秒），已忽略" % stats.y
 		return
 
 	var ratio: float = stats.x
@@ -286,22 +278,22 @@ func _finish_segment() -> void:
 		kind = INHALE
 	elif ratio <= exhale_ratio:
 		kind = EXHALE
-	_syllable_label.text = "%s（氣音比例 %.2f，%.2f 秒）" % [kind if kind != &"" else "unknown", ratio, stats.y]
-	_inhale_level = ratio
-	_exhale_level = 1.0 - ratio
+	_syllable_label.text = "%s（氣音比例 %.2f，%.2f 秒）" % [kind if kind != &"" else "unknown，已忽略", ratio, stats.y]
+	if kind == &"":
+		return
+	_inhale_level = 1.0 if kind == INHALE else 0.0
+	_exhale_level = 1.0 if kind == EXHALE else 0.0
 	_hold_seconds = RESULT_HOLD_SECONDS
-	if kind != &"":
-		syllable_recognized.emit(kind)
+	syllable_recognized.emit(kind)
 
 
-## 更新左（吸，黃）右（吐，藍）指示條；結果停留結束後淡出。
+## 更新左（吸，黃）右（吐，藍）指示條：只在辨認成功時亮 RESULT_HOLD_SECONDS 秒，之後歸零。
 func _update_syllable_bars(delta: float) -> void:
-	if _segment.is_empty():
-		if _hold_seconds > 0.0:
-			_hold_seconds -= delta
-		else:
-			_inhale_level = move_toward(_inhale_level, 0.0, delta * 2.0)
-			_exhale_level = move_toward(_exhale_level, 0.0, delta * 2.0)
+	if _hold_seconds > 0.0:
+		_hold_seconds -= delta
+		if _hold_seconds <= 0.0:
+			_inhale_level = 0.0
+			_exhale_level = 0.0
 	_inhale_bar.value = _inhale_level
 	_exhale_bar.value = _exhale_level
 
