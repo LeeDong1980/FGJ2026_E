@@ -1,7 +1,32 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://spvsuc3vpm6y"]
 
-[ext_resource type="PackedScene" path="res://scenes/dungeon_room/dungeon_room.tscn" id="1_room"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/prototype_floor.tscn" id="Ext1"]
+[ext_resource type="PackedScene" path="res://scenes/red_dragon/red_dragon.tscn" id="Ext2"]
+[ext_resource type="PackedScene" path="res://scenes/main/prototype_presentation.tscn" id="Ext3"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/dragon_effects.tscn" id="DragonEffects"]
 
-[node name="Main" type="Node3D"]
+[node name="Main" type="Node3D" unique_id=1308509842]
 
-[node name="DungeonRoom" parent="." instance=ExtResource("1_room")]
+[node name="Floors" type="Node3D" parent="." unique_id=697491627]
+
+[node name="LowFloor" parent="Floors" unique_id=1631948770 instance=ExtResource("Ext1")]
+
+[node name="MiddleFloor" parent="Floors" unique_id=1297753695 instance=ExtResource("Ext1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+floor_index = 1
+
+[node name="HighFloor" parent="Floors" unique_id=959884622 instance=ExtResource("Ext1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+floor_index = 2
+
+[node name="RedDragon" parent="." unique_id=1900174303 instance=ExtResource("Ext2")]
+unique_name_in_owner = true
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 6.4, -16.018951)
+base_animation = &"fly"
+metadata/initial_floor = 1
+
+[node name="PrototypePresentation" parent="." unique_id=19663475 instance=ExtResource("Ext3")]
+
+[node name="Effects" parent="." instance=ExtResource("DragonEffects")]
+unique_name_in_owner = true
+dragon_path = NodePath("../RedDragon")

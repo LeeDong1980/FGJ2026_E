@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://Models/dragonEggs/dragon_egg_lowpoly.glb" id="1_egg"]
+
+[node name="DragonEggLowpoly" type="Node3D"]
+metadata/display_height = 0.9
+
+[node name="Model" parent="." instance=ExtResource("1_egg")]
+position = Vector3(-0, 0.45, -0)
+scale = Vector3(0.387639284, 0.387639284, 0.387639284)
