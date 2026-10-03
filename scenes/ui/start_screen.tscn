@@ -1,0 +1,215 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/start_screen.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://scenes/ui/game_logo.png" id="2_logo"]
+
+[sub_resource type="Gradient" id="Gradient_bottom"]
+colors = PackedColorArray(0.043, 0.035, 0.07, 0, 0.043, 0.035, 0.07, 0.85)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_bottom"]
+gradient = SubResource("Gradient_bottom")
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+content_margin_left = 28.0
+content_margin_top = 22.0
+content_margin_right = 28.0
+content_margin_bottom = 26.0
+bg_color = Color(0.08, 0.067, 0.125, 0.82)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.94, 0.66, 0.19, 1)
+corner_radius_top_left = 55
+corner_radius_top_right = 55
+corner_radius_bottom_right = 55
+corner_radius_bottom_left = 55
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(1, 0.75, 0.3, 1)
+corner_radius_top_left = 55
+corner_radius_top_right = 55
+corner_radius_bottom_right = 55
+corner_radius_bottom_left = 55
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.8, 0.55, 0.14, 1)
+corner_radius_top_left = 55
+corner_radius_top_right = 55
+corner_radius_bottom_right = 55
+corner_radius_bottom_left = 55
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_focus"]
+draw_center = false
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 0.85)
+corner_radius_top_left = 55
+corner_radius_top_right = 55
+corner_radius_bottom_right = 55
+corner_radius_bottom_left = 55
+expand_margin_left = 6.0
+expand_margin_top = 6.0
+expand_margin_right = 6.0
+expand_margin_bottom = 6.0
+
+[node name="StartScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_logo")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BottomShade" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -320.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = SubResource("GradientTexture2D_bottom")
+expand_mode = 1
+
+[node name="PlayerACard" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 60.0
+offset_top = -60.0
+offset_right = 500.0
+offset_bottom = 150.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="Content" type="VBoxContainer" parent="PlayerACard"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="PlayerACard/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_font_sizes/font_size = 36
+text = "玩家 A｜控制高度"
+horizontal_alignment = 1
+
+[node name="Separator" type="HSeparator" parent="PlayerACard/Content"]
+layout_mode = 2
+
+[node name="BodyLabel" type="Label" parent="PlayerACard/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_constants/line_spacing = 14
+theme_override_font_sizes/font_size = 28
+text = "用音量控制龍的高度
+大聲飛高、小聲飛低"
+horizontal_alignment = 1
+
+[node name="PlayerBCard" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -60.0
+offset_right = -60.0
+offset_bottom = 150.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="Content" type="VBoxContainer" parent="PlayerBCard"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="PlayerBCard/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_font_sizes/font_size = 36
+text = "玩家 B｜吸與吐"
+horizontal_alignment = 1
+
+[node name="Separator" type="HSeparator" parent="PlayerBCard/Content"]
+layout_mode = 2
+
+[node name="BodyLabel" type="Label" parent="PlayerBCard/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_constants/line_spacing = 14
+theme_override_font_sizes/font_size = 28
+text = "喊「吸」把食材吞進胃袋
+喊「吐」吐進鍋子，胃空時噴火"
+horizontal_alignment = 1
+
+[node name="Footer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = -200.0
+offset_right = 500.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 18
+alignment = 2
+
+[node name="ButtonRow" type="CenterContainer" parent="Footer"]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="Footer/ButtonRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_colors/font_hover_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_colors/font_pressed_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_colors/font_focus_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_font_sizes/font_size = 44
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
+text = "開始遊戲"
+
+[node name="CalibrationHint" type="Label" parent="Footer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.85)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 26
+text = "按下開始遊戲時請保持安靜，遊戲會以當下的聲音校正麥克風"
+horizontal_alignment = 1
