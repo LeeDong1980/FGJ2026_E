@@ -1,10 +1,10 @@
 class_name PotsDebugView
 extends Node3D
-## 測試用：在右平台放暫時的鍋子，上方顯示禁止清單與進度。正式介面由 UI 負責。
+## 測試用：在各層鍋子上方顯示禁止清單與進度。正式介面由 UI 負責。
 
 @export var game_manager: GameManager
 @export var lane_layout: LaneLayout
-@export var pot_x: float = 3.8
+## 標籤在鍋子定位點上方的高度。
 @export var label_height: float = 1.4
 
 var _labels: Array[Label3D] = []
@@ -12,18 +12,8 @@ var _labels: Array[Label3D] = []
 
 func _ready() -> void:
 	for i in lane_layout.lane_count:
-		var y := lane_layout.position.y + lane_layout.get_lane_position(i)
-		var pot := MeshInstance3D.new()
-		var mesh := CylinderMesh.new()
-		mesh.top_radius = 0.45
-		mesh.bottom_radius = 0.35
-		mesh.height = 0.5
-		pot.mesh = mesh
-		pot.position = Vector3(pot_x, y + 0.25, 0.0)
-		add_child(pot)
-
 		var label := Label3D.new()
-		label.position = Vector3(pot_x, y + label_height, 0.0)
+		label.position = lane_layout.position + lane_layout.get_anchor_position(i, &"PotAnchor") + Vector3.UP * label_height
 		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		label.font_size = 40
 		label.outline_size = 10

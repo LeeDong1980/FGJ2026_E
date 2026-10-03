@@ -19,8 +19,9 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	for ingredient: IngredientState in _models:
-		var y := lane_layout.position.y + lane_layout.get_lane_position(_lanes[ingredient])
-		_models[ingredient].position = Vector3(ingredient.x, y, 0.0)
+		# 隊伍沿著房間定位點的高度與深度排列。
+		var anchor := lane_layout.get_anchor_position(_lanes[ingredient], &"QueueFrontAnchor")
+		_models[ingredient].position = lane_layout.position + Vector3(ingredient.x, anchor.y, anchor.z)
 		_models[ingredient].set_burn_progress(ingredient.burn_progress)
 
 
