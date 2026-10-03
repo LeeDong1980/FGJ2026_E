@@ -46,6 +46,8 @@ autoload/          全域單例
 - `res://scenes/ingredient/ingredient_model.tscn` @露柑
 - `res://scenes/dungeon_room/dungeon_room.tscn` @Codex
 - `res://scenes/main/dragon_platform_showcase.tscn` @Codex
+- `res://scenes/lobby/lobby.tscn` @Samuel
+- `res://scenes/network_test/network_test.tscn` @Samuel
 - `res://scenes/mic_test/mic_test.tscn` @山雷
 - `res://scenes/pause_menu/pause_menu.tscn` @山雷
 - `res://scenes/pause_menu/mic_settings_panel.tscn` @山雷

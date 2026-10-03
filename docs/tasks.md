@@ -6,7 +6,7 @@
 編號規則：
 - 編號是「區塊代號-兩位數流水號」，例如 `GM-03`。新任務取該區塊目前最大的號碼 +1。
 - 編號給出後就不再更動；任務刪除或取消，編號也不再使用。
-- 區塊代號：`DES` 設計、`SET` 專案設定、`MIC` 麥克風輸入、`GM` 遊戲機制、`UI` UI 程式、`ART` 美術與關卡、`SND` 音效與 UI 素材、`EX` 有時間再做。
+- 區塊代號：`DES` 設計、`SET` 專案設定、`MIC` 麥克風輸入、`GM` 遊戲機制、`UI` UI 程式、`NET` 區網連線、`ART` 美術與關卡、`SND` 音效與 UI 素材、`EX` 有時間再做。
 
 2026-10-03：使用者要求本輪先收尾，停止新增製作／配置，待辦保留；接續狀態見 `docs/prototype_art_handoff.md`。尚未完整驗收，未 commit／push。
 
@@ -63,6 +63,12 @@
 - [ ] UI-08 準備支援繁體中文的字型與 UI Theme
 - [ ] UI-09 和遊戲機制、麥克風輸入確認 UI 需要的 signal 與資料（鍋子狀態、勝敗、音量、辨識結果）
 - [ ] UI-10 請主場景負責人把 UI 根場景放進 main.tscn
+
+#### 區網連線（Samuel）
+- [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel
+- [x] NET-04 語音封包傳輸測試：Client 傳音量與「吸／吐」封包給 Host，兩邊畫面顯示收發狀態與錯誤（掉包、無回應、斷線） @Samuel
+- [ ] NET-02 雙機同步骨架：MultiplayerSpawner／Synchronizer 同步龍的所在層，Server 權威，樓層產生用同一個 seed（等 GM-01、GM-02 完成）
+- [ ] NET-03 雙機分工：Host 與 Client 各自負責移動／動作其中一項輸入（等 DES 決定操作方式）
 
 ### 美術與關卡
 

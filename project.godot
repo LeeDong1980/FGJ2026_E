@@ -23,6 +23,7 @@ driver/enable_input=true
 
 MicInput="*res://autoload/mic_controller.gd"
 PauseMenu="*res://scenes/pause_menu/pause_menu.tscn"
+NetworkManager="*res://autoload/network_manager.gd"
 
 [display]
 

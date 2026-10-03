@@ -1,0 +1,66 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/lobby/lobby.gd" id="1_lobby"]
+
+[node name="Lobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lobby")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "區網連線"
+horizontal_alignment = 1
+
+[node name="HostButton" type="Button" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "建立房間"
+
+[node name="LocalIpLabel" type="Label" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Center/Panel"]
+layout_mode = 2
+
+[node name="IpInput" type="LineEdit" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "127.0.0.1"
+placeholder_text = "Host 的 IP，例如 192.168.1.10"
+
+[node name="JoinButton" type="Button" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "加入房間"
+
+[node name="LeaveButton" type="Button" parent="Center/Panel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "離開"
+
+[node name="StatusLabel" type="Label" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3

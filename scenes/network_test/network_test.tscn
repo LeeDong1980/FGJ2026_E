@@ -1,0 +1,109 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/network_test/network_test.gd" id="1_test"]
+[ext_resource type="PackedScene" path="res://scenes/lobby/lobby.tscn" id="2_lobby"]
+
+[node name="NetworkTest" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_test")
+
+[node name="Split" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Lobby" parent="Split" instance=ExtResource("2_lobby")]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+
+[node name="Right" type="VBoxContainer" parent="Split"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="RoleLabel" type="Label" parent="Split/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="HostPanel" type="VBoxContainer" parent="Split/Right"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PeerLabel" type="Label" parent="Split/Right/HostPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VolumeBar" type="ProgressBar" parent="Split/Right/HostPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+
+[node name="WordLabel" type="Label" parent="Split/Right/HostPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="StatsLabel" type="Label" parent="Split/Right/HostPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="AgeLabel" type="Label" parent="Split/Right/HostPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ClientPanel" type="VBoxContainer" parent="Split/Right"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="VolumeSlider" type="HSlider" parent="Split/Right/ClientPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.5
+
+[node name="StreamCheck" type="CheckButton" parent="Split/Right/ClientPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "持續傳送音量（每秒 20 次）"
+
+[node name="Words" type="HBoxContainer" parent="Split/Right/ClientPanel"]
+layout_mode = 2
+
+[node name="SuckButton" type="Button" parent="Split/Right/ClientPanel/Words"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "送出「吸」"
+
+[node name="SpitButton" type="Button" parent="Split/Right/ClientPanel/Words"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "送出「吐」"
+
+[node name="AckLabel" type="Label" parent="Split/Right/ClientPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Log" type="RichTextLabel" parent="Split/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
