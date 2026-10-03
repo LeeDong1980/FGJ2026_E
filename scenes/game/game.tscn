@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://scenes/game/ingredients_view.gd" id="5_view"]
 [ext_resource type="Script" path="res://scenes/game/pots_debug_view.gd" id="6_pots_debug"]
 [ext_resource type="Script" path="res://scenes/game/stomach_debug_view.gd" id="7_stomach_debug"]
-[ext_resource type="Script" path="res://scenes/game/voice_action_input.gd" id="8_voice"]
+[ext_resource type="Script" path="res://scenes/game/pitch_lane_input.gd" id="8_pitch"]
 
 [sub_resource type="Environment" id="Environment_game"]
 background_mode = 1
@@ -49,8 +49,9 @@ script = ExtResource("3_keyboard")
 dragon = NodePath("../Dragon")
 game_manager = NodePath("..")
 
-[node name="VoiceActionInput" type="Node" parent="." node_paths=PackedStringArray("game_manager")]
-script = ExtResource("8_voice")
+[node name="PitchLaneInput" type="Node" parent="." node_paths=PackedStringArray("dragon", "game_manager")]
+script = ExtResource("8_pitch")
+dragon = NodePath("../Dragon")
 game_manager = NodePath("..")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2134861306]
