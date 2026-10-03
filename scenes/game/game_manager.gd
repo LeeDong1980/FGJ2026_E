@@ -3,7 +3,11 @@ extends Node3D
 ## 保存並推進遊戲狀態：各層的食材隊伍、鍋子與小龍、龍的胃袋、勝敗。畫面只讀這裡的資料。
 ## 對外接口的說明見 docs/api.md。
 
+enum GameState { WAITING, PLAYING, ENDED }
 enum BabyLeaveReason { COMPLETED, KICKED }
+
+## start_game() 之後發出，此時已重置完畢並開始遊玩。
+signal game_started
 
 signal ingredient_spawned(lane: int, ingredient: IngredientState)
 ## 食材離開隊伍（被吞下或燒掉）。
@@ -60,32 +64,40 @@ var pots: Array[PotState] = []
 var stomach: IngredientState = null
 var completed_count: int = 0
 var cleared_count: int = 0
-var is_game_over: bool = false
+## WAITING：場景擺好但靜止，等待 start_game()。PLAYING：遊玩中。ENDED：已分出勝敗。
+var state: GameState = GameState.WAITING
 ## 玩家正在持續喊「吐」。
 var is_spitting: bool = false
 ## 這次按下「吐」已經把食材吐進鍋子，放開前不會接著噴火。
 var _spit_used_for_pot: bool = false
+## 每次重置加一，用來忽略上一局還沒觸發的換小龍計時。
+var _round: int = 0
 
 
 func _ready() -> void:
-	for i in lane_layout.lane_count:
-		lanes.append(LaneState.new())
-		for k in max_ingredients_per_lane:
-			_spawn(i, front_x - k * ingredient_spacing)
-		pots.append(PotState.new())
-		_baby_arrive(i)
+	_setup_round()
 
 
 func _process(delta: float) -> void:
+	if state != GameState.PLAYING:
+		return
 	for i in lanes.size():
 		_advance_queue(lanes[i], delta)
 		_try_spawn(i)
 	_update_burning(delta)
 
 
+## 開始遊戲或重新遊玩。開場第一次呼叫時直接沿用已擺好的場景，之後每次都原地重置。
+func start_game() -> void:
+	if state != GameState.WAITING:
+		_setup_round()
+	state = GameState.PLAYING
+	game_started.emit()
+
+
 ## 胃袋空著時，把所在層最前端的食材吞進胃袋。
 func suck() -> void:
-	if is_game_over:
+	if state != GameState.PLAYING:
 		return
 	var lane := dragon.current_lane
 	var ingredient: IngredientState = get_front(lane) if stomach == null else null
@@ -100,7 +112,7 @@ func suck() -> void:
 
 ## 開始喊「吐」。胃袋有食材就立刻吐進所在層的鍋子；胃袋空著就開始噴火，持續到 spit_released()。
 func spit_pressed() -> void:
-	if is_game_over:
+	if state != GameState.PLAYING:
 		return
 	is_spitting = true
 	var lane := dragon.current_lane
@@ -131,7 +143,7 @@ func get_pot(lane: int) -> PotState:
 
 ## 持續噴火時，累計所在層最前端食材的燒毀進度。
 func _update_burning(delta: float) -> void:
-	if not is_spitting or _spit_used_for_pot or stomach != null or is_game_over:
+	if not is_spitting or _spit_used_for_pot or stomach != null:
 		return
 	var lane := dragon.current_lane
 	var ingredient := get_front(lane)
@@ -178,10 +190,12 @@ func _baby_leave(lane: int, reason: BabyLeaveReason) -> void:
 	pot.count = 0
 	pot_changed.emit(lane)
 	baby_left.emit(lane, reason)
-	get_tree().create_timer(baby_swap_time).timeout.connect(_baby_arrive.bind(lane))
+	get_tree().create_timer(baby_swap_time).timeout.connect(_baby_arrive.bind(lane, _round))
 
 
-func _baby_arrive(lane: int) -> void:
+func _baby_arrive(lane: int, round_id: int) -> void:
+	if round_id != _round:
+		return
 	var pot := pots[lane]
 	pot.randomize_request(forbidden_min, forbidden_max, required_min, required_max)
 	pot.has_baby = true
@@ -190,13 +204,41 @@ func _baby_arrive(lane: int) -> void:
 
 
 func _end_game(won: bool) -> void:
-	if is_game_over:
+	if state == GameState.ENDED:
 		return
-	is_game_over = true
+	state = GameState.ENDED
 	if won:
 		game_won.emit()
 	else:
 		game_lost.emit()
+
+
+## 清掉上一局的所有狀態，重新排滿隊伍、換上小龍，龍回到中間層。
+func _setup_round() -> void:
+	_round += 1
+	for i in lanes.size():
+		for ingredient in lanes[i].queue:
+			ingredient_removed.emit(i, ingredient)
+	lanes.clear()
+	pots.clear()
+
+	if stomach != null:
+		stomach = null
+		stomach_changed.emit(null)
+	is_spitting = false
+	_spit_used_for_pot = false
+	completed_count = 0
+	completed_count_changed.emit(completed_count)
+	cleared_count = 0
+	cleared_count_changed.emit(cleared_count)
+	dragon.reset_position()
+
+	for i in lane_layout.lane_count:
+		lanes.append(LaneState.new())
+		for k in max_ingredients_per_lane:
+			_spawn(i, front_x - k * ingredient_spacing)
+		pots.append(PotState.new())
+		_baby_arrive(i, _round)
 
 
 func _take_front(lane: int) -> void:

@@ -26,6 +26,17 @@
 - 層數：`game_manager.lane_layout.lane_count`。
 - 鍵盤測試輸入 `scenes/game/keyboard_input.gd` 就是用這些呼叫（按住 K 噴火），可以當作範例。
 
+## 給 UI：遊戲流程
+
+| 呼叫 | 用途 |
+|---|---|
+| `game_manager.start_game()` | 開始遊戲，也用於「重新遊玩」 |
+
+- 開啟場景時是 `WAITING`：隊伍排滿、小龍到位、龍在中間層，但靜止不動，吸吐沒有作用。
+- 第一次呼叫 `start_game()` 直接沿用擺好的場景開始；之後再呼叫會原地重置隊伍、鍋子、胃袋、完成鍋數、清空次數與龍的位置，再開始。重置時會發出對應的 signal（`pot_changed`、`stomach_changed`、`completed_count_changed` 等），UI 照常更新即可。
+- 「開始遊戲」按鍵的流程建議由 UI 串起來：先呼叫麥克風輸入的校正，再呼叫 `start_game()`。
+- 「下一關」要等關卡資料完成後才會提供。
+
 ## 給 UI：查詢資料
 
 | 屬性 / 函式 | 型別 | 內容 |
@@ -38,7 +49,7 @@
 | `game_manager.stomach` | `IngredientState` | 胃袋裡的食材，胃空時為 `null`；種類是 `.type` |
 | `game_manager.completed_count` / `pots_to_win` | `int` | 完成鍋數 / 成功需要的鍋數 |
 | `game_manager.cleared_count` / `clears_to_lose` | `int` | 清空次數 / 失敗需要的次數 |
-| `game_manager.is_game_over` | `bool` | 遊戲是否已結束 |
+| `game_manager.state` | `GameManager.GameState` | `WAITING`（等待開始）、`PLAYING`（遊玩中）、`ENDED`（已分出勝敗） |
 | `game_manager.is_spitting` | `bool` | 玩家 B 正在持續喊「吐」 |
 | `IngredientState.burn_progress` | `float` | 食材被燒的進度，0～1；中途停止噴火不會歸零 |
 | `dragon.current_lane` | `int` | 龍目前所在的層 |
@@ -56,7 +67,8 @@
 | `stomach_changed(ingredient)` | 胃袋內容改變，胃空時為 `null` |
 | `completed_count_changed(count)` | 完成鍋數改變 |
 | `cleared_count_changed(count)` | 清空次數改變 |
-| `game_won` / `game_lost` | 遊戲成功 / 失敗，之後不再接受吸吐 |
+| `game_started` | `start_game()` 完成重置並開始遊玩 |
+| `game_won` / `game_lost` | 遊戲成功 / 失敗，之後不再接受吸吐，`state` 變為 `ENDED` |
 | `ingredient_swallowed(lane, ingredient)` | 食材被吞進胃袋 |
 | `ingredient_spat(lane, ingredient)` | 胃裡的食材吐進鍋子 |
 | `ingredient_burned(lane, ingredient)` | 食材被噴火燒掉 |

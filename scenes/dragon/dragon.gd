@@ -12,9 +12,7 @@ var current_lane: int = 0
 
 
 func _ready() -> void:
-	target_lane = floori(lane_layout.lane_count / 2.0)
-	position.y = _lane_y(target_lane)
-	current_lane = target_lane
+	reset_position()
 
 
 func _process(delta: float) -> void:
@@ -22,6 +20,15 @@ func _process(delta: float) -> void:
 	var lane := lane_layout.get_lane_at(position.y - lane_layout.position.y)
 	if lane != current_lane:
 		current_lane = lane
+		current_lane_changed.emit(current_lane)
+
+
+## 立刻回到中間層（開始或重新遊玩時使用）。
+func reset_position() -> void:
+	target_lane = floori(lane_layout.lane_count / 2.0)
+	position.y = _lane_y(target_lane)
+	if current_lane != target_lane:
+		current_lane = target_lane
 		current_lane_changed.emit(current_lane)
 
 
