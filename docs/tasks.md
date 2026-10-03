@@ -23,6 +23,7 @@
 - [x] 修正模型搬移後的紅龍場景引用，使用 Models/dungeon/Red_dragon.glb @Codex
 - [x] 依參考圖在主場景排列左右各五個 Cube 平台，保留中央紅龍通道 @Codex
 - [x] 更新紅龍搬至 Models/dragon 後的場景及貼圖引用，檢查主場景與素材載入 @Codex
+- [x] 使用 Models/dungeon 素材建立參考圖風格的地牢房間，配置家具、燈光與攝影機 @Codex
 
 ### 音效與 UI
 
