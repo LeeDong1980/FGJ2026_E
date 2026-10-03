@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://c47hsqb0ccaeq" path="res://scenes/game/lane_layout.gd" id="1_lanes"]
 [ext_resource type="PackedScene" path="res://scenes/dragon/dragon.tscn" id="2_dragon"]
 [ext_resource type="Script" uid="uid://bc0iq51h7egnb" path="res://scenes/game/keyboard_input.gd" id="3_keyboard"]
+[ext_resource type="Script" path="res://scenes/game/game_manager.gd" id="4_manager"]
+[ext_resource type="Script" path="res://scenes/game/ingredients_view.gd" id="5_view"]
 
 [sub_resource type="Environment" id="Environment_game"]
 background_mode = 1
@@ -13,7 +15,9 @@ ambient_light_energy = 0.7
 reflected_light_source = 2
 tonemap_mode = 2
 
-[node name="Game" type="Node3D" unique_id=1674477969]
+[node name="Game" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout")]
+script = ExtResource("4_manager")
+lane_layout = NodePath("LaneLayout")
 
 [node name="LaneLayout" type="Node3D" parent="." unique_id=835830840]
 script = ExtResource("1_lanes")
@@ -21,9 +25,15 @@ script = ExtResource("1_lanes")
 [node name="Dragon" parent="." unique_id=1188782568 node_paths=PackedStringArray("lane_layout") instance=ExtResource("2_dragon")]
 lane_layout = NodePath("../LaneLayout")
 
-[node name="KeyboardInput" type="Node" parent="." unique_id=109144308 node_paths=PackedStringArray("dragon")]
+[node name="IngredientsView" type="Node3D" parent="." node_paths=PackedStringArray("game_manager", "lane_layout")]
+script = ExtResource("5_view")
+game_manager = NodePath("..")
+lane_layout = NodePath("../LaneLayout")
+
+[node name="KeyboardInput" type="Node" parent="." unique_id=109144308 node_paths=PackedStringArray("dragon", "game_manager")]
 script = ExtResource("3_keyboard")
 dragon = NodePath("../Dragon")
+game_manager = NodePath("..")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2134861306]
 environment = SubResource("Environment_game")

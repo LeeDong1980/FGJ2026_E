@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/ingredient/ingredient_model.gd" id="1_script"]
+
+[sub_resource type="CapsuleMesh" id="Mesh_capsule"]
+radius = 0.2
+height = 0.8
+
+[node name="IngredientModel" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 0.4, 0)
+mesh = SubResource("Mesh_capsule")
+
+[node name="NameLabel" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.05, 0)
+billboard = 1
+font_size = 48
+outline_size = 12
