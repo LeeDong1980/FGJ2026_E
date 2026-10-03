@@ -18,5 +18,5 @@ func _unhandled_input(event: InputEvent) -> void:
 		game_manager.suck(dragon.current_lane)
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"spit"):
-		game_manager.burn(dragon.current_lane)
+		game_manager.spit(dragon.current_lane)
 		get_viewport().set_input_as_handled()

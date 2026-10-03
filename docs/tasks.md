@@ -34,11 +34,11 @@
 - [x] GM-06 GameManager 隊伍邏輯：開場排滿、每幀推進 x 並在前一個食材後停下、有空間時隨機產生，發出 `ingredient_spawned`、`ingredient_removed`；速度、間隔、上限、出生點、停止點用 `@export` @露柑
 - [x] GM-07 IngredientsView：依 signal 建立或刪除食材模型，每幀依 x 與 LaneLayout 層高擺放 @露柑
 - [x] GM-08 吸與吐：`suck(lane)`、`burn(lane)` 只作用在已到最前端的食材，沒有食材時發出吸空或吐空的 signal；鍵盤 J 吸、K 吐（鍋子完成前吸入的食材直接消失） @露柑
-- [ ] GM-09 `PotState` 資料類別：禁止清單、需求數量、目前數量、小龍是否到位，並隨機產生要求（禁止 1～3 種、需求 2～5 個） @露柑
-- [ ] GM-10 胃袋：`suck` 改為吞進胃袋（胃滿發出 `suck_missed`）；`burn` 改為 `spit`，胃有食材吐進鍋子、胃空噴火，小龍未到位時發出 `spit_missed` @露柑
-- [ ] GM-11 鍋子判定與勝敗：完成／踢翻、換小龍空窗（時間 `@export`）、累計完成鍋數與清空次數、`game_won`／`game_lost`（目標數 `@export`），遊戲結束後不再接受輸入 @露柑
-- [ ] GM-12 UI 接口：實作 `get_pot()`、`pot_changed`、`baby_left`、`baby_arrived`、`stomach_changed`、完成鍋數與清空次數的 signal、`game_won`、`game_lost`，並寫進 `docs/api.md` @露柑
-- [ ] GM-13 測試用暫時畫面：右平台暫時鍋子、Label3D 顯示禁止清單與進度、龍身上顯示胃袋食材 @露柑
+- [x] GM-09 `PotState` 資料類別：禁止清單、需求數量、目前數量、小龍是否到位，並隨機產生要求（禁止 1～3 種、需求 2～5 個） @露柑
+- [x] GM-10 胃袋：`suck` 改為吞進胃袋（胃滿發出 `suck_missed`）；`burn` 改為 `spit`，胃有食材吐進鍋子、胃空噴火，小龍未到位時發出 `spit_missed` @露柑
+- [x] GM-11 鍋子判定與勝敗：完成／踢翻、換小龍空窗（時間 `@export`）、累計完成鍋數與清空次數、`game_won`／`game_lost`（目標數 `@export`），遊戲結束後不再接受輸入 @露柑
+- [x] GM-12 UI 接口：實作 `get_pot()`、`pot_changed`、`baby_left`、`baby_arrived`、`stomach_changed`、完成鍋數與清空次數的 signal、`game_won`、`game_lost`，並寫進 `docs/api.md` @露柑
+- [x] GM-13 測試用暫時畫面：右平台暫時鍋子、Label3D 顯示禁止清單與進度、龍身上顯示胃袋食材 @露柑
 
 #### UI（GMF）
 - [ ] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF

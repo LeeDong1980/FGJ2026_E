@@ -5,6 +5,8 @@
 [ext_resource type="Script" uid="uid://bc0iq51h7egnb" path="res://scenes/game/keyboard_input.gd" id="3_keyboard"]
 [ext_resource type="Script" path="res://scenes/game/game_manager.gd" id="4_manager"]
 [ext_resource type="Script" path="res://scenes/game/ingredients_view.gd" id="5_view"]
+[ext_resource type="Script" path="res://scenes/game/pots_debug_view.gd" id="6_pots_debug"]
+[ext_resource type="Script" path="res://scenes/game/stomach_debug_view.gd" id="7_stomach_debug"]
 
 [sub_resource type="Environment" id="Environment_game"]
 background_mode = 1
@@ -29,6 +31,16 @@ lane_layout = NodePath("../LaneLayout")
 script = ExtResource("5_view")
 game_manager = NodePath("..")
 lane_layout = NodePath("../LaneLayout")
+
+[node name="PotsDebugView" type="Node3D" parent="." node_paths=PackedStringArray("game_manager", "lane_layout")]
+script = ExtResource("6_pots_debug")
+game_manager = NodePath("..")
+lane_layout = NodePath("../LaneLayout")
+
+[node name="StomachDebugView" type="Node3D" parent="." node_paths=PackedStringArray("game_manager", "dragon")]
+script = ExtResource("7_stomach_debug")
+game_manager = NodePath("..")
+dragon = NodePath("../Dragon")
 
 [node name="KeyboardInput" type="Node" parent="." unique_id=109144308 node_paths=PackedStringArray("dragon", "game_manager")]
 script = ExtResource("3_keyboard")
