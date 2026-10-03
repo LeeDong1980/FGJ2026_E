@@ -23,6 +23,7 @@ Game Jam 3D 遊戲專案（玩法尚未決定，見 docs/design.md）。多人�
 - `docs/tasks.md`：任務清單。**每次開始任務前都要讀**。
 - `docs/design.md`：玩法、操作、勝敗條件、範圍。實作遊戲功能前先讀。
 - `docs/conventions.md`：命名、資料夾、場景歸屬規則。新增或修改檔案、場景前先讀。
+- `docs/voice-input.md`：聲音輸入系統（`MicInput`）的使用方法與串接方式。接聲音輸入前先讀。
 
 ## 工作規則
 1. 開始任務前先讀 `docs/tasks.md`，在任務後面標上自己的負責人（`@名字`），然後馬上 commit 並 push，讓其他人知道。
