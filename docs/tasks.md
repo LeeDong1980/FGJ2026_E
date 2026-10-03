@@ -68,7 +68,12 @@
 - [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel
 - [x] NET-04 語音封包傳輸測試：Client 傳音量與「吸／吐」封包給 Host，兩邊畫面顯示收發狀態與錯誤（掉包、無回應、斷線） @Samuel
 - [ ] NET-02 雙機同步骨架：MultiplayerSpawner／Synchronizer 同步龍的所在層，Server 權威，樓層產生用同一個 seed（等 GM-01、GM-02 完成）
-- [ ] NET-03 雙機分工：Host 與 Client 各自負責移動／動作其中一項輸入（等 DES 決定操作方式）
+- [ ] NET-03 雙機分工：Host 與 Client 各自負責移動／動作其中一項輸入（等 DES 決定操作方式）；移動與動作的輸入來源要能各自切換為本機 `MicInput` 或 `voice_*_received` signal，供 NET-05 備案（兩位玩家都用手機）使用
+- [ ] NET-05 手機網頁收音備案（規劃見 docs/web-mic.md）：連線測試，Godot 開 HTTP＋WebSocket server，經 Cloudflare Tunnel 讓 Android 手機打開網頁，畫面顯示收到的音量與延遲 @露柑
+- [ ] NET-06 手機備案接上 signal：`WebMicServer` 發出與 `NetworkManager` 相同的 `voice_volume_received`／`voice_word_received`（等 NET-03 的輸入來源切換） @露柑
+- [ ] NET-07 手機備案的吸／吐辨識：JS 版字音判斷取代測試用按鈕 @露柑
+- [ ] NET-08 手機備案啟動流程：Godot 自動啟動 cloudflared、讀出網址，畫面顯示玩家 A、B 的 QR code @露柑
+- [ ] NET-09 手機備案匯出設定：匯出 preset 的 include filter 加上 `*.html` @露柑
 
 ### 美術與關卡
 

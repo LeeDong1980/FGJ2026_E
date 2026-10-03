@@ -31,6 +31,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `docs/design.md`：玩法、操作、勝敗條件、範圍。實作遊戲功能前先讀。
 - `docs/conventions.md`：命名、資料夾、場景歸屬規則。新增或修改檔案、場景前先讀。
 - `docs/voice-input.md`：聲音輸入系統（`MicInput`）的使用方法與串接方式。接聲音輸入前先讀。
+- `docs/web-mic.md`：手機網頁收音備案（經 Cloudflare Tunnel 連回電腦）的規劃。
 - `docs/api.md`：遊戲機制對外的函式與 signal（給 UI 與麥克風輸入）。
 - `docs/art_asset_needs.md`：prototype 缺素材表、派工進度與模組接口。美術總監在素材到位、交付及進度回報時更新。
 - `docs/asset_credits.md`：第三方資源清單。記錄模型、素材的來源連結與授權。
