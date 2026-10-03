@@ -1,0 +1,36 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scenes/vfx/directed_effect.gd" id="1"]
+[ext_resource type="Shader" path="res://scenes/vfx/endpoint_flow.gdshader" id="2"]
+[ext_resource type="Shader" path="res://scenes/vfx/flow_surface.gdshader" id="3"]
+
+[sub_resource type="ShaderMaterial" id="Process_Flow"]
+resource_local_to_scene = true
+shader = ExtResource("2")
+shader_parameter/effect_kind = 0
+shader_parameter/enabled = false
+
+[sub_resource type="ShaderMaterial" id="Surface_Flow"]
+resource_local_to_scene = true
+shader = ExtResource("3")
+shader_parameter/effect_kind = 0
+shader_parameter/tint = Color(0.48, 0.82, 1, 0.55)
+
+[sub_resource type="QuadMesh" id="Mesh_Flow"]
+resource_local_to_scene = true
+material = SubResource("Surface_Flow")
+size = Vector2(1, 1)
+
+[node name="SuctionEffect" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Flow" type="GPUParticles3D" parent="."]
+emitting = false
+visible = false
+amount = 96
+lifetime = 0.28
+local_coords = false
+fixed_fps = 60
+cast_shadow = 0
+process_material = SubResource("Process_Flow")
+draw_pass_1 = SubResource("Mesh_Flow")

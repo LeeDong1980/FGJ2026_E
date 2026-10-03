@@ -1,6 +1,6 @@
 # 房間概念美術 v1
 
-使用內建 image_gen 工具生成，作為第一版美術提案；圖中配置與風格尚未確定為實作規格。
+使用內建 image_gen 工具生成。使用者已確認 prototype 第一版依這兩張概念圖製作房間；實際模型、開放牆面與天花板規格見 `docs/design.md`，缺素材及進度見 `docs/art_asset_needs.md`。圖片中的細部陳設不代表所有素材已備齊。
 
 - 地下城：`dungeon_room_concept_v1.png`
 - 龍族撫育幼龍房：`dragon_nursery_concept_v1.png`

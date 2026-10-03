@@ -1,0 +1,573 @@
+[gd_scene load_steps=39 format=3]
+
+[ext_resource type="Texture2D" path="res://Models/dungeon/LowPolyDungeonsLite_Texture_01.png" id="Ext1"]
+
+[ext_resource type="Script" path="res://scenes/rooms/room_module.gd" id="Ext2"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Ground_01.fbx" id="Ext3"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Wall_27.fbx" id="Ext4"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Column_01.fbx" id="Ext5"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Table_01.fbx" id="Ext6"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Chair_05.fbx" id="Ext7"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Book_09.fbx" id="Ext8"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Jug_02.fbx" id="Ext9"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Bottle_05.fbx" id="Ext10"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Candle_01.fbx" id="Ext11"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Box_02.fbx" id="Ext12"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/WallDecor_05.fbx" id="Ext13"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Wood_02.fbx" id="Ext14"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Rock_01.fbx" id="Ext15"]
+
+[ext_resource type="PackedScene" path="res://Models/dungeon/Light_08.fbx" id="Ext16"]
+
+[ext_resource type="PackedScene" path="res://scenes/rooms/room_ceiling.tscn" id="Ext17"]
+
+[sub_resource type="StandardMaterial3D" id="DungeonMaterial"]
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("Ext1")
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="FlameMaterial"]
+shading_mode = 0
+albedo_color = Color(1, 0.63, 0.17, 1)
+emission_enabled = true
+emission = Color(1, 0.28, 0.04, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="StoneMaterial"]
+albedo_color = Color(0.24, 0.21, 0.18, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="MeshFoundation"]
+material = SubResource("StoneMaterial")
+size = Vector3(8, 0.25, 8)
+
+[sub_resource type="BoxShape3D" id="ShapeFoundation"]
+size = Vector3(8, 0.25, 8)
+
+[sub_resource type="BoxShape3D" id="ShapeBackWall0"]
+size = Vector3(4, 4, 0.193971828)
+
+[sub_resource type="BoxShape3D" id="ShapeBackWall1"]
+size = Vector3(4, 4, 0.193971828)
+
+[sub_resource type="BoxShape3D" id="ShapeOuterWall0"]
+size = Vector3(4, 4, 0.193971828)
+
+[sub_resource type="BoxShape3D" id="ShapeInnerRearWall"]
+size = Vector3(4, 4, 0.193971828)
+
+[sub_resource type="BoxShape3D" id="ShapeColumnBackLeft"]
+size = Vector3(0.784957147, 4, 0.784957147)
+
+[sub_resource type="BoxShape3D" id="ShapeColumnBackRight"]
+size = Vector3(0.784957147, 4, 0.784957147)
+
+[sub_resource type="BoxShape3D" id="ShapeColumnOuterFront"]
+size = Vector3(0.784957147, 4, 0.784957147)
+
+[sub_resource type="BoxMesh" id="MeshBackCornice"]
+material = SubResource("StoneMaterial")
+size = Vector3(8, 0.24, 0.4)
+
+[sub_resource type="BoxShape3D" id="ShapeBackCornice"]
+size = Vector3(8, 0.24, 0.4)
+
+[sub_resource type="BoxMesh" id="MeshOuterCornice"]
+material = SubResource("StoneMaterial")
+size = Vector3(0.4, 0.24, 8)
+
+[sub_resource type="BoxShape3D" id="ShapeOuterCornice"]
+size = Vector3(0.4, 0.24, 8)
+
+[sub_resource type="BoxShape3D" id="ShapeAlchemyTable"]
+size = Vector3(2.4, 1.05658066, 1.4722034)
+
+[sub_resource type="BoxShape3D" id="ShapeStudyChair"]
+size = Vector3(0.52238415, 0.95, 0.477101847)
+
+[sub_resource type="BoxShape3D" id="ShapeStorageCrate"]
+size = Vector3(1, 1.00035431, 0.996639195)
+
+[sub_resource type="BoxShape3D" id="ShapeStorageCrateStack"]
+size = Vector3(0.75, 0.750265736, 0.747479396)
+
+[sub_resource type="BoxShape3D" id="ShapeStorageCrateSide"]
+size = Vector3(0.8, 0.800283452, 0.797311356)
+
+[node name="HeroChallengeRoom" type="Node3D"]
+script = ExtResource("Ext2")
+
+[node name="Architecture" type="Node3D" parent="."]
+
+[node name="Floor00" type="Node3D" parent="Architecture"]
+position = Vector3(-2, -0.001, -2)
+
+[node name="Model" parent="Architecture/Floor00" instance=ExtResource("Ext3")]
+position = Vector3(4.85722584e-15, -0, 4.85722584e-15)
+scale = Vector3(100.000002, 100.000002, 100.000002)
+
+[node name="Ground_01" parent="Architecture/Floor00/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Floor01" type="Node3D" parent="Architecture"]
+position = Vector3(-2, -0.001, 2)
+
+[node name="Model" parent="Architecture/Floor01" instance=ExtResource("Ext3")]
+position = Vector3(4.85722584e-15, -0, 4.85722584e-15)
+scale = Vector3(100.000002, 100.000002, 100.000002)
+
+[node name="Ground_01" parent="Architecture/Floor01/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Floor10" type="Node3D" parent="Architecture"]
+position = Vector3(2, -0.001, -2)
+
+[node name="Model" parent="Architecture/Floor10" instance=ExtResource("Ext3")]
+position = Vector3(4.85722584e-15, -0, 4.85722584e-15)
+scale = Vector3(100.000002, 100.000002, 100.000002)
+
+[node name="Ground_01" parent="Architecture/Floor10/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Floor11" type="Node3D" parent="Architecture"]
+position = Vector3(2, -0.001, 2)
+
+[node name="Model" parent="Architecture/Floor11" instance=ExtResource("Ext3")]
+position = Vector3(4.85722584e-15, -0, 4.85722584e-15)
+scale = Vector3(100.000002, 100.000002, 100.000002)
+
+[node name="Ground_01" parent="Architecture/Floor11/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Foundation" type="Node3D" parent="Architecture"]
+position = Vector3(0, -0.125, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Architecture/Foundation"]
+mesh = SubResource("MeshFoundation")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/Foundation"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/Foundation/Body"]
+shape = SubResource("ShapeFoundation")
+
+[node name="BackWall0" type="Node3D" parent="Architecture"]
+position = Vector3(-2, 0, -4)
+
+[node name="Model" parent="Architecture/BackWall0" instance=ExtResource("Ext4")]
+position = Vector3(-0, 1.26407315e-07, -0.0969850831)
+scale = Vector3(1, 1, 1)
+
+[node name="Wall_27" parent="Architecture/BackWall0/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/BackWall0"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/BackWall0/Body"]
+position = Vector3(0, 2, 0)
+shape = SubResource("ShapeBackWall0")
+
+[node name="BackWall1" type="Node3D" parent="Architecture"]
+position = Vector3(2, 0, -4)
+
+[node name="Model" parent="Architecture/BackWall1" instance=ExtResource("Ext4")]
+position = Vector3(-0, 1.26407315e-07, -0.0969850831)
+scale = Vector3(1, 1, 1)
+
+[node name="Wall_27" parent="Architecture/BackWall1/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/BackWall1"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/BackWall1/Body"]
+position = Vector3(0, 2, 0)
+shape = SubResource("ShapeBackWall1")
+
+[node name="OuterWall0" type="Node3D" parent="Architecture"]
+position = Vector3(-4, 0, -2)
+rotation = Vector3(0, 1.57079633, 0)
+
+[node name="Model" parent="Architecture/OuterWall0" instance=ExtResource("Ext4")]
+position = Vector3(-0, 1.26407315e-07, -0.0969850831)
+scale = Vector3(1, 1, 1)
+
+[node name="Wall_27" parent="Architecture/OuterWall0/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/OuterWall0"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/OuterWall0/Body"]
+position = Vector3(0, 2, 0)
+shape = SubResource("ShapeOuterWall0")
+
+[node name="InnerRearWall" type="Node3D" parent="Architecture"]
+position = Vector3(4, 0, -2)
+rotation = Vector3(0, 1.57079633, 0)
+
+[node name="Model" parent="Architecture/InnerRearWall" instance=ExtResource("Ext4")]
+position = Vector3(-0, 1.26407315e-07, -0.0969850831)
+scale = Vector3(1, 1, 1)
+
+[node name="Wall_27" parent="Architecture/InnerRearWall/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/InnerRearWall"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/InnerRearWall/Body"]
+position = Vector3(0, 2, 0)
+shape = SubResource("ShapeInnerRearWall")
+
+[node name="ColumnBackLeft" type="Node3D" parent="Architecture"]
+position = Vector3(-3.6, 0, -3.6)
+
+[node name="Model" parent="Architecture/ColumnBackLeft" instance=ExtResource("Ext5")]
+position = Vector3(-5.20417054e-16, -0, -5.20417054e-16)
+scale = Vector3(100.000002, 100.000002, 100.000002)
+
+[node name="Column_01" parent="Architecture/ColumnBackLeft/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/ColumnBackLeft"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/ColumnBackLeft/Body"]
+position = Vector3(0, 2, 0)
+shape = SubResource("ShapeColumnBackLeft")
+
+[node name="ColumnBackRight" type="Node3D" parent="Architecture"]
+position = Vector3(3.6, 0, -3.6)
+
+[node name="Model" parent="Architecture/ColumnBackRight" instance=ExtResource("Ext5")]
+position = Vector3(-5.20417054e-16, -0, -5.20417054e-16)
+scale = Vector3(100.000002, 100.000002, 100.000002)
+
+[node name="Column_01" parent="Architecture/ColumnBackRight/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/ColumnBackRight"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/ColumnBackRight/Body"]
+position = Vector3(0, 2, 0)
+shape = SubResource("ShapeColumnBackRight")
+
+[node name="ColumnOuterFront" type="Node3D" parent="Architecture"]
+position = Vector3(-3.6, 0, 3.6)
+
+[node name="Model" parent="Architecture/ColumnOuterFront" instance=ExtResource("Ext5")]
+position = Vector3(-5.20417054e-16, -0, -5.20417054e-16)
+scale = Vector3(100.000002, 100.000002, 100.000002)
+
+[node name="Column_01" parent="Architecture/ColumnOuterFront/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/ColumnOuterFront"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/ColumnOuterFront/Body"]
+position = Vector3(0, 2, 0)
+shape = SubResource("ShapeColumnOuterFront")
+
+[node name="BackCornice" type="Node3D" parent="Architecture"]
+position = Vector3(0, 3.88, -3.8)
+
+[node name="Mesh" type="MeshInstance3D" parent="Architecture/BackCornice"]
+mesh = SubResource("MeshBackCornice")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/BackCornice"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/BackCornice/Body"]
+shape = SubResource("ShapeBackCornice")
+
+[node name="OuterCornice" type="Node3D" parent="Architecture"]
+position = Vector3(-3.8, 3.88, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Architecture/OuterCornice"]
+mesh = SubResource("MeshOuterCornice")
+
+[node name="Body" type="StaticBody3D" parent="Architecture/OuterCornice"]
+
+[node name="Collision" type="CollisionShape3D" parent="Architecture/OuterCornice/Body"]
+shape = SubResource("ShapeOuterCornice")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="AlchemyTable" type="Node3D" parent="Props"]
+position = Vector3(-1.9, 0, -2.5)
+
+[node name="Model" parent="Props/AlchemyTable" instance=ExtResource("Ext6")]
+position = Vector3(-0.000498518378, -0, -0.0171513404)
+scale = Vector3(118.582196, 118.582196, 118.582196)
+
+[node name="Table_01" parent="Props/AlchemyTable/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Props/AlchemyTable"]
+
+[node name="Collision" type="CollisionShape3D" parent="Props/AlchemyTable/Body"]
+position = Vector3(0, 0.528290329, 0)
+shape = SubResource("ShapeAlchemyTable")
+
+[node name="StudyChair" type="Node3D" parent="Props"]
+position = Vector3(-2, 0, -1.4)
+rotation = Vector3(0, 3.14159265, 0)
+
+[node name="Model" parent="Props/StudyChair" instance=ExtResource("Ext7")]
+position = Vector3(-0.00535837573, -0.000250704657, 0.0051372016)
+scale = Vector3(1.08072992, 1.08072992, 1.08072992)
+
+[node name="Chair_05" parent="Props/StudyChair/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Props/StudyChair"]
+
+[node name="Collision" type="CollisionShape3D" parent="Props/StudyChair/Body"]
+position = Vector3(0, 0.475, 0)
+shape = SubResource("ShapeStudyChair")
+
+[node name="SpellBook" type="Node3D" parent="Props"]
+position = Vector3(-2.2, 1.05658066, -2.45)
+
+[node name="Model" parent="Props/SpellBook" instance=ExtResource("Ext8")]
+position = Vector3(0.0222309171, 0.0509297494, -0.000318440783)
+scale = Vector3(149.843084, 149.843084, 149.843084)
+
+[node name="Book_09" parent="Props/SpellBook/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="AlchemyJug" type="Node3D" parent="Props"]
+position = Vector3(-1.2, 1.05658066, -2.55)
+
+[node name="Model" parent="Props/AlchemyJug" instance=ExtResource("Ext9")]
+position = Vector3(4.16405493e-16, -2.59357056e-09, 4.16405493e-16)
+scale = Vector3(87.2877904, 87.2877904, 87.2877904)
+
+[node name="Jug_02" parent="Props/AlchemyJug/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="PotionTall" type="Node3D" parent="Props"]
+position = Vector3(-1.65, 1.05658066, -2.8)
+
+[node name="Model" parent="Props/PotionTall" instance=ExtResource("Ext10")]
+position = Vector3(-9.89938162e-09, -6.51905885e-15, 3.50341673e-16)
+scale = Vector3(170.070084, 170.070084, 170.070084)
+
+[node name="Bottle_05" parent="Props/PotionTall/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="PotionShort" type="Node3D" parent="Props"]
+position = Vector3(-1.85, 1.05658066, -2.85)
+
+[node name="Model" parent="Props/PotionShort" instance=ExtResource("Ext10")]
+position = Vector3(-6.44610896e-09, -4.24496855e-15, 2.28129461e-16)
+scale = Vector3(110.74331, 110.74331, 110.74331)
+
+[node name="Bottle_05" parent="Props/PotionShort/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Candle" type="Node3D" parent="Props"]
+position = Vector3(-2.65, 1.05658066, -2.5)
+
+[node name="Model" parent="Props/Candle" instance=ExtResource("Ext11")]
+position = Vector3(-0, 2.80342959e-08, -2.621606e-08)
+scale = Vector3(150.129493, 150.129493, 150.129493)
+
+[node name="Candle_01" parent="Props/Candle/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="StorageCrate" type="Node3D" parent="Props"]
+position = Vector3(2.55, 0, -2.8)
+
+[node name="Model" parent="Props/StorageCrate" instance=ExtResource("Ext12")]
+position = Vector3(-0.00153602392, 0.498885881, 6.33212837e-05)
+scale = Vector3(109.134367, 109.134367, 109.134367)
+
+[node name="Box_02" parent="Props/StorageCrate/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Props/StorageCrate"]
+
+[node name="Collision" type="CollisionShape3D" parent="Props/StorageCrate/Body"]
+position = Vector3(0, 0.500177157, 0)
+shape = SubResource("ShapeStorageCrate")
+
+[node name="StorageCrateStack" type="Node3D" parent="Props"]
+position = Vector3(2.55, 1.000354, -2.8)
+
+[node name="Model" parent="Props/StorageCrateStack" instance=ExtResource("Ext12")]
+position = Vector3(-0.00115201794, 0.374164411, 4.74909627e-05)
+scale = Vector3(81.8507752, 81.8507752, 81.8507752)
+
+[node name="Box_02" parent="Props/StorageCrateStack/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Props/StorageCrateStack"]
+
+[node name="Collision" type="CollisionShape3D" parent="Props/StorageCrateStack/Body"]
+position = Vector3(0, 0.375132868, 0)
+shape = SubResource("ShapeStorageCrateStack")
+
+[node name="StorageCrateSide" type="Node3D" parent="Props"]
+position = Vector3(1.4, 0, -2.8)
+
+[node name="Model" parent="Props/StorageCrateSide" instance=ExtResource("Ext12")]
+position = Vector3(-0.00122881913, 0.399108705, 5.06570269e-05)
+scale = Vector3(87.3074936, 87.3074936, 87.3074936)
+
+[node name="Box_02" parent="Props/StorageCrateSide/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="Body" type="StaticBody3D" parent="Props/StorageCrateSide"]
+
+[node name="Collision" type="CollisionShape3D" parent="Props/StorageCrateSide/Body"]
+position = Vector3(0, 0.400141726, 0)
+shape = SubResource("ShapeStorageCrateSide")
+
+[node name="BackBanner" type="Node3D" parent="Props"]
+position = Vector3(0.4, 1.3, -3.76)
+
+[node name="Model" parent="Props/BackBanner" instance=ExtResource("Ext13")]
+position = Vector3(-6.12858409e-16, 2.11521245, -0.0688516279)
+scale = Vector3(117.76294, 117.76294, 117.76294)
+
+[node name="WallDecor_05" parent="Props/BackBanner/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="LooseBoard" type="Node3D" parent="Props"]
+position = Vector3(-3, 0, 2.8)
+rotation = Vector3(0, 0.3, 0)
+
+[node name="Model" parent="Props/LooseBoard" instance=ExtResource("Ext14")]
+position = Vector3(0.00336527772, 0.0117120961, -0)
+scale = Vector3(53.6694921, 53.6694921, 53.6694921)
+
+[node name="Wood_02" parent="Props/LooseBoard/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="CornerRock" type="Node3D" parent="Props"]
+position = Vector3(-3, 0, -0.7)
+
+[node name="Model" parent="Props/CornerRock" instance=ExtResource("Ext15")]
+position = Vector3(0.0234997842, 0.250377031, 0.0282025864)
+scale = Vector3(33.8718299, 33.8718299, 33.8718299)
+
+[node name="Rock_01" parent="Props/CornerRock/Model" index="0"]
+material_override = SubResource("DungeonMaterial")
+
+[node name="LocalLighting" type="Node3D" parent="."]
+
+[node name="WallTorch0" type="Node3D" parent="LocalLighting"]
+position = Vector3(-2.7, 2, -3.67)
+
+[node name="Model" parent="LocalLighting/WallTorch0" instance=ExtResource("Ext16")]
+position = Vector3(-0, 0.330910577, -0.177228356)
+scale = Vector3(1.38744753, 1.38744753, 1.38744753)
+
+[node name="Light_08" parent="LocalLighting/WallTorch0/Model" index="0"]
+surface_material_override/0 = SubResource("DungeonMaterial")
+surface_material_override/1 = SubResource("FlameMaterial")
+
+[node name="TorchGlow0" type="OmniLight3D" parent="LocalLighting"]
+position = Vector3(-2.7, 2.65, -3.35)
+light_color = Color(1, 0.57, 0.26, 1)
+light_energy = 1.2
+omni_range = 3.6
+omni_attenuation = 1.4
+
+[node name="WallTorch1" type="Node3D" parent="LocalLighting"]
+position = Vector3(2.7, 2, -3.67)
+
+[node name="Model" parent="LocalLighting/WallTorch1" instance=ExtResource("Ext16")]
+position = Vector3(-0, 0.330910577, -0.177228356)
+scale = Vector3(1.38744753, 1.38744753, 1.38744753)
+
+[node name="Light_08" parent="LocalLighting/WallTorch1/Model" index="0"]
+surface_material_override/0 = SubResource("DungeonMaterial")
+surface_material_override/1 = SubResource("FlameMaterial")
+
+[node name="TorchGlow1" type="OmniLight3D" parent="LocalLighting"]
+position = Vector3(2.7, 2.65, -3.35)
+light_color = Color(1, 0.57, 0.26, 1)
+light_energy = 1.2
+omni_range = 3.6
+omni_attenuation = 1.4
+
+[node name="DragonSideAnchor" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(4, 0, 1.1)
+
+[node name="QueueSpawnAnchor" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(-4, 0, 1.1)
+
+[node name="QueueFrontAnchor" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(3.4, 0, 1.1)
+
+[node name="CeilingAnchor" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 4, 0)
+
+[node name="RoomCeiling" parent="CeilingAnchor" instance=ExtResource("Ext17")]
+visible = false
+
+[editable path="Architecture/Floor00/Model"]
+
+[editable path="Architecture/Floor01/Model"]
+
+[editable path="Architecture/Floor10/Model"]
+
+[editable path="Architecture/Floor11/Model"]
+
+[editable path="Architecture/BackWall0/Model"]
+
+[editable path="Architecture/BackWall1/Model"]
+
+[editable path="Architecture/OuterWall0/Model"]
+
+[editable path="Architecture/InnerRearWall/Model"]
+
+[editable path="Architecture/ColumnBackLeft/Model"]
+
+[editable path="Architecture/ColumnBackRight/Model"]
+
+[editable path="Architecture/ColumnOuterFront/Model"]
+
+[editable path="Props/AlchemyTable/Model"]
+
+[editable path="Props/StudyChair/Model"]
+
+[editable path="Props/SpellBook/Model"]
+
+[editable path="Props/AlchemyJug/Model"]
+
+[editable path="Props/PotionTall/Model"]
+
+[editable path="Props/PotionShort/Model"]
+
+[editable path="Props/Candle/Model"]
+
+[editable path="Props/StorageCrate/Model"]
+
+[editable path="Props/StorageCrateStack/Model"]
+
+[editable path="Props/StorageCrateSide/Model"]
+
+[editable path="Props/BackBanner/Model"]
+
+[editable path="Props/LooseBoard/Model"]
+
+[editable path="Props/CornerRock/Model"]
+
+[editable path="LocalLighting/WallTorch0/Model"]
+
+[editable path="LocalLighting/WallTorch1/Model"]
