@@ -11,6 +11,7 @@ Game Jam 3D 遊戲專案（玩法尚未決定，見 docs/design.md）。多人�
 - `scenes/dungeon_room/`：地牢房間，包含 dungeon 模型實例、材質、碰撞、燈光與攝影機。
 - `scenes/red_dragon/`：紅龍模型子場景。
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
+- `scenes/mic_test/`：麥克風輸入實驗場景（顯示即時音量、切換輸入裝置）。
 - `Models/`：模型與貼圖素材。
 - `docs/`：設計、開發慣例與任務清單。
 
