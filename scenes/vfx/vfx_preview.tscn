@@ -1,0 +1,54 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scenes/vfx/vfx_preview.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/main/main.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/dragon_effects.tscn" id="3"]
+
+[sub_resource type="StandardMaterial3D" id="TargetMaterial"]
+shading_mode = 0
+albedo_color = Color(0.35, 0.8, 0.85, 1)
+
+[sub_resource type="TorusMesh" id="TargetRing"]
+material = SubResource("TargetMaterial")
+inner_radius = 0.085
+outer_radius = 0.1
+rings = 12
+ring_segments = 12
+
+[sub_resource type="LabelSettings" id="Instructions"]
+font_size = 18
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="VfxPreview" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Main" parent="." instance=ExtResource("2")]
+
+[node name="DragonEffects" parent="." instance=ExtResource("3")]
+unique_name_in_owner = true
+
+[node name="Target" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(-4.6, 6, 1.1)
+
+[node name="Ring" type="MeshInstance3D" parent="Target"]
+rotation = Vector3(1.5707963, 0, 0)
+mesh = SubResource("TargetRing")
+cast_shadow = 0
+
+[node name="Label" type="Label3D" parent="Target"]
+position = Vector3(0, 0.27, 0)
+text = "VFX target"
+font_size = 24
+pixel_size = 0.008
+billboard = 1
+modulate = Color(0.5, 0.9, 1, 1)
+
+[node name="Instructions" type="CanvasLayer" parent="."]
+
+[node name="Status" type="Label" parent="Instructions"]
+unique_name_in_owner = true
+offset_left = 18.0
+offset_top = 15.0
+label_settings = SubResource("Instructions")
