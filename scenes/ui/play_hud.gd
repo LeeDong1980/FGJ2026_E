@@ -50,6 +50,11 @@ func setup_lanes(lane_count: int) -> void:
 	_volume_meter.current_lane = -1
 
 
+## 目前建立了幾層的鍋子資訊。
+func get_lane_count() -> int:
+	return _pot_infos.size()
+
+
 ## 讓各層鍋子資訊跟著鍋子在畫面上的位置。沒有設定時，鍋子資訊排在畫面右側。
 func set_pot_anchors(camera: Camera3D, world_positions: Array[Vector3]) -> void:
 	_camera = camera

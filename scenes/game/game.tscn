@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scenes/game/ingredients_view.gd" id="5_view"]
 [ext_resource type="Script" path="res://scenes/game/pots_debug_view.gd" id="6_pots_debug"]
 [ext_resource type="Script" path="res://scenes/game/stomach_debug_view.gd" id="7_stomach_debug"]
+[ext_resource type="PackedScene" path="res://scenes/ui/game_ui.tscn" id="8_game_ui"]
 
 [sub_resource type="Environment" id="Environment_game"]
 background_mode = 1
@@ -61,3 +62,5 @@ shadow_enabled = true
 transform = Transform3D(1, 0, 0, 0, 0.9800666, 0.19866933, 0, -0.19866933, 0.9800666, 0, 3, 14)
 current = true
 fov = 52.0
+
+[node name="GameUI" parent="." instance=ExtResource("8_game_ui")]
