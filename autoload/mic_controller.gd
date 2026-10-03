@@ -8,10 +8,19 @@ extends Node
 ##
 ## 三種輸出都是「按住」模式：聲音持續就持續輸出（*_active 為 true），
 ## 聲音中斷超過 *_release_seconds 才放開。放開後數值維持最後的值，不會歸零。
+##
+## 這是 autoload（全域名稱 MicInput）：切換場景時設定與狀態都保留，設定也會存到 user://mic_settings.cfg。
 
 signal action_changed(action: StringName)
 
 const BUS_NAME := "MicInput"
+const SETTINGS_PATH := "user://mic_settings.cfg"
+## 會被存檔的設定
+const SAVED_PROPERTIES: PackedStringArray = [
+	"volume_min_db", "volume_max_db", "volume_release_seconds",
+	"pitch_min_hz", "pitch_max_hz", "pitch_release_seconds",
+	"action_gate_db", "inhale_max", "exhale_min", "action_release_seconds",
+]
 const MIN_DB := -60.0
 const INHALE := &"inhale"
 const EXHALE := &"exhale"
@@ -85,6 +94,9 @@ var _wanted: StringName = &""
 
 
 func _ready() -> void:
+	# 暫停選單開啟時（tree.paused）仍要持續收音與分析，讓設定畫面能即時回饋
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	load_settings()
 	_setup_bus()
 
 
@@ -93,6 +105,32 @@ func _process(delta: float) -> void:
 		_on_chunk(_chunk_zcr, volume_db, _chunk_seconds)
 	_update_outputs(delta)
 
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		save_settings()
+
+
+## 把目前的設定與輸入裝置存到 user://。
+func save_settings() -> void:
+	var config := ConfigFile.new()
+	for property in SAVED_PROPERTIES:
+		config.set_value("mic", property, get(property))
+	config.set_value("mic", "input_device", AudioServer.input_device)
+	config.save(SETTINGS_PATH)
+
+
+## 讀取存檔；沒有存檔就維持 @export 的預設值。
+func load_settings() -> void:
+	var config := ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return
+	for property in SAVED_PROPERTIES:
+		if config.has_section_key("mic", property):
+			set(property, config.get_value("mic", property))
+	var device: String = config.get_value("mic", "input_device", "")
+	if device in AudioServer.get_input_device_list():
+		AudioServer.input_device = device
 
 ## 建立靜音的 MicInput bus，掛 Capture 效果取得原始取樣，並由麥克風串流播放進去。
 func _setup_bus() -> void:

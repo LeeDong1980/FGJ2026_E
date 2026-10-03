@@ -11,7 +11,9 @@ Game Jam 3D 遊戲專案（玩法尚未決定，見 docs/design.md）。多人�
 - `scenes/dungeon_room/`：地牢房間，包含 dungeon 模型實例、材質、碰撞、燈光與攝影機。
 - `scenes/red_dragon/`：紅龍模型子場景。
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
-- `scenes/mic_test/`：麥克風輸入實驗場景。`mic_controller.gd` 是輸入控制器（音量、音高、吸／吐三種輸出與可調區間），`range_meter.gd` 是可拖曳區間的觀察條，`mic_test.tscn` 左邊觀察與設定、右邊顯示輸出。
+- `autoload/`：全域單例。`mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。
+- `scenes/pause_menu/`：暫停選單（autoload `PauseMenu`，Esc 開關）、麥克風設定面板 `mic_settings_panel.tscn`、可拖曳區間的觀察條 `range_meter.gd`。
+- `scenes/mic_test/`：麥克風輸入實驗場景，只實例化設定面板，F6 單獨執行用。
 - `Models/`：模型與貼圖素材。
 - `docs/`：設計、開發慣例與任務清單。
 

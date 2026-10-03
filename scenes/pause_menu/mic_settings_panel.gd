@@ -1,5 +1,11 @@
 extends Control
-## 麥克風輸入實驗場景：左邊觀察與設定音量、音高、吸／吐的區間，右邊顯示控制器的輸出結果。
+## 麥克風設定面板：左邊觀察與設定音量、音高、吸／吐的區間，右邊顯示全域控制器（MicInput）的輸出結果。
+## 暫停選單與 mic_test 場景共用這個面板。
+
+signal close_requested
+
+## 顯示「繼續遊戲」按鈕（暫停選單使用）
+@export var show_close_button: bool = false
 
 const INHALE_COLOR := Color(1.0, 0.8, 0.1)
 const EXHALE_COLOR := Color(0.25, 0.55, 1.0)
@@ -11,7 +17,8 @@ const PITCH_AXIS_MAX_HZ := 1000.0
 ## 沒有按住時輸出條的透明度
 const INACTIVE_ALPHA := 0.35
 
-@onready var _controller: MicController = %MicController
+@onready var _controller: MicController = MicInput
+@onready var _close_button: Button = %CloseButton
 @onready var _device_option: OptionButton = %DeviceOption
 
 @onready var _volume_title: Label = %VolumeTitle
@@ -39,11 +46,16 @@ const INACTIVE_ALPHA := 0.35
 
 
 func _ready() -> void:
+	_close_button.visible = show_close_button
+	_close_button.pressed.connect(close_requested.emit)
 	_setup_devices()
 	_setup_meters()
 	_setup_hold_sliders()
 	_setup_output_bars()
-	_controller.action_changed.connect(_on_action_changed)
+
+
+func _exit_tree() -> void:
+	_controller.save_settings()
 
 
 func _process(_delta: float) -> void:
@@ -156,10 +168,6 @@ func _update_outputs() -> void:
 	_inhale_bar.value = 1.0 if c.action == MicController.INHALE else 0.0
 	_exhale_bar.value = 1.0 if c.action == MicController.EXHALE else 0.0
 	_action_out_label.text = "吸／吐：%s" % (str(c.action) if c.action != &"" else "--")
-
-
-func _on_action_changed(action: StringName) -> void:
-	print("action_changed: %s" % (str(action) if action != &"" else "（放開）"))
 
 
 func _format_db(value: float) -> String:

@@ -19,6 +19,11 @@ config/icon="res://icon.svg"
 
 driver/enable_input=true
 
+[autoload]
+
+MicInput="*res://autoload/mic_controller.gd"
+PauseMenu="*res://scenes/pause_menu/pause_menu.tscn"
+
 [display]
 
 window/stretch/mode="canvas_items"

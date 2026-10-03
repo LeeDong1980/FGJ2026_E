@@ -43,6 +43,8 @@ autoload/          全域單例
 - `res://scenes/dungeon_room/dungeon_room.tscn` @Codex
 - `res://scenes/main/dragon_platform_showcase.tscn` @Codex
 - `res://scenes/mic_test/mic_test.tscn` @山雷
+- `res://scenes/pause_menu/pause_menu.tscn` @山雷
+- `res://scenes/pause_menu/mic_settings_panel.tscn` @山雷
 
 ## Git
 - `.import` 和 `.uid` 檔要 commit，`.godot/` 不要 commit
