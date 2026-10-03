@@ -26,9 +26,9 @@
 #### 麥克風輸入（山雷）
 
 #### 遊戲機制（露柑）
-- [ ] GM-01 建立 `scenes/game/game.tscn` 與獨立的 LaneLayout 節點：依 `@export` 的層數與層距產生各層左右平台（實例化 cube_platform.tscn），提供 `get_lane_position(i)`、`get_lane_at(z)` @露柑
-- [ ] GM-02 建立 `scenes/dragon/dragon.tscn`（實例化紅龍模型）與控制腳本：`move_toward` 等速飛向目標層，速度用 `@export`，所在層改變時發出 signal @露柑
-- [ ] GM-03 鍵盤測試輸入：Input Map 加入 1／2／3 設定目標層 @露柑
+- [x] GM-01 建立 `scenes/game/game.tscn` 與獨立的 LaneLayout 節點：依 `@export` 的層數與層距產生各層左右平台（實例化 cube_platform.tscn），提供 `get_lane_position(i)`、`get_lane_at(y)` @露柑
+- [x] GM-02 建立 `scenes/dragon/dragon.tscn`（實例化紅龍模型）與控制腳本：`move_toward` 等速飛向目標層，速度用 `@export`，所在層改變時發出 signal @露柑
+- [x] GM-03 鍵盤測試輸入：Input Map 加入 1／2／3 設定目標層 @露柑
 
 #### UI（GMF）
 
