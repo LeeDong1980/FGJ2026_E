@@ -38,8 +38,9 @@ void process() {
 			position.y += age * age * 0.18;
 		}
 		float fade = smoothstep(0.0, 0.12, age) * (1.0 - smoothstep(0.65, 1.0, age));
-		float width = inward ? 0.065 : mix(0.18, 0.30, progress);
-		float height = inward ? 0.34 : 0.48;
+		float stroke_scale = clamp(radius / 0.35, 0.6, 2.2);
+		float width = inward ? 0.065 * stroke_scale : mix(0.18, 0.30, progress) * sqrt(stroke_scale);
+		float height = inward ? 0.34 * sqrt(stroke_scale) : 0.48;
 		if (effect_kind == 2) {
 			width = 0.035;
 			height = 0.10;

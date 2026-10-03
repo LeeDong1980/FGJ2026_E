@@ -171,5 +171,115 @@ func _verify() -> void:
 		_expect(integrated.get_active_effect() == &"", "main integrated controller starts idle")
 		_expect(integrated.play_fire(Vector3(-4.6, 6.0, 1.1), 0.1), "main dragon_path automatically binds")
 		integrated.stop_effects()
+	_verify_width_controls(scene)
+	_verify_preview_controls()
 	print("VFX_RESULT checks=", _checks, " failures=", _failures)
 	quit(0 if _failures == 0 else 1)
+
+
+func _verify_width_controls(scene: PackedScene) -> void:
+	var effects: DragonEffects = scene.instantiate() as DragonEffects
+	var second: DragonEffects = scene.instantiate() as DragonEffects
+	var dragon: TestDragon = TestDragon.new()
+	root.add_child(dragon)
+	dragon.scale = Vector3.ONE * 5.0
+	dragon.rotation.y = -0.7
+	dragon.position = Vector3(1.0, 2.0, 3.0)
+	root.add_child(effects)
+	root.add_child(second)
+	effects.bind_dragon(dragon)
+	_expect(effects.suction_width == 4.0 and effects.fire_width == 3.0, "exaggerated defaults remain independent")
+	var source: Vector3 = dragon.anchor.global_position
+	var target: Vector3 = source + Vector3.LEFT * 4.0
+	var suction: GPUParticles3D = effects.get_node("SuctionEffect/Flow") as GPUParticles3D
+	var fire: GPUParticles3D = effects.get_node("FireBreathEffect/Flow") as GPUParticles3D
+	var core: MeshInstance3D = effects.get_node("FireBreathEffect/FlameCore") as MeshInstance3D
+	for widths: Vector2 in [Vector2(0.1, 0.1), Vector2(4.0, 3.0), Vector2(8.0, 8.0)]:
+		_expect(effects.set_effect_widths(widths.x, widths.y), "valid min/default/max pair accepted")
+		effects.play_suction(target, 1.0)
+		var suction_radius: float = (suction.process_material as ShaderMaterial).get_shader_parameter(&"radius")
+		_expect(is_equal_approx(suction_radius, widths.x * 0.5), "suction shader receives diameter / 2")
+		_expect(suction.visibility_aabb.has_point(source + Vector3.UP * suction_radius), "suction bounds cover selected width at scale5")
+		effects.play_fire(target, 1.0)
+		var fire_radius: float = (fire.process_material as ShaderMaterial).get_shader_parameter(&"radius")
+		_expect(is_equal_approx(fire_radius, widths.y * 0.5), "fire shader receives diameter / 2")
+		_expect(is_equal_approx(core.global_basis.x.length(), widths.y * 0.5), "cone world radius follows width at scale5")
+		_expect(is_equal_approx(core.global_basis.y.length(), 4.0), "width does not change cone length")
+		_expect(fire.visibility_aabb.has_point(source + Vector3.UP * fire_radius), "fire bounds cover selected width")
+	var events: Array[StringName] = []
+	effects.effect_started.connect(func(kind: StringName) -> void: events.append(kind))
+	effects.effect_interrupted.connect(func(kind: StringName) -> void: events.append(kind))
+	var range_before: float = effects.effect_range
+	effects.set_effect_widths(1.0, 2.0)
+	_expect(is_equal_approx(core.global_basis.x.length(), 1.0), "pair setter updates active cone immediately")
+	_expect(events.is_empty(), "width update does not restart or interrupt playback")
+	effects.fire_width = 5.0
+	_expect(is_equal_approx(core.global_basis.x.length(), 2.5), "property setter updates active cone immediately")
+	_expect((fire.process_material as ShaderMaterial).get_shader_parameter(&"radius") == 2.5, "active particle spread updates immediately")
+	_expect(fire.visibility_aabb.has_point(source + Vector3.UP * 2.5), "active bounds expand immediately")
+	_expect(second.suction_width == 4.0 and second.fire_width == 3.0, "width changes remain instance local")
+	for invalid: Vector2 in [Vector2(0.0, 3.0), Vector2(-1.0, 3.0), Vector2(NAN, 2.0), Vector2(2.0, INF)]:
+		_expect(not effects.set_effect_widths(invalid.x, invalid.y), "invalid pair rejected")
+		_expect(effects.suction_width == 1.0 and effects.fire_width == 5.0, "invalid pair changes neither effect")
+	effects.suction_width = 0.0
+	effects.fire_width = NAN
+	_expect(effects.suction_width == 1.0 and effects.fire_width == 5.0, "invalid property assignments retain widths")
+	_expect(effects.set_effect_widths(0.001, 999.0), "positive out-of-range pair clamps")
+	_expect(effects.suction_width == 0.1 and effects.fire_width == 8.0, "new API clamps to legal bounds")
+	effects.suction_width = 999.0
+	effects.fire_width = 0.001
+	_expect(effects.suction_width == 8.0 and effects.fire_width == 0.1, "property assignments clamp to legal bounds")
+	effects.radius = 0.35
+	_expect(is_equal_approx(effects.radius, 0.35), "legacy getter remains radius")
+	_expect(is_equal_approx(effects.suction_width, 0.7) and is_equal_approx(effects.fire_width, 0.7), "legacy radius writes both diameters")
+	_expect(is_equal_approx(core.global_basis.x.length(), 0.35), "legacy radius updates active geometry")
+	effects.radius = 0.01
+	_expect(is_equal_approx(effects.suction_width, 0.02), "old minimum radius remains supported")
+	effects.radius = INF
+	_expect(is_equal_approx(effects.radius, 0.01), "invalid legacy radius ignored")
+	_expect(effects.effect_range == range_before, "all width APIs leave range unchanged")
+	effects.stop_effects()
+	_expect(not core.visible and not fire.visible and not suction.visible, "stop clears widened effects")
+	# Derived legacy radius must not overwrite the distinct widths when saved.
+	effects.set_effect_widths(2.4, 3.8)
+	var saved: PackedScene = PackedScene.new()
+	_expect(saved.pack(effects) == OK, "configured controller packs")
+	var state: SceneState = saved.get_state()
+	var radius_saved: bool = false
+	for property_index: int in range(state.get_node_property_count(0)):
+		radius_saved = radius_saved or state.get_node_property_name(0, property_index) == &"radius"
+	_expect(not radius_saved, "derived radius not serialized into new scenes")
+	var restored: DragonEffects = saved.instantiate() as DragonEffects
+	_expect(is_equal_approx(restored.suction_width, 2.4) and is_equal_approx(restored.fire_width, 3.8), "independent widths survive PackedScene round trip")
+	restored.free()
+	var legacy_text: String = FileAccess.get_file_as_string("res://scenes/vfx/dragon_effects.tscn").replace('script = ExtResource("1")', 'script = ExtResource("1")\nradius = 0.35')
+	var legacy_file: FileAccess = FileAccess.open("user://legacy_width.tscn", FileAccess.WRITE)
+	legacy_file.store_string(legacy_text)
+	legacy_file.close()
+	var legacy_scene: PackedScene = load("user://legacy_width.tscn")
+	var legacy_instance: DragonEffects = legacy_scene.instantiate() as DragonEffects
+	_expect(is_equal_approx(legacy_instance.suction_width, 0.7) and is_equal_approx(legacy_instance.fire_width, 0.7), "old serialized radius still loads as half width")
+	legacy_instance.free()
+
+
+func _verify_preview_controls() -> void:
+	var preview: Node3D = load("res://scenes/vfx/vfx_preview.tscn").instantiate() as Node3D
+	root.add_child(preview)
+	var effects: DragonEffects = preview.get_node("DragonEffects") as DragonEffects
+	var initial_range: float = effects.effect_range
+	for entry: Vector2i in [Vector2i(KEY_Q, 1), Vector2i(KEY_A, -1), Vector2i(KEY_W, 1), Vector2i(KEY_S, -1)]:
+		var old_suction: float = effects.suction_width
+		var old_fire: float = effects.fire_width
+		var key: InputEventKey = InputEventKey.new()
+		key.physical_keycode = entry.x
+		key.pressed = true
+		preview.call(&"_unhandled_key_input", key)
+		if entry.x == KEY_Q or entry.x == KEY_A:
+			_expect(is_equal_approx(effects.suction_width, old_suction + entry.y * 0.25) and effects.fire_width == old_fire, "preview suction controls affect only suction")
+		else:
+			_expect(is_equal_approx(effects.fire_width, old_fire + entry.y * 0.25) and effects.suction_width == old_suction, "preview fire controls affect only fire")
+	_expect(effects.effect_range == initial_range, "preview width keys leave range unchanged")
+	preview.call(&"_refresh_status")
+	var label: Label = preview.get_node("Instructions/Status") as Label
+	_expect(label.text.contains("吸取寬 4.00") and label.text.contains("噴火寬 3.00"), "preview displays live widths in Traditional Chinese")
+	_expect(label.text.contains("完整直徑") and label.text.contains("胃袋吐食材"), "preview states diameter and fire-only scope")
