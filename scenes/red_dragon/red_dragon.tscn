@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://Models/Red_dragon.glb" id="1_dragon"]
+
+[node name="RedDragon" type="Node3D"]
+
+[node name="Model" parent="." instance=ExtResource("1_dragon")]
+position = Vector3(0, 0.005511, 1.488613)
+scale = Vector3(0.05, 0.05, 0.05)
