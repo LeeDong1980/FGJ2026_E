@@ -40,6 +40,17 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="RetryButton" type="Button" parent="Margin/Root/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "重新偵測"
+
+[node name="MicEnabledCheck" type="CheckButton" parent="Margin/Root/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "啟用麥克風"
+
 [node name="CloseButton" type="Button" parent="Margin/Root/Header"]
 unique_name_in_owner = true
 visible = false
@@ -60,6 +71,14 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "觀察與設定（拖曳把手調整）"
+
+[node name="StatusLabel" type="Label" parent="Margin/Root/Columns/SettingsPanel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.65, 0.2, 1)
+autowrap_mode = 3
+text = ""
 
 [node name="VolumeTitle" type="Label" parent="Margin/Root/Columns/SettingsPanel"]
 unique_name_in_owner = true
