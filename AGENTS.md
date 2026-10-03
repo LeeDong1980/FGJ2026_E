@@ -21,8 +21,10 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `scenes/mic_test/`：麥克風輸入實驗場景，只實例化設定面板，F6 單獨執行用。
 - `scenes/rooms/`：prototype 勇者挑戰房、幼龍哺育房、通用天花板與垂直樓層子場景。
 - `scenes/vfx/`：吸取、噴火的程序材質、粒子子場景、控制接口與獨立展示。
+- `scenes/ui/`：UI 根場景與三個介面（遊戲開始、遊玩狀態、遊戲結束）。`game_ui.tscn` 是接上遊戲機制的完整 UI，已實例化在 game.tscn；`ui_test.tscn` 只測介面流程（假資料與測試快捷鍵）。
+- `scenes/backdrop/`：遊戲中 3D 場景最後面的 2D 龍洞穴背景圖（`cave_backdrop.tscn`，由 `game_ui.tscn` 實例化，自動對齊攝影機）。
 - `Models/`：模型與貼圖素材。
-- `docs/`：設計、開發慣例與任務清單。
+- `docs/`：設計、開發慣例與任務清單；`docs/images/` 放企劃書用的示意圖。
 
 新資料夾依 docs/conventions.md 的規則建立，建好後更新這一節。
 
@@ -32,6 +34,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `docs/conventions.md`：命名、資料夾、場景歸屬規則。新增或修改檔案、場景前先讀。
 - `docs/voice-input.md`：聲音輸入系統（`MicInput`）的使用方法與串接方式。接聲音輸入前先讀。
 - `docs/api.md`：遊戲機制對外的函式與 signal（給 UI 與麥克風輸入）。
+- `docs/ui_art_prompts.md`：UI 與背景美術的生圖提示詞，以及替換暫時美術的方法。
 - `docs/art_asset_needs.md`：prototype 缺素材表、派工進度與模組接口。美術總監在素材到位、交付及進度回報時更新。
 - `docs/asset_credits.md`：第三方資源清單。記錄模型、素材的來源連結與授權。
 

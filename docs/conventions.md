@@ -51,6 +51,14 @@ autoload/          全域單例
 - `res://scenes/mic_test/mic_test.tscn` @山雷
 - `res://scenes/pause_menu/pause_menu.tscn` @山雷
 - `res://scenes/pause_menu/mic_settings_panel.tscn` @山雷
+- `res://scenes/ui/ui_root.tscn` @GMF
+- `res://scenes/ui/start_screen.tscn` @GMF
+- `res://scenes/ui/play_hud.tscn` @GMF
+- `res://scenes/ui/pot_info.tscn` @GMF
+- `res://scenes/ui/result_screen.tscn` @GMF
+- `res://scenes/ui/ui_test.tscn` @GMF
+- `res://scenes/ui/game_ui.tscn` @GMF
+- `res://scenes/backdrop/cave_backdrop.tscn` @GMF
 
 ### Prototype 美術任務分工
 - 場景美術負責主場景整合；動畫師負責紅龍場景及專用動畫控制腳本，交付後由美術總監驗收。

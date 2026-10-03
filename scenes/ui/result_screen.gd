@@ -17,6 +17,7 @@ const SUCCESS_BUTTON_COLOR := Color("f0a830")
 const FAIL_BUTTON_COLOR := Color("e5484d")
 const SUCCESS_BUTTON_TEXT_COLOR := Color("2a1a05")
 const FAIL_BUTTON_TEXT_COLOR := Color.WHITE
+const FAIL_PANEL_TINT := Color(1.0, 0.72, 0.72)
 
 var _action: Action = Action.RETRY
 
@@ -42,8 +43,9 @@ func show_result(success: bool, has_next_level: bool, completed: int, target: in
 	_stats_label.text = "完成鍋數 %d / %d\n清空次數 %d / %d" % [completed, target, cleared, limit]
 	_action_button.text = ACTION_TEXTS[_action]
 
-	var panel_style := _result_panel.get_theme_stylebox(&"panel").duplicate() as StyleBoxFlat
-	panel_style.border_color = Color(title_color, 0.55)
+	# 面板是圖片（九宮格）：成功維持原色，失敗偏紅。
+	var panel_style := _result_panel.get_theme_stylebox(&"panel").duplicate() as StyleBoxTexture
+	panel_style.modulate_color = Color.WHITE if success else FAIL_PANEL_TINT
 	_result_panel.add_theme_stylebox_override(&"panel", panel_style)
 	_set_button_colors(SUCCESS_BUTTON_COLOR if success else FAIL_BUTTON_COLOR,
 			SUCCESS_BUTTON_TEXT_COLOR if success else FAIL_BUTTON_TEXT_COLOR)

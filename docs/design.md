@@ -78,6 +78,7 @@
 - 場景分成多層，目前做三層（高、中、低），之後可能增加。
 - 各層垂直往上疊，層與層的間距可以調整。鏡頭從正面稍微往下看，最上面一層是高層，最下面一層是低層。
 - 每一層左邊的平台放食材隊伍，右邊的平台放鍋子，龍在中間。
+- 3D 場景最後面有一張 2D 龍洞穴背景圖（`scenes/backdrop/cave_backdrop.png`），自動對齊攝影機並蓋滿畫面，不影響 3D 房間。構圖：左邊上中下三層山洞隧道，中間是龍飛行的巨大山中洞穴，底部是龍巢與龍蛋，右邊是上中下三個料理洞窟。已換成正式美術（原檔名 `FGJ2026TeamE_GameSceneBG.png`）。
 - 每一層由左到右依序是：**食材 → 龍 → 鍋子**。
 - 龍在畫面中間，面向左邊的食材。
 - 鏡頭：攝影機面向龍頭。
@@ -211,24 +212,23 @@ UIRoot (CanvasLayer)          UI 根節點，負責依遊戲狀態開關底下�
 **功用：** 開啟遊戲後第一個看到的介面。讓玩家知道怎麼玩，並在按下「開始遊戲」時觸發聲音校正、開始遊玩。不另外做標題場景。
 
 **介面長相：**
-- 整個畫面蓋上一層半透明的深色底，後面隱約看得到 3D 場景和龍。
-- 畫面正中偏上是大字的遊戲名稱，下面一行小字是一句話介紹。
-- 名稱下方左右並排兩張說明卡：
+- 背景是遊戲 Logo 圖（`scenes/ui/game_logo.png`，戴廚師帽的紅龍與「龍席 Dragon Feast」標題），鋪滿整個畫面，保持原圖亮度。遊戲名稱由 Logo 呈現，不另外放文字標題。
+- 畫面左右兩側的岩壁上各一張說明卡，避開中央的龍與標題：
   - 左卡「玩家 A｜控制高度」：用音量控制龍的高度，大聲飛高、小聲飛低。
-  - 右卡「玩家 B｜吸與吐」：喊「吸」把食材吸進鍋，喊「吐」噴火燒掉禁止的食材。
-- 說明卡下方正中是一顆大的「開始遊戲」按鍵。
-- 按鍵正下方一行提示文字：「按下開始遊戲時請保持安靜，遊戲會以當下的聲音校正麥克風」。
+  - 右卡「玩家 B｜吸與吐」：喊「吸」把食材吞進胃袋，喊「吐」吐進鍋子，胃空時噴火。
+- 畫面底部正中是「開始遊戲」按鍵，按鍵下方一行提示文字：「按下開始遊戲時請保持安靜，遊戲會以當下的聲音校正麥克風」。
+- 畫面底部加一層由透明漸深的陰影，讓按鍵與提示文字在火焰背景上看得清楚。
+- 上方示意圖是加入 Logo 之前的版本，實際畫面以本段描述為準。
 
 **元件內容：**
 
 | 元件 | 節點類型 | 內容 / 功用 |
 |---|---|---|
-| Background | ColorRect | 半透明深色底 |
-| TitleLabel | Label | 遊戲名稱 |
-| TaglineLabel | Label | 一句話介紹 |
-| PlayerACard | PanelContainer | 玩家 A 的操作說明 |
-| PlayerBCard | PanelContainer | 玩家 B 的操作說明 |
-| StartButton | Button | 「開始遊戲」。按下時立即校正聲音，並切換到遊玩狀態 |
+| Background | TextureRect | 遊戲 Logo 背景圖，等比例鋪滿畫面（超出部分裁切） |
+| BottomShade | TextureRect | 底部漸層陰影 |
+| PlayerACard | PanelContainer | 玩家 A 的操作說明，畫面左側 |
+| PlayerBCard | PanelContainer | 玩家 B 的操作說明，畫面右側 |
+| StartButton | Button | 「開始遊戲」。與鍵盤 Enter 相同，呼叫 `start_game()` 開始遊玩 |
 | CalibrationHint | Label | 提醒玩家按下時保持安靜 |
 
 ### 6.5 遊玩狀態介面（PlayHud）
@@ -309,8 +309,8 @@ UIRoot (CanvasLayer)          UI 根節點，負責依遊戲狀態開關底下�
 **功用：** 遊戲成功或失敗時顯示結果，並提供下一步的選項。成功和失敗共用這個介面，依結果切換內容。
 
 **介面長相：**
-- 整個畫面蓋上半透明的深色底，遊玩狀態介面隱藏。
-- 畫面正中是一塊大面板：
+- 背景是遊戲結束背景圖（`scenes/ui/result_background.png`）：與 Logo 同一個山洞，模糊、調暗並偏暖紅，遊玩狀態介面隱藏。
+- 畫面正中是一塊大面板，外觀是資訊面板圖（`scenes/ui/result_panel.png`，深色石板加火焰邊框，九宮格拉伸）。失敗時面板偏紅。
   - 最上方大字標題：成功時是金色的「料理成功！」，失敗時是紅色的「料理失敗…」。
   - 標題下方兩行結算：「完成鍋數 2 / 6」、「清空次數 3 / 3」。
   - 最下方是一顆大按鍵，文字依情況不同（見下表）。
@@ -325,11 +325,30 @@ UIRoot (CanvasLayer)          UI 根節點，負責依遊戲狀態開關底下�
 
 | 元件 | 節點類型 | 內容 / 功用 |
 |---|---|---|
-| Background | ColorRect | 半透明深色底 |
-| ResultPanel | PanelContainer | 中央面板 |
+| Background | TextureRect | 遊戲結束背景圖，等比例鋪滿畫面 |
+| ResultPanel | PanelContainer | 中央面板，外觀為資訊面板圖（StyleBoxTexture 九宮格，邊框 56 像素） |
 | ResultLabel | Label | 「料理成功！」或「料理失敗…」 |
 | StatsLabel | Label | 完成鍋數與清空次數 |
 | ActionButton | Button | 依情況顯示「下一關」「關閉遊戲」或「重新遊玩」 |
+
+### 6.8 介面與遊戲的對接
+
+介面只負責顯示，資料來自遊戲機制（`GameManager`、`Dragon`，接口見 `docs/api.md`）與麥克風輸入（`MicInput`，見 `docs/voice-input.md`）。對接由 `scenes/ui/game_ui.tscn`（腳本 `ui_game_bridge.gd`）負責，已實例化在 `game.tscn`（`GameManager` 的子節點 `GameUI`），執行 `game.tscn` 就會先顯示遊戲開始介面。「開始遊戲」按鍵與鍵盤 Enter 都呼叫 `start_game()`，效果相同。
+
+| 介面顯示 | 資料來源 |
+|---|---|
+| 完成鍋數 | `completed_count_changed`、`pots_to_win` |
+| 清空次數 | `cleared_count_changed`、`clears_to_lose` |
+| 各層禁止食材與進度 | `baby_arrived`、`pot_changed` 後讀 `get_pot(lane)` 的 `forbidden`、`count`、`required` |
+| 鍋子完成（閃綠色）／被踢翻（閃紅色） | `baby_left(lane, reason)`，`reason` 為 `COMPLETED` 或 `KICKED` |
+| 龍所在的層 | `Dragon.current_lane_changed` |
+| 玩家 A 音量條 | 每幀讀 `MicInput.volume_value`（0～100），門檻線依層數平均分段 |
+| 玩家 B「吸」 | `ingredient_swallowed`、`suck_missed` |
+| 玩家 B「吐」 | `ingredient_spat`、`spit_missed`，以及開始噴火（`is_spitting` 變成 true） |
+| 開始遊戲 | `game_started` 時顯示遊玩狀態介面；從開始介面進入時呼叫麥克風校正（`MicInput.calibrate()`，完成前略過），重新遊玩不重新校正 |
+| 遊戲結束 | `game_won`／`game_lost` 顯示遊戲結束介面；「重新遊玩」呼叫 `start_game()`。「下一關」等關卡資料完成才提供，目前成功時顯示「關閉遊戲」 |
+
+玩家 B 的「吸」「吐」以遊戲收到的指令為準，所以鍵盤測試（J 吸、按住 K 吐）與麥克風都會顯示。
 
 ## 7. 關卡設定參數
 
@@ -369,7 +388,8 @@ UIRoot (CanvasLayer)          UI 根節點，負責依遊戲狀態開關底下�
 - 美術風格（低多邊形 / 寫實 / 卡通），模型自製還是使用免費素材
 - 吞食、吐進鍋子、噴火、小龍踢翻鍋子與換小龍的動畫表現
 - 遊戲名稱
-- UI 美術素材：食材圖示、禁止符號、面板與按鍵樣式、字型
+- UI 美術素材：食材圖示、禁止符號、按鍵樣式、字型
+- 遊戲結束背景、資訊面板的正式版（目前是暫時版，提示詞見 `docs/ui_art_prompts.md`）
 - 進入下一關或重新遊玩時，是否要重新校正聲音
 
 ### 技術與範圍

@@ -2,9 +2,12 @@
 
 [ext_resource type="Script" path="res://scenes/ui/ui_game_bridge.gd" id="1_bridge"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ui_root.tscn" id="2_ui"]
+[ext_resource type="PackedScene" path="res://scenes/backdrop/cave_backdrop.tscn" id="3_backdrop"]
 
 [node name="GameUI" type="Node" node_paths=PackedStringArray("ui_root")]
 script = ExtResource("1_bridge")
 ui_root = NodePath("UIRoot")
+
+[node name="CaveBackdrop" parent="." instance=ExtResource("3_backdrop")]
 
 [node name="UIRoot" parent="." instance=ExtResource("2_ui")]
