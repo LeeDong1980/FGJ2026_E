@@ -77,6 +77,8 @@ var pitch_active: bool = false
 var voicedness: float = 100.0
 ## 目前按住的動作：&"inhale"、&"exhale" 或 &""（沒有）
 var action: StringName = &""
+## 最後一次按住的動作，放開後仍保留（給 UI 顯示最後辨識到的字音）
+var last_action: StringName = &""
 
 var _capture: AudioEffectCapture
 var _window: PackedFloat32Array = PackedFloat32Array()
@@ -245,6 +247,8 @@ func _set_action(new_action: StringName) -> void:
 	if new_action == action:
 		return
 	action = new_action
+	if action != &"":
+		last_action = action
 	action_changed.emit(action)
 
 

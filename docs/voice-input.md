@@ -24,36 +24,50 @@
 ## 2. 快速使用
 
 `MicInput` 在任何場景都能直接用，不用實例化、不用 `get_node`。
+遊戲端的呼叫對象見 [api.md](api.md)「給麥克風輸入：操作龍」；鍵盤版的接法可以參考 `scenes/game/keyboard_input.gd`，聲音輸入就是用同樣的呼叫取代按鍵。
 
-### 每個 frame 讀取數值
+### 音量 → 龍的目標層
+
+層從 0（最低層）開始，音量大對應高層（design.md 3.1）。
 
 ```gdscript
+@export var dragon: Dragon
+@export var game_manager: GameManager
+
 func _process(_delta: float) -> void:
-	var volume: float = MicInput.volume_value   # 0~100
-	var layer: int = clampi(int(volume / 100.0 * layer_count), 0, layer_count - 1)
-	dragon.target_layer = layer
+	var lane_count: int = game_manager.lane_layout.lane_count
+	var lane: int = clampi(int(MicInput.volume_value / 100.0 * lane_count), 0, lane_count - 1)
+	dragon.set_target_lane(lane)
 ```
 
-### 用 signal 接收吸／吐
+沒出聲時 `volume_value` 會維持最後的值，所以龍會停在最後的高度，不需要額外處理。
+
+### 吸／吐 → 吸與吐
+
+「吐」要回報開始和結束，剛好對應按住模式：`exhale` 開始時呼叫 `spit_pressed()`，放開時呼叫 `spit_released()`。
 
 ```gdscript
+var _previous_action: StringName = &""
+
 func _ready() -> void:
 	MicInput.action_changed.connect(_on_action_changed)
 
 func _on_action_changed(action: StringName) -> void:
+	if _previous_action == MicController.EXHALE:
+		game_manager.spit_released()
 	match action:
 		MicController.INHALE:   # &"inhale"
-			dragon.inhale()
+			game_manager.suck()
 		MicController.EXHALE:   # &"exhale"
-			dragon.exhale()
-		_:                      # &""：放開
-			pass
+			game_manager.spit_pressed()
+	_previous_action = action
 ```
 
-`action_changed` 在「開始按住」和「放開」時各發一次，所以：
+`action_changed` 在「開始按住」和「放開」時各發一次（放開時 `action` 為 `&""`），所以：
 
-- 每次發聲只要觸發一次動作（例如吸走一個食材）：在 `action_changed` 收到 `inhale` / `exhale` 時處理。
-- 需要「按住期間持續作用」：在 `_process` 讀 `MicInput.action`。
+- 每次發聲只要觸發一次動作（例如吸走一個食材）：在 `action_changed` 收到 `inhale` 時處理。
+- 需要「按住期間持續作用」（例如噴火）：開始時呼叫 `spit_pressed()`，放開時呼叫 `spit_released()`，或在 `_process` 讀 `MicInput.action`。
+- 遊戲狀態是 `WAITING` 或 `ENDED` 時，吸吐沒有作用，不需要自己擋。
 
 ## 3. 輸出（唯讀）
 
@@ -66,6 +80,7 @@ func _on_action_changed(action: StringName) -> void:
 | `pitch_active` | bool | 音高是否按住中 |
 | `pitch_hz` | float | 目前音高（Hz），沒有明確音高時為 0 |
 | `action` | StringName | 目前按住的動作：`&"inhale"`、`&"exhale"`，沒有則 `&""` |
+| `last_action` | StringName | 最後一次按住的動作，放開後仍保留；還沒有過則為 `&""`。給 UI 顯示「最後辨識到的字音」用 |
 | `voicedness` | float 0～100 | 氣音軸即時值（0 = 嘶聲、100 = 母音），供畫面或除錯用 |
 
 | Signal | 說明 |
