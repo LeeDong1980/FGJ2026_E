@@ -6,11 +6,51 @@ signal effect_started(effect_name: StringName)
 signal effect_finished(effect_name: StringName)
 signal effect_interrupted(effect_name: StringName)
 
+const MIN_EFFECT_WIDTH: float = 0.1
+const MAX_EFFECT_WIDTH: float = 8.0
+const MIN_LEGACY_RADIUS: float = 0.01
+
+var _suction_width: float = 4.0
+var _fire_width: float = 3.0
+
 @export_node_path("Node3D") var dragon_path: NodePath
 @export_range(0.05, 10.0, 0.05) var default_duration: float = 0.6
 @export_range(0.1, 20.0, 0.1) var effect_range: float = 6.0
-@export_range(0.01, 1.5, 0.01) var radius: float = 0.35
-@export_range(8, 512, 1) var particle_count: int = 96
+@export_range(8, 512, 1) var particle_count: int = 192
+
+@export_group("Effect Widths")
+## Diameter at the widest cross-section, in world units. Does not change range.
+@export_range(0.1, 8.0, 0.1) var suction_width: float = 4.0:
+	get:
+		return _suction_width
+	set(value):
+		if not _is_valid_width(value):
+			return
+		_suction_width = clampf(value, MIN_EFFECT_WIDTH, MAX_EFFECT_WIDTH)
+		_apply_active_width()
+@export_range(0.1, 8.0, 0.1) var fire_width: float = 3.0:
+	get:
+		return _fire_width
+	set(value):
+		if not _is_valid_width(value):
+			return
+		_fire_width = clampf(value, MIN_EFFECT_WIDTH, MAX_EFFECT_WIDTH)
+		_apply_active_width()
+
+## Compatibility: read suction radius; writing sets both widths to radius * 2.
+## Old positive radii down to 0.01 remain valid, including widths below 0.1.
+## Kept as a script property, not serialized by new scenes: a derived radius
+## must not overwrite independent widths when a PackedScene is saved/reloaded.
+var radius: float:
+	get:
+		return _suction_width * 0.5
+	set(value):
+		if not _is_valid_width(value):
+			return
+		var legacy_radius: float = clampf(value, MIN_LEGACY_RADIUS, MAX_EFFECT_WIDTH * 0.5)
+		_suction_width = legacy_radius * 2.0
+		_fire_width = legacy_radius * 2.0
+		_apply_active_width()
 
 var last_error: String = ""
 var _dragon: Node3D
@@ -56,6 +96,33 @@ func stop_effects() -> void:
 	_cancel_current()
 
 
+## Validates both inputs before updating either width. Positive values clamp.
+func set_effect_widths(suction: float, fire: float) -> bool:
+	if not _is_valid_width(suction) or not _is_valid_width(fire):
+		return false
+	_suction_width = clampf(suction, MIN_EFFECT_WIDTH, MAX_EFFECT_WIDTH)
+	_fire_width = clampf(fire, MIN_EFFECT_WIDTH, MAX_EFFECT_WIDTH)
+	last_error = ""
+	_apply_active_width()
+	return true
+
+
+func _is_valid_width(value: float) -> bool:
+	if not is_finite(value) or value <= 0.0:
+		last_error = "Effect width/radius must be positive and finite."
+		return false
+	return true
+
+
+func _apply_active_width() -> void:
+	if _active_effect != null:
+		_update_endpoints()
+
+
+func _get_effect_radius(effect_name: StringName) -> float:
+	return (_suction_width if effect_name == &"suction" else _fire_width) * 0.5
+
+
 func set_target_global_position(target_global_position: Vector3) -> void:
 	if not target_global_position.is_finite():
 		last_error = "Target must contain finite world coordinates."
@@ -81,7 +148,7 @@ func _play(effect_name: StringName, target: Vector3, duration: float) -> bool:
 	if not target.is_finite() or not is_finite(duration) or duration <= 0.0:
 		last_error = "Target must be finite and duration must be positive."
 		return false
-	if not is_finite(effect_range) or effect_range <= 0.0 or not is_finite(radius) or radius <= 0.0:
+	if not is_finite(effect_range) or effect_range <= 0.0:
 		last_error = "Effect range and radius must be positive and finite."
 		return false
 	var anchor: Marker3D = _get_mouth_anchor()
@@ -100,7 +167,7 @@ func _play(effect_name: StringName, target: Vector3, duration: float) -> bool:
 	_active_name = effect_name
 	_remaining = duration
 	_draining = false
-	_active_effect.radius = radius
+	_active_effect.radius = _get_effect_radius(effect_name)
 	_active_effect.particle_count = clampi(particle_count, 8, 512)
 	_update_endpoints()
 	if _active_effect == null:
@@ -136,6 +203,7 @@ func _update_endpoints() -> void:
 		stop_effects()
 		return
 	_visual_end = anchor.global_position + offset.limit_length(effect_range)
+	_active_effect.radius = _get_effect_radius(_active_name)
 	_active_effect.set_endpoints(anchor.global_position, _visual_end)
 
 

@@ -8,7 +8,7 @@
 - 編號給出後就不再更動；任務刪除或取消，編號也不再使用。
 - 區塊代號：`DES` 設計、`SET` 專案設定、`MIC` 麥克風輸入、`GM` 遊戲機制、`UI` UI 程式、`NET` 區網連線、`ART` 美術與關卡、`SND` 音效與 UI 素材、`EX` 有時間再做。
 
-2026-10-03：使用者要求本輪先收尾，停止新增製作／配置，待辦保留；接續狀態見 `docs/prototype_art_handoff.md`。尚未完整驗收，未 commit／push。
+2026-10-03：首版收尾後使用者已確認七項成果；素材／場景／特效已由團隊提交至 718d62b、2497e5d、bec1096。ART-07／ART-08 特效加寬已於 2026-10-03 獲使用者驗收，授權提交並建立 PR；ART-09／ART-10 已撤回，素材分配與缺件待辦保留。
 
 ## 必做
 
@@ -34,6 +34,8 @@
 - [ ] MIC-06 換層防抖：音量在層界線附近時不來回換層（例如遲滯），確定後更新 design.md 未定事項 @山雷
 - [ ] MIC-07 用真人聲音實測，調整音量、音高、吸/吐的預設參數（尤其「吐」開頭爆音被誤判成吸） @山雷
 - [x] MIC-08 修正 Windows 部分裝置的 WASAPI「unsupported channel count in microphone!」錯誤洪水：偵測麥克風沒有訊號時自動停止收音（只留一則警告），設定面板加「啟用麥克風」開關與「重新偵測」按鈕 @山雷
+- [x] MIC-09 單機保底版：game.tscn 加入 `PitchLaneInput` 橋接，玩家 1 的音高（`MicInput.pitch_value`）平均切成層數段，低中高音對應 1／2／3 層；玩家 2 用鍵盤 J／K 吸／吐（語音吸吐在實測中無法正確傳遞，已放棄） @Samuel
+- [x] MIC-10 單機保底版語音開關：game.tscn 左下角「音高」「吸／吐」兩個 toggle（`VoiceTogglePanel`，狀態存在 `MicInput.pitch_input_enabled`／`action_input_enabled` 並存檔）；新增 `VoiceActionInput` 語音吸吐橋接（與鍵盤 J／K 各自獨立）；音高音量閥值 `pitch_gate_db` 可存檔、預設改 -35 dB（遊戲畫面不放滑桿，需調整時從 Inspector 或 `user://mic_settings.cfg` 改） @Samuel
 
 #### 遊戲機制（露柑）
 - [x] GM-01 建立 `scenes/game/game.tscn` 與獨立的 LaneLayout 節點：依 `@export` 的層數與層距產生各層左右平台（實例化 cube_platform.tscn），提供 `get_lane_position(i)`、`get_lane_at(y)` @露柑
@@ -51,7 +53,8 @@
 - [x] GM-13 測試用暫時畫面：右平台暫時鍋子、Label3D 顯示禁止清單與進度、龍身上顯示胃袋食材 @露柑
 - [x] GM-14 噴火改為按住累計：胃空時持續吐 1 秒（`@export`）才燒掉，進度存在食材上、中斷保留，食材上顯示進度條；接口改為 `spit_pressed()`／`spit_released()` 並更新 api.md @露柑
 - [x] GM-15 遊戲流程：GameManager 加入遊戲狀態（等待開始／遊玩中／結束），開場擺好但靜止，`start_game()` 原地重置並開始（開始遊戲與重新遊玩共用），發出 `game_started`；鍵盤 Enter 開始；更新 api.md @露柑
-- [ ] GM-16 game.tscn 接入原型美術：LaneLayout 改為產生 prototype_floor、隊伍與鍋子位置讀房間定位點、龍沿用展示倍率、改用 PrototypePresentation 鏡頭燈光（特效之後再接） @露柑
+- [x] GM-16 game.tscn 接入原型美術：LaneLayout 改為產生 prototype_floor、隊伍與鍋子位置讀房間定位點、龍沿用展示倍率、改用 PrototypePresentation 鏡頭燈光（特效之後再接） @露柑
+- [x] GM-17 game.tscn 接入吸取與噴火特效：`EffectsView` 依 GameManager 事件播放，吞下或吸空時吸取、胃空喊「吐」期間持續噴火，目標為所在層隊伍最前端；吐進鍋子暫無特效 @露柑
 
 #### UI（GMF）
 - [x] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF
@@ -109,10 +112,14 @@
 - [x] 將吸取與噴火特效接口接入主場景，保留獨立展示與程式控制方式 @場景美術
 - [x] 驗證 Models/dragonEggs 三種龍蛋的匯入、材質及比例，建立可重用龍蛋子場景並配置哺育房 @場景美術
 - [x] 驗證 Models/dragonBabies 幼龍模型與貼圖，建立可重用幼龍子場景並配置三層哺育房 @場景美術
-- [ ] 逐一盤點 Models/kitkayDungeon 模型的實際內容、材質、尺寸與動畫，分類並提出房間補件及人物用途建議 @場景美術
+- [x] 逐一盤點 Models/kitkayDungeon 模型的實際內容、材質、尺寸與動畫，分類並提出房間補件及人物用途建議 @場景美術
 - [ ] 確認 kitkayDungeon 配置範圍與人物用途，定案後派工並驗證房間遮擋及通道 @美術總監
 - [ ] 決定 kitkayDungeon 用於勇者挑戰房或幼龍哺育房；兩類房間須使用不同素材，定案前不配置這批地牢物件 @待使用者決定
 - [ ] 確認人物模型位置與內容後先配置勇者挑戰房，驗證尺寸、材質與主鏡頭可見性 @場景美術
+- [x] ART-07 [緊急] 加寬吸取／噴火，提供分別可調整的世界寬度參數、上下界及執行時接口，完成展示與設定文件（使用者已驗收，授權提交 PR） @技術美術與特效
+- [x] ART-08 驗證加寬特效的最小／預設／最大表現、即時調整、停止清場與三層遮擋，統整設定方式供使用者驗收（使用者已驗收，授權提交 PR） @美術總監
+- [x] ART-09 [緊急] game.tscn 按 1／2／3 換層後紅龍模型不對齊目標（使用者表示已解決並撤回修正；本輪未改動畫，診斷資料保留供參考） @動畫師
+- [x] ART-10 統整兩項緊急任務進度與確認方式（使用者撤回 ART-09，沒有本輪動畫修正須交叉回歸；特效檢查已完成於 ART-08） @美術總監
 
 ### 音效與 UI
 

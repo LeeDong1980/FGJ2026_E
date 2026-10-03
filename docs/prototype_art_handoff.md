@@ -1,11 +1,13 @@
 # Prototype 美術交接清單
 
-2026-10-03，美術總監整理。使用者要求本輪先收尾；停止新增製作與配置，保存已完成成果及未完成事項。**本輪沒有 commit／push，也尚未取得完整任務完成確認。**
+2026-10-03，美術總監整理。本文件保存首次收尾快照。使用者其後已確認七項成果，素材／場景／特效已由團隊分別提交為 718d62b、2497e5d、bec1096，並包含於遠端 master；實際歷史為三個美術提交，不重寫成七個。
+
+使用者恢復工作後，ART-07／ART-08 吸取、噴火加寬與可調寬度接口已完成，預設採更誇張的覆蓋表現，已獲使用者驗收並授權提交 PR。game.tscn 紅龍原點問題（ART-09／ART-10）其後由使用者解決並撤回，本輪未改動畫。當前進度以 tasks.md 與 art_asset_needs.md 為準，本輪已驗收特效與相關文件以獨立 PR 提交，其餘缺件與決策保留。
 
 ## 專案狀態與檢視入口
 
 - 工作目錄：`C:/UnityProject/FGJ2026_E`。
-- 收尾時分支：`master`；HEAD：`4a87107`（art: track concept image imports and complete changes cleanup）。本輪成果仍在工作目錄中。
+- 初次收尾時分支：`master`；當時 HEAD：`4a87107`。首版成果其後已提交；恢復工作時本機 HEAD 為 def2614（首版與語音／區網功能已整合）。遠端仍可能有其他人的新提交，接續前核對實際 Git 狀態。
 - Godot：專案規格 4.7，驗證執行檔 4.7.2；Forward Plus／D3D12、Jolt。
 - 整體畫面：開 `project.godot`，F5 執行 `scenes/main/main.tscn`。
 - 特效：開 `scenes/vfx/vfx_preview.tscn`，F6；1 吸取、2 噴火、Space 停止、Tab 切目標、+／- 調射程、PageUp／PageDown 切展示高度。
@@ -19,7 +21,7 @@
 - 房間前側 +Z 朝攝影機開放；通用天花板可逐房隱藏，預設隱藏且停用其碰撞。
 - 主龍使用者新構圖：根倍率 5、位置 `(0, 6.4, -16.018951)`、基礎動畫 fly。不要還原倍率 2 或強制對齊 MiddleFloor 的 DragonAnchor。
 - 攝影機以 Blender Perspective／150mm 換算，Godot 俯視 5°，垂直 FOV 約 7.7232°；36mm 水平感光元件與 16:9 為換算假設，展示 rig 依房間邊界重新構圖。細節見攝影機文件。
-- 吸取為收束到嘴的氣流，噴火為清楚、節制的短錐暖色火焰；主場景預設停止，未自行將 atk／roar 對應到玩法。
+- 吸取為收束到嘴的氣流，噴火為暖色錐形火焰；使用者恢復工作後要求更誇張、覆蓋更大，新增獨立寬度接口（ART-07／ART-08）。主場景預設停止，未自行將 atk／roar 對應到玩法。
 - 育幼核心素材由使用者提供；不以小型成年龍、幾何巢或其它代用品補齊尚缺素材。
 - **兩類房間要用不同素材；kitkayDungeon 用哪一類尚未決定，暫不配置此批地牢物件。人物模型先放挑戰房，但人物檔案尚未找到。**
 
@@ -76,7 +78,7 @@ kitkay 盤點文件由場景美術維護：`docs/kitkay_dungeon_inventory.md`。
 | 素材署名與另行改動 | `docs/asset_credits.md` 仍有待補欄位；`scenes/dungeon_room/dungeon_room_dev.tscn` 為另外出現的場景，需核對來源／歸屬後再決定提交範圍 |
 | 完整驗收與提交 | 補素材／定案後只重驗相關變更；使用者確認完整任務完成，再由總監分批 commit／push |
 
-## 未提交範圍與提交順序
+## 首版七項分組（已提交，保留作查核）
 
 以重新執行 `git status --short` 的結果為準；目前主要範圍：
 
@@ -88,7 +90,7 @@ kitkay 盤點文件由場景美術維護：`docs/kitkay_dungeon_inventory.md`。
 6. 共用文件與預覽：`AGENTS.md`、`docs/conventions.md`、`design.md`、`tasks.md`、`room_concepts_v1.md`、素材表、驗收／整合／交接文件、參考圖及主場景預覽／.import。
 7. `dungeon_room_dev.tscn`、`asset_credits.md`：先核對來源與歸屬，勿混入其他人的改動。
 
-此列表是交接後的建議分組，**不是提交授權**。每組 .uid／.import 隨資源保存，.godot 快取不提交；不要移動或重新命名來源模型。沒有清除、還原或暫存使用者改動。
+此列表記錄使用者已確認的首版七項分組；已包含於上述團隊提交，不能視為仍有七批待提交。新改動仍需另行驗收。.uid／.import 隨資源保存，.godot 快取不提交；不要移動或重新命名來源模型。沒有清除、還原或暫存使用者改動。
 
 ## Session 接續位置
 

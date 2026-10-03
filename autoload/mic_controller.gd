@@ -22,9 +22,9 @@ const SETTINGS_PATH := "user://mic_settings.cfg"
 ## 會被存檔的設定
 const SAVED_PROPERTIES: PackedStringArray = [
 	"volume_min_db", "volume_max_db", "volume_release_seconds",
-	"pitch_min_hz", "pitch_max_hz", "pitch_release_seconds",
+	"pitch_min_hz", "pitch_max_hz", "pitch_release_seconds", "pitch_gate_db",
 	"action_gate_db", "inhale_max", "exhale_min", "action_release_seconds",
-	"mic_enabled",
+	"mic_enabled", "pitch_input_enabled", "action_input_enabled",
 ]
 const MIN_DB := -60.0
 ## 開始收音後這麼久都沒有任何訊號，就視為麥克風無法使用並停止收音
@@ -51,7 +51,7 @@ const DETECT_MAX_HZ := 1000.0
 @export var pitch_max_hz: float = 500.0
 @export var pitch_release_seconds: float = 0.1
 ## 低於此音量不做音高判定（避免環境噪音誤判）
-@export var pitch_gate_db: float = -45.0
+@export var pitch_gate_db: float = -35.0
 ## 自相關峰值（0~1）低於此值視為沒有明確音高
 @export_range(0.0, 1.0) var min_correlation: float = 0.5
 
@@ -89,6 +89,9 @@ var last_action: StringName = &""
 ## 麥克風收音狀態與開關（開關會存檔）
 var mic_status: MicStatus = MicStatus.LISTENING
 var mic_enabled: bool = true
+## 遊戲端是否採用音高（換層）與吸／吐（語音）輸出；只是給遊戲橋接讀的開關，不影響收音與分析，會存檔
+var pitch_input_enabled: bool = true
+var action_input_enabled: bool = true
 
 var _capture: AudioEffectCapture
 var _mic_player: AudioStreamPlayer

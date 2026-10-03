@@ -4,7 +4,7 @@ extends Node3D
 
 @export_range(8, 512, 1) var particle_count: int = 96
 @export_range(0.01, 1.0, 0.01) var particle_lifetime: float = 0.28
-@export_range(0.01, 1.5, 0.01) var radius: float = 0.35
+@export_range(0.01, 4.0, 0.01) var radius: float = 0.35
 
 var _emitters: Array[GPUParticles3D] = []
 var _core: MeshInstance3D

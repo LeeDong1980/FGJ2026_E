@@ -3,6 +3,7 @@ extends Node3D
 
 var _floor_index: int = 1
 var _alternate_target: bool = false
+var _playback_error: String = ""
 
 @onready var main: Node3D = $Main
 @onready var effects: DragonEffects = %DragonEffects
@@ -14,7 +15,19 @@ var _alternate_target: bool = false
 func _ready() -> void:
 	effects.bind_dragon(_dragon)
 	_update_target()
-	_status.text = "1: suction   2: fire   Space: stop   Tab: switch target   +/-: visual range   PgUp/PgDn: move dragon\nTarget ring is a VFX marker. Gameplay and action animations are not connected."
+	_refresh_status()
+
+
+func _process(_delta: float) -> void:
+	_refresh_status()
+
+
+func _refresh_status() -> void:
+	var text: String = "1：吸取　2：噴火　空白：停止　Tab：切換目標　PageUp/Down：換層\nQ/A：吸取加寬／縮窄　W/S：噴火加寬／縮窄　＋/－：調整射程\n吸取寬 %.2f　噴火寬 %.2f　射程 %.1f（世界單位；寬度為完整直徑）\n圓環是特效目標；此處「吐」指噴火，未串接胃袋吐食材。" % [effects.suction_width, effects.fire_width, effects.effect_range]
+	if not _playback_error.is_empty():
+		text += "\n無法播放特效：" + _playback_error
+	if _status.text != text:
+		_status.text = text
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -30,6 +43,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_play(true)
 		KEY_SPACE:
 			effects.stop_effects()
+			_playback_error = ""
 		KEY_TAB:
 			_alternate_target = not _alternate_target
 			_update_target()
@@ -41,12 +55,19 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			effects.effect_range = minf(20.0, effects.effect_range + 1.0)
 		KEY_MINUS, KEY_KP_SUBTRACT:
 			effects.effect_range = maxf(1.0, effects.effect_range - 1.0)
+		KEY_Q:
+			effects.suction_width += 0.25
+		KEY_A:
+			effects.suction_width = maxf(DragonEffects.MIN_EFFECT_WIDTH, effects.suction_width - 0.25)
+		KEY_W:
+			effects.fire_width += 0.25
+		KEY_S:
+			effects.fire_width = maxf(DragonEffects.MIN_EFFECT_WIDTH, effects.fire_width - 0.25)
 
 
 func _play(fire: bool) -> void:
 	var accepted: bool = effects.play_fire(target.global_position, effects.default_duration) if fire else effects.play_suction(target.global_position, effects.default_duration)
-	if not accepted:
-		_status.text = "Effect unavailable: " + effects.last_error + "\n1 / 2: retry after the mouth anchor is ready."
+	_playback_error = "" if accepted else effects.last_error
 
 
 func _move_floor(direction: int) -> void:

@@ -175,3 +175,35 @@ Jolt headless 整合檢查通過：三隻幼龍皆高 1.15、底部對齊各層�
 Forward Plus／D3D12、1600 × 900 真實主鏡頭確認：幼龍、蛋組與鍋子分開可讀，三層配置皆可見，未調整主鏡頭或主龍構圖。檢查圖：`C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/main_hatchlings_review.png`。獨立比例圖：`C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/baby_dragon_review.png`。
 
 素材 GLB 內含的作者／授權中繼資料：Baby dragon，Kanna-Nakajima，CC-BY-4.0；來源連結為 [Sketchfab Baby dragon](https://sketchfab.com/3d-models/baby-dragon-8ebffa958b6247d09b0c40f33f03bbae)。此處記錄檔案內資訊，供總監統整素材署名。
+
+## 特效加寬後的主鏡頭只讀檢視
+
+2026-10-03 恢復工作後，以 `master def2614` 的房間／主場景及技美正在交付的加寬版特效做獨立副本檢視。使用者已選擇「更誇張、覆蓋更大的範圍」，本輪保留 `suction_width=4.0`、`fire_width=3.0`，沒有縮小預設，也沒有修改共享 Effects、主龍、攝影機或 GM 場景。寬度表示最寬截面的完整直徑，合法上下界及設定接口由 `docs/dragon_vfx_api.md` 說明。
+
+### 取樣方法與證據
+
+- Godot 4.7.2、Forward Plus／D3D12、RTX 4070 Laptop GPU、1600 × 900。獨立載入 `scenes/main/main.tscn`，保持主龍倍率 5、位置 `(0, 6.4, -16.018951)` 及目前主攝影機。
+- 凍結一次 fly 姿勢，嘴部約 `(-0.4154, 11.2851, -4.8817)`；依序指向低／中／高層 `QueueFrontAnchor + Vector3.UP`。保持目前主龍位置，不虛構主場景已接換層或朝左動畫。
+- 每層吸取與噴火各比較三種設定：寬度預設 4／3、射程 6；相同寬度、射程上限 20；完整寬度 8／8、射程上限 20。共 18 張效果圖及 1 張待機圖，全部 PNG 保存回傳 0，程序正常退出。
+- 射程 20 是允許連到各層真實目標的上限，不會把距離較近的目標向外推到 20。此取樣嘴部到低／中／高目標距離約 12.612／9.012／7.306。
+- 載入／GPU 日誌沒有 script／shader 解析錯誤。獨立副本仍有使用者快取／憑證存放區權限訊息及 ground UID 快取未註冊警告，後者回退既有文字路徑正常；沒有更動共享來源資源。
+
+### 可讀性與建議
+
+| 設定 | 實際觀察 | 建議 |
+|---|---|---|
+| 吸取 4、噴火 3 | 藍色氣流幅寬與暖色火焰錐形明顯；三層右側鍋子、藍色幼龍及三種蛋均可各自辨識。效果主要位於中央至左房，沒有覆蓋右側育幼陳設 | 保留指定預設供使用者驗收；沒有理由由場景美術縮回舊窄版 |
+| 射程預設 6 | 本次三層目標距離均大於 6，效果會在中央通道或左房入口前截短，尤其低層看起來與目標分離 | 若要求效果連到隊首，呼叫端須另設射程；本次上限 20 可連到三層，14 也足夠本姿勢，但不能以此保證所有動畫姿勢 |
+| 寬度 8、射程 20 | 吸取散布更大，部分氣流覆過左房內側與上下邊界；火焰的亮粒子及連續核心遮住左房內側木箱／牆面，低層斜向效果同時覆過中層邊界。右側鍋子／幼龍／蛋仍可辨識 | 8 保留為可調最大值；須告知大範圍表現會降低左房陳設及作用樓層的辨識度，不代表技術接口失敗 |
+| 固定展示龍指向低／中層 | 嘴部在高處，效果斜向穿過中間高度；加寬會放大跨層視覺，但這也來自既有展示龍與目標的對位 | 後續由總監與玩法／動畫負責人決定換層、口部對位或作用層提示，本輪不動已確認構圖 |
+
+此檢視只涵蓋目前主鏡頭的一次固定姿勢與左側隊首目標，不是所有 fly 姿勢、轉頭、GM-16 遊戲場景或向鍋子吐食材的驗收。人物／六種食材模型仍未提供，不能宣稱已確認角色臉部、食材輪廓或 UI 進度的遮擋。巢穴與稻草／軟墊仍缺，沒有擅自新增替代物。
+
+### 檢視輸出
+
+- [吸取三層比較索引](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/width_suction_three_floor_index.png)。
+- [噴火三層比較索引](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/width_fire_three_floor_index.png)。
+- [取樣數值及右房物件投影外框](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/width_readability_metadata.json)。同目錄保留 `width_<lowfloor/middlefloor/highfloor>_<suction/fire>_<default/range20/maxwidth_range20>.png` 及 `width_scene_idle.png` 原圖。
+- 暫存專案 `C:/Users/LeeDong/AppData/Local/Temp/fgj_main_effects_qa`，包含 `capture_width_readability.gd`、`width_review_sheets.py`、`width_source_snapshot.json` 與 `width_capture*.log`。截圖取樣後技美修改的 legacy radius 序列化與獨立預覽操作沒有改變此次主場景效果的寬度／渲染計算；若後續修改幅寬、shader 或主要場景變換，須重新取樣。
+
+本 session 僅更新自己的兩份交付文件，未 commit／push；驗證程序已退出，使用者 Godot 保留。

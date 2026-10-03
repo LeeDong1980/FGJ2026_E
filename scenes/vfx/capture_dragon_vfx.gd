@@ -39,7 +39,21 @@ func _capture() -> void:
 	print("MOUTH ", (dragon.call(&"get_mouth_anchor") as Marker3D).global_position, " target=", target.global_position)
 	# Keep the sampled fly pose constant so captures compare only VFX changes.
 	dragon.call(&"stop_animation", true)
+	for emitter_node: Node in effects.find_children("*", "GPUParticles3D", true, false):
+		var emitter: GPUParticles3D = emitter_node as GPUParticles3D
+		emitter.use_fixed_seed = true
+		emitter.seed = 235
 	await _save("vfx_idle.png")
+	# Original 0.35 radius / 96-particle budget, with the same pose and camera.
+	effects.radius = 0.35
+	effects.particle_count = 96
+	await _capture_effect(effects, target, false, "width_suction_before.png")
+	await _capture_effect(effects, target, true, "width_fire_before.png")
+	effects.particle_count = 192
+	effects.set_effect_widths(0.1, 0.1)
+	await _capture_effect(effects, target, false, "width_suction_min.png")
+	await _capture_effect(effects, target, true, "width_fire_min.png")
+	effects.set_effect_widths(4.0, 3.0)
 	if not effects.play_suction(target.global_position, 2.0):
 		push_error(effects.last_error)
 		quit(3)
@@ -49,17 +63,32 @@ func _capture() -> void:
 	effects.play_fire(target.global_position, 2.0)
 	await create_timer(0.45).timeout
 	await _save("vfx_fire.png")
+	effects.set_effect_widths(8.0, 8.0)
+	await _capture_effect(effects, target, false, "width_suction_max.png")
+	await _capture_effect(effects, target, true, "width_fire_max.png")
+	effects.set_effect_widths(4.0, 3.0)
 	# Also show the same target reached with an explicit, larger visual range.
 	effects.effect_range = 12.0
 	effects.play_fire(target.global_position, 2.0)
 	await create_timer(0.45).timeout
 	await _save("vfx_fire_range12.png")
 	effects.stop_effects()
+	effects.effect_range = 6.0
 	await process_frame
 	await process_frame
 	await _save("vfx_stopped.png")
 	print("VFX_GPU_CAPTURE_COMPLETE")
 	quit(0)
+
+
+func _capture_effect(effects: DragonEffects, target: Marker3D, fire: bool, filename: String) -> void:
+	var accepted: bool = effects.play_fire(target.global_position, 2.0) if fire else effects.play_suction(target.global_position, 2.0)
+	if not accepted:
+		push_error(effects.last_error)
+		quit(3)
+		return
+	await create_timer(0.45).timeout
+	await _save(filename)
 
 
 func _save(filename: String) -> void:

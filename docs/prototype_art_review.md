@@ -1,12 +1,12 @@
 # Prototype 美術首版整合紀錄
 
-日期：2026-10-03。美術總監統整；目前為可檢視首版，巢穴與稻草／軟墊尚未提供，尚未完成使用者驗收，未 commit／push。
+日期：2026-10-03。美術總監統整；首版七項已經使用者確認並由團隊提交（718d62b、2497e5d、bec1096）。巢穴與稻草／軟墊尚未提供，保留後續待辦；ART-07／ART-08 加寬特效已完成並獲使用者驗收，授權提交 PR。ART-09／ART-10 紅龍原點問題已由使用者解決並撤回，本輪未改動畫。
 
 ## 檢視方式
 
 在 Godot 開啟 `project.godot` 後按 F5，執行 `scenes/main/main.tscn`。房間是供主場景實例化的子場景，本身不含攝影機；單獨按 F6 並非完整展示畫面。
 
-未提交成果及逐項檢視操作見 `prototype_art_acceptance.md`；特效展示開啟 `scenes/vfx/vfx_preview.tscn` 後按 F6。
+成果及逐項檢視操作見 `prototype_art_acceptance.md`；特效展示開啟 `scenes/vfx/vfx_preview.tscn` 後按 F6。
 
 ![三層主場景首版](prototype_main_preview.png)
 
@@ -54,4 +54,18 @@
 
 使用者確認完整任務完成後，再由美術總監按房間／布局、動畫、合成及共用文件整理提交與推送。
 
-工作期間另外出現 `scenes/dungeon_room/dungeon_room_dev.tscn`、`docs/asset_credits.md`，不屬於本輪指派 session 的交付；已原樣保留，正式提交前需核對來源與歸屬。
+首版工作期間另外出現 `scenes/dungeon_room/dungeon_room_dev.tscn`、`docs/asset_credits.md`，其後已隨團隊提交；兩者不屬於本輪緊急修改範圍，維持原樣。
+
+## ART-07／ART-08 加寬特效驗證
+
+使用者要求更誇張、覆蓋更大的表現。新版 `DragonEffects` 的 `suction_width` 預設 4、`fire_width` 預設 3，皆以最寬截面的完整世界直徑表示，合法範圍 0.1～8。兩種寬度獨立，播放中修改會即時更新粒子、火焰核心及剔除邊界，射程仍由 `effect_range` 控制。
+
+- 技美完成 122 項接口／預覽檢查，包含非法數值、上下界、執行時修改、實例資源隔離、獨立寬度的場景存取及舊 `radius` 程式接口相容。
+- 總監在更新至目前來源的獨立副本重新檢查主場景、三層 Jolt 通道／天花板、幼龍／蛋落地及特效接口，輸出 `INTEGRATION_FAILURES 0`。另驗證 F6 的 Q／A、W／S 按鍵能各別調寬、立即更新作用中效果、不改射程或主龍變換，Space 清除粒子與核心；輸出 `DIRECTOR_WIDTH_PREVIEW_FAILURES 0`。
+- 總監以 Godot 4.7.2、Forward Plus／D3D12、1600 × 900 擷取 11 張 GPU 圖：待機、舊寬度 0.7、最小 0.1、新預設 4／3、最大 8、另設射程 12，以及停止。全部 PNG 儲存回傳 0、程序退出碼 0，無 script／shader 編譯錯誤。
+- 新預設幅寬明顯增加；本次左側目標取樣中，右房鍋子、幼龍及蛋仍清楚。最大寬度 8 會覆住部分左房與龍爪，並跨樓層邊界；保留上限供使用者選擇。場景美術另完成三層共 18 張比較，細節與限制見 `prototype_rooms.md`；合成師完成 61 個 fly 姿勢的幾何檢視，見 `prototype_camera.md`。
+- 預設射程 6 對目前展示龍通常無法連到左房隊首；加寬不會延長射程。玩法呼叫端需依目標另設射程，視覺範圍不作命中判定。
+
+可重跑的接口驗證、GPU 擷取腳本與對比圖由技美保存在 `scenes/vfx/`，設定方式見 `dragon_vfx_api.md`。總監的獨立取樣保存在 `C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-5594-79b3-b9ec-39574beee96d/width_review/`。
+
+這批 GPU 畫面代表本輪取樣時的紅龍來源。使用者其後表示 `scenes/game/game.tscn` 原點問題已解決，撤回 ART-09 修正；動畫師沒有改動動畫程式或場景，不另外進行撤回任務的交叉回歸。使用者已於 2026-10-03 確認加寬特效，授權將特效與相關文件 commit／push 並建立 PR。

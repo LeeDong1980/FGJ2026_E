@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scenes/vfx/vfx_preview.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/main/main.tscn" id="2"]
@@ -15,7 +15,11 @@ outer_radius = 0.1
 rings = 12
 ring_segments = 12
 
+[sub_resource type="SystemFont" id="PreviewFont"]
+font_names = PackedStringArray("Microsoft JhengHei", "Noto Sans CJK TC", "Microsoft YaHei")
+
 [sub_resource type="LabelSettings" id="Instructions"]
+font = SubResource("PreviewFont")
 font_size = 18
 outline_size = 3
 outline_color = Color(0, 0, 0, 1)
@@ -39,7 +43,8 @@ cast_shadow = 0
 
 [node name="Label" type="Label3D" parent="Target"]
 position = Vector3(0, 0.27, 0)
-text = "VFX target"
+text = "特效目標"
+font = SubResource("PreviewFont")
 font_size = 24
 pixel_size = 0.008
 billboard = 1

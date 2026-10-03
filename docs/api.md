@@ -24,6 +24,7 @@
 - 吸和吐一律作用在龍目前位置所在的層（`dragon.current_lane`），不需要傳層的編號。
 - 「吐」要回報開始和結束：胃袋有食材時，`spit_pressed()` 一呼叫就吐進鍋子；胃袋空著時是噴火，要持續到 `spit_released()`，累計 `burn_time` 秒（預設 1 秒）才燒掉一個食材。
 - 層數：`game_manager.lane_layout.lane_count`。
+- 樓層位置：`lane_layout.get_lane_position(lane)` 是該層地板頂面的 Y（LaneLayout 本地座標，層距 5）；`lane_layout.get_anchor_position(lane, name)` 取房間定位點（`QueueSpawnAnchor`、`QueueFrontAnchor`、`PotAnchor` 等，名稱見 `docs/prototype_rooms.md`），例如 UI 跟隨鍋子用 `PotAnchor`。
 - 鍵盤測試輸入 `scenes/game/keyboard_input.gd` 就是用這些呼叫（按住 K 噴火），可以當作範例。
 
 ## 給 UI：遊戲流程
