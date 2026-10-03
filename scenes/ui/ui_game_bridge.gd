@@ -8,7 +8,7 @@ extends Node
 
 ## 「下一關」要等關卡資料完成後才會提供（docs/api.md），目前成功時一律顯示「關閉遊戲」。
 const HAS_NEXT_LEVEL := false
-## 鍋子資訊跟隨的位置：右平台中心往上這麼高（世界座標）。
+## 鍋子資訊跟隨的位置：鍋子定位點往上這麼高（世界座標）。
 const POT_ANCHOR_HEIGHT := 0.6
 
 @export var game_manager: GameManager
@@ -80,12 +80,12 @@ func _read_current_state() -> void:
 	_hud.set_current_lane(_dragon.current_lane)
 
 
-## 各層右平台（鍋子）上方的世界座標。
+## 各層鍋子上方的世界座標。
 func _pot_anchor_positions(lane_count: int) -> Array[Vector3]:
 	var layout := game_manager.lane_layout
 	var positions: Array[Vector3] = []
 	for lane in lane_count:
-		var local := Vector3(layout.platform_offset_x, layout.get_lane_position(lane) + POT_ANCHOR_HEIGHT, 0.0)
+		var local := layout.get_anchor_position(lane, &"PotAnchor") + Vector3.UP * POT_ANCHOR_HEIGHT
 		positions.append(layout.to_global(local))
 	return positions
 
