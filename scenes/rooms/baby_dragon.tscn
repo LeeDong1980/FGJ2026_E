@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://Models/dragonBabies/baby_dragon.glb" id="1_baby"]
+
+[node name="BabyDragon" type="Node3D"]
+metadata/display_height = 1.15
+metadata/static_pose = true
+
+[node name="Model" parent="." instance=ExtResource("1_baby")]
+position = Vector3(-0, -0.00065677014, 0.211296117)
+scale = Vector3(8.654718, 8.654718, 8.654718)

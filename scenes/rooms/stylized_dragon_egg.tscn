@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://Models/dragonEggs/stylized_dragon_egg.glb" id="1_egg"]
+
+[node name="StylizedDragonEgg" type="Node3D"]
+metadata/display_height = 0.9
+
+[node name="Model" parent="." instance=ExtResource("1_egg")]
+position = Vector3(3.05712323, 0.000208496444, 0.00102771596)
+scale = Vector3(0.0321060119, 0.0321060119, 0.0321060119)

@@ -1,0 +1,127 @@
+# 紅龍吸取與噴火特效
+
+交付：@技術美術與特效，2026-10-03。此模組提供視覺效果，食材銷毀、進鍋、命中、換層及動畫作用時刻由玩法程式決定。使用者已確認氣流向嘴收束、短錐暖色火焰的方向。
+
+## 檔案內容
+
+| 檔案（`res://scenes/vfx/`） | 內容 |
+|---|---|
+| `dragon_effects.tscn`、`dragon_effects.gd` | `DragonEffects` 控制器；綁定嘴部接口、播放／中斷／完成事件、世界目標更新及視覺射程限制 |
+| `suction_effect.tscn` | `SuctionEffect`；淡藍氣流由目標端收束至嘴部，預設 96 粒子 |
+| `fire_breath_effect.tscn` | `FireBreathEffect`；連續錐形核心、暖色粒子、少量火星與淡煙，預設 96 + 16 + 12 粒子 |
+| `directed_effect.gd` | 粒子資源隔離、世界端點與剔除邊界更新、發射／尾端消散／立即清場 |
+| `endpoint_flow.gdshader` | `particles` shader；按生命週期計算收束／向外流動、錐形展開、旋流、淡出 |
+| `flow_surface.gdshader` | `spatial` shader；沿畫面作用方向排列粒子，以 UV 程序形狀產生氣流／火焰／火星／煙；不需要外部貼圖 |
+| `flame_core.gdshader` | 低透明度錐形核心的程序起伏與流動紋理，填補粒子間隙，與尾端一併淡出 |
+| `vfx_preview.tscn`、`vfx_preview.gd` | 實例化目前主場景的 F6 展示，保留使用者主龍變換；使用目標圓環，不生成食材 |
+| `verify_dragon_vfx.gd` | 無視窗接口、資源隔離及實際嘴部／主場景整合驗證 |
+| `capture_dragon_vfx.gd` | Forward Plus GPU 擷取工具；固定取樣的 fly 姿勢以比較特效，不修改來源場景 |
+| `qa/*.png` | 同一主鏡頭、同一龍姿勢的待機、吸取、預設噴火、加長範圍及停止畫面 |
+
+腳本、shader 的 `.uid` 及 QA 圖片的 `.import` 一併交付。共享文件由總監維護，主場景接入由場景美術負責；本 session 沒有修改紅龍、主場景、來源模型、InputMap、攝影機或 Environment。
+
+## 整合接口
+
+根節點類別為 `DragonEffects`。在主場景實例化一次，Inspector 的 `dragon_path` 指向紅龍，例如 `../RedDragon`；或於 ready 後呼叫：
+
+```gdscript
+@onready var effects: DragonEffects = %Effects
+@onready var dragon: Node3D = %RedDragon
+
+func _ready() -> void:
+	if not effects.bind_dragon(dragon):
+		print(effects.last_error)
+
+func show_suction(target_marker: Marker3D) -> void:
+	effects.play_suction(target_marker.global_position, effects.default_duration)
+
+func show_fire(target_marker: Marker3D) -> void:
+	effects.play_fire(target_marker.global_position, 0.6)
+
+func cancel_action() -> void:
+	effects.stop_effects()
+```
+
+| 方法 | 行為 |
+|---|---|
+| `bind_dragon(dragon: Node3D) -> bool` | 綁定具 `get_mouth_anchor() -> Marker3D` 的角色；更換綁定會中斷舊效果。節點或掛點不可用時回傳 false |
+| `play_suction(target_global_position: Vector3, duration: float = 0.6) -> bool` | 從目標端吸向嘴部；duration 是發射秒數。每次呼叫重新播放，並中斷既有效果 |
+| `play_fire(target_global_position: Vector3, duration: float = 0.6) -> bool` | 從嘴部噴向目標端；參數及重播規則同上 |
+| `set_target_global_position(position: Vector3) -> void` | 更新世界目標，可在效果播放時逐幀呼叫；不保存食材節點引用 |
+| `stop_effects() -> void` | 立即停止發射並隱藏／清除尾端；無作用中的效果時不發事件 |
+| `get_active_effect() -> StringName` | 回傳 `suction`、`fire` 或空字串；消散期間仍算作用中 |
+| `get_visual_end_global_position() -> Vector3` | 最近一次計算的視覺端點，供除錯或範圍提示使用；閒置時可能是前次端點 |
+
+未 ready、未綁定、缺掛點、非有限座標／duration、非正 duration，或目標距嘴部小於 0.01 單位，播放會回傳 false；原因可讀 `last_error`。失敗的播放請求不替換既有效果。掛點於播放中被移除，或目標移到嘴部，則中斷並清場。非有限目標更新會被忽略。
+
+不直接綁定 `roar`／`atk`，也不使用 `animation_finished` 作命中判定。現有專用吸取／噴火動畫及作用時刻尚未定案；玩法需在自己的作用時刻呼叫特效，在取消／切換樓層時明確停止。
+
+## 事件與消散
+
+```gdscript
+signal effect_started(effect_name: StringName)
+signal effect_finished(effect_name: StringName)
+signal effect_interrupted(effect_name: StringName)
+```
+
+- 一般播放：`effect_started(new)`。
+- 切換、同效果重播：`effect_interrupted(old)` → `effect_started(new)`。
+- 自然結束：停止新粒子發射，保留尾端淡出，再發出 `effect_finished(name)`。
+- 明確停止、重新綁定或掛點失效：立即清場，僅發出 `effect_interrupted(name)`。
+- 事件回呼中發出的較新播放／停止請求優先，不被外層舊請求覆蓋。
+
+預設吸取尾端最多 0.33 秒、噴火最多 0.43 秒；例如 duration=0.6 的完整視覺週期約為 0.93／1.03 秒。這是視覺完成事件，不代表食材命中或進鍋。
+
+## Inspector、世界尺寸與預算
+
+| 屬性 | 預設 | 說明 |
+|---|---:|---|
+| `dragon_path` | 空 | 相對控制器的角色節點路徑；空時由程式綁定 |
+| `default_duration` | 0.6 秒 | 提供呼叫端與預覽使用；範例會明確傳入此值。省略函式 duration 參數時為簽名中的固定 0.6 秒 |
+| `effect_range` | 6 單位 | 嘴部至視覺端點的最大距離；不改變遊戲作用範圍 |
+| `radius` | 0.35 單位 | 外端最大分布半徑；吸取向嘴收窄，噴火向外展開 |
+| `particle_count` | 96 | 主要氣流／火焰粒子數；火星 16、煙 12 於噴火子場景獨立設定 |
+| 子場景 `particle_lifetime` | 0.28 秒 | 主要粒子最長生命週期；火星 0.25、煙 0.38 秒 |
+
+全部距離、半徑、粒子大小與剔除邊界使用 Godot **世界單位**。嘴部掛點繼承角色的變換，特效子場景則隔離父節點變換，以世界座標更新 shader；角色根倍率 2、5 或旋轉／位移不會把火焰尺寸再乘上角色倍率。
+
+兩個效果合計配置 220 粒子，互斥播放；吸取可見預算 96，噴火 124，加上一個 12 邊錐形核心，最多 4 個繪製通道同時可見。每實例的 4 個粒子 process material、4 個繪製 material、核心 material 及 4 個 QuadMesh 均獨立；不可變的 shader 程式與核心 mesh 可共享。以低透明度、窄分布與局部 emission 保留可讀性，無粒子碰撞／吸引器／光源／額外 Glow／景深。
+
+端點超界時，以 `(target - mouth).limit_length(effect_range)` 截短視覺長度，仍朝原目標方向。吸取粒子此時從截短端點收束，**不會在真正超界目標附近生成**；噴火也不會觸及真正超界目標。需完整連接兩點時，由呼叫端調整視覺 `effect_range`，不能據此判定玩法命中。
+
+## 預覽
+
+開啟 `res://scenes/vfx/vfx_preview.tscn` 按 F6：
+
+- `1` 吸取、`2` 噴火、空白立即停止。
+- Tab 在兩個左房目標間切換；`+`／`-` 每次增減視覺射程 1 單位（範圍 1～20）。
+- PageUp／PageDown 在預覽內上下移動龍與目標，切層前清除特效；不改來源 main 的變換。
+- 圓環及 `VFX target` 是效果定位提示，沒有食材、傷害或鍋子規則；這些按鍵不寫入 InputMap。
+
+主場景保持預設不發射；如場景美術已接入 `%Effects`，預覽使用自己的控制器進行操作，主場景內控制器仍保持閒置。
+
+## 驗證與目前限制
+
+2026-10-03，在專用 Windows Temp 專案副本使用 Godot 4.7.2 驗證，未對共享專案執行匯入。
+
+- 無視窗驗證：`VFX_RESULT checks=64 failures=0`，涵蓋缺／錯誤／被刪除掛點、無效參數、待機不發射、停止、自然消散、切換、連續重播、回呼重入、目標更新、世界射程與邊界、兩實例資源隔離、倍率 2／5、位移／旋轉、連續錐形核心的尺寸／停止／消散，以及動畫師實際嘴部接口的 fly 追蹤。
+- 場景美術接入的 Main `%Effects` 已驗證自動綁定 `../RedDragon`、初始閒置及播放接受。
+- GPU 使用 **D3D12／Forward Plus／RTX 4070 Laptop GPU**，1600 × 900；三個 shader 實際編譯及五張 PNG 擷取成功。`INSTANCE_CUSTOM` 從 vertex 透過 varying 傳入 fragment；無 shader／script 解析錯誤。停止後圖片與待機圖片 SHA-256 相同，沒有殘留特效。
+- 圖片取樣保留已確認的 root scale 5、position `(0, 6.4, -16.018951)`；固定當下 fly 姿勢後比較 VFX。取樣嘴部約 `(-0.38, 10.98, -4.95)`，目標 `(-4.6, 6, 1.1)`，該姿勢相距約 8.9 單位，故預設 6 單位會截短；另附 range=12 的連接目標畫面，沒有改攝影機或主龍布局。**8.9 是單次取樣，非全程固定距離**；fly 起伏、頭部動作及樓層切換都會改變嘴部至目標的距離，視覺端點逐幀重算。
+- 目前龍面向攝影機，效果方向由世界目標計算，沒有替龍頭轉向；噴射方向可能與嘴部局部 -Z 不一致。自然的朝左動作仍需動畫／玩法整合決定，不私自改使用者構圖。
+- 最終 GPU 圖片已同步場景美術配置的三種龍蛋及幼龍。目前主鏡頭下鍋子與育幼陳設位於右側，所取樣的窄效果不遮住它們；六種食材模型尚未提供，無法驗收真正食材的遮擋。主龍倍率 5 的部分 fly 姿勢本身可能超出相機／房間邊界，這是現有構圖限制；本模組沒有擴大鏡頭。
+- 龍根節點位於中層，不代表嘴部也位於中層；目前倍率與 fly 姿勢使嘴部高於中層目標，效果會由高處斜向中層。若玩法需要嚴格的同層水平口部表現，須由團隊另定角色／動畫對位策略，本控制器不自行校正龍的位置。
+- 適用目前 Forward Plus。沒有驗證 Web／Compatibility、目標装置效能或所有動畫姿勢下的遮擋；平台變更需另驗證。
+- 執行環境仍有 root certificate store 警告；獨立副本一度出現 `ground.tres` 引用的 UID 快取未完整註冊警告，回退有效文字路徑後正常載入。共享來源的 UID 與貼圖 `.import` 一致，沒有修改來源資源。
+
+![吸取取樣](../scenes/vfx/qa/vfx_suction.png)
+![預設短錐噴火](../scenes/vfx/qa/vfx_fire.png)
+
+重跑方式（先準備獨立匯入副本）：
+
+```powershell
+& "<Godot 執行檔>" --headless --path "<專案副本>" --script res://scenes/vfx/verify_dragon_vfx.gd
+& "<Godot 執行檔>" --path "<專案副本>" --rendering-method forward_plus --rendering-driver d3d12 --script res://scenes/vfx/capture_dragon_vfx.gd -- --output=<絕對輸出目錄>
+```
+
+程序 shader 不需要新增外部素材。剩餘待團隊決定的是專用動作／作用時刻、轉頭呈現、實際食材效果目標點及視覺射程配置；此交付沒有 commit／push。

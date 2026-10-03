@@ -1,0 +1,70 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/main/prototype_presentation.gd" id="1_presentation"]
+
+[sub_resource type="Environment" id="Environment_prototype"]
+resource_local_to_scene = true
+background_mode = 1
+background_color = Color(0.018, 0.024, 0.036, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.52, 0.62, 0.78, 1)
+ambient_light_energy = 0.32
+reflected_light_source = 1
+tonemap_mode = 2
+tonemap_exposure = 1.0
+ssao_enabled = true
+ssao_radius = 0.35
+ssao_intensity = 0.65
+ssao_power = 1.2
+ssao_detail = 0.35
+glow_enabled = true
+glow_normalized = true
+glow_intensity = 0.22
+glow_bloom = 0.0
+glow_hdr_threshold = 2.0
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributes_prototype"]
+resource_local_to_scene = true
+auto_exposure_enabled = false
+dof_blur_far_enabled = false
+dof_blur_near_enabled = false
+
+[node name="PrototypePresentation" type="Node3D"]
+script = ExtResource("1_presentation")
+
+[node name="PresentationCamera" type="Camera3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 19.059282, 137.552478)
+rotation = Vector3(-0.08726646, 0, 0)
+current = true
+fov = 7.723215
+near = 0.5
+far = 150.995601
+attributes = SubResource("CameraAttributes_prototype")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_prototype")
+
+[node name="LightRig" type="Node3D" parent="."]
+position = Vector3(0, 7.025, 0)
+
+[node name="WarmKey" type="DirectionalLight3D" parent="LightRig"]
+unique_name_in_owner = true
+rotation = Vector3(-0.31415927, -0.43633232, 0)
+light_color = Color(1, 0.86, 0.72, 1)
+light_energy = 1.05
+shadow_enabled = true
+shadow_bias = 0.04
+shadow_normal_bias = 0.6
+directional_shadow_mode = 0
+directional_shadow_max_distance = 150.995601
+
+[node name="CoolFill" type="DirectionalLight3D" parent="LightRig"]
+rotation = Vector3(-0.13962634, 0.5235988, 0)
+light_color = Color(0.58, 0.72, 1, 1)
+light_energy = 0.38
+
+[node name="CoolRim" type="DirectionalLight3D" parent="LightRig"]
+rotation = Vector3(-0.34906585, 2.8797932, 0)
+light_color = Color(0.46, 0.64, 1, 1)
+light_energy = 0.5

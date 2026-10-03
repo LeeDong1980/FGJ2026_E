@@ -36,8 +36,9 @@ autoload/          全域單例
 
 ### 歸屬表
 <!-- 一行一個場景，格式：- `res://路徑.tscn` @負責人 -->
-- `res://scenes/main/main.tscn` @Codex
-- `res://scenes/red_dragon/red_dragon.tscn` @Codex
+- `res://scenes/main/main.tscn` @場景美術
+- `res://scenes/main/prototype_presentation.tscn` @合成師
+- `res://scenes/red_dragon/red_dragon.tscn` @動畫師
 - `res://scenes/platforms/cube_platform.tscn` @Codex
 - `res://scenes/platforms/platform_layout.tscn` @Codex
 - `res://scenes/game/game.tscn` @露柑
@@ -45,13 +46,27 @@ autoload/          全域單例
 - `res://scenes/ingredient/ingredient_model.tscn` @露柑
 - `res://scenes/dungeon_room/dungeon_room.tscn` @Codex
 - `res://scenes/main/dragon_platform_showcase.tscn` @Codex
-- `res://scenes/ui/ui_root.tscn` @GMF
-- `res://scenes/ui/start_screen.tscn` @GMF
-- `res://scenes/ui/play_hud.tscn` @GMF
-- `res://scenes/ui/pot_info.tscn` @GMF
-- `res://scenes/ui/result_screen.tscn` @GMF
-- `res://scenes/ui/ui_preview.tscn` @GMF
-- `res://scenes/ui/ui_test.tscn` @GMF
+- `res://scenes/mic_test/mic_test.tscn` @山雷
+- `res://scenes/pause_menu/pause_menu.tscn` @山雷
+- `res://scenes/pause_menu/mic_settings_panel.tscn` @山雷
+
+### Prototype 美術任務分工
+- 場景美術負責主場景整合；動畫師負責紅龍場景及專用動畫控制腳本，交付後由美術總監驗收。
+- `res://scenes/rooms/hero_challenge_room.tscn` @場景美術
+- `res://scenes/rooms/dragon_nursery_room.tscn` @場景美術
+- `res://scenes/rooms/room_ceiling.tscn` @場景美術
+- `res://scenes/rooms/prototype_floor.tscn` @場景美術
+- 房間、樓層及主場景只由場景美術修改；合成師使用獨立 `prototype_presentation.tscn` 與專用腳本管理 Camera3D、WorldEnvironment 及共用燈光，由主場景實例化。
+- 共用文件由美術總監維護。各 session 的接口與驗證文件分開保存，避免同時改動同一檔案。
+- 技術美術與特效負責 `scenes/vfx/` 內吸取、噴火的 shader、粒子、專用腳本及獨立展示子場景；紅龍嘴部掛點由動畫師修改紅龍場景，主場景實例化由場景美術整合。
+- `res://scenes/vfx/dragon_effects.tscn` @技術美術與特效
+- `res://scenes/vfx/suction_effect.tscn` @技術美術與特效
+- `res://scenes/vfx/fire_breath_effect.tscn` @技術美術與特效
+- `res://scenes/vfx/vfx_preview.tscn` @技術美術與特效
+- `res://scenes/rooms/dragon_egg.tscn` @場景美術
+- `res://scenes/rooms/dragon_egg_lowpoly.tscn` @場景美術
+- `res://scenes/rooms/stylized_dragon_egg.tscn` @場景美術
+- `res://scenes/rooms/baby_dragon.tscn` @場景美術
 
 ## Git
 - `.import` 和 `.uid` 檔要 commit，`.godot/` 不要 commit
