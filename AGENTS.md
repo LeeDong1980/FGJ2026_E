@@ -11,6 +11,8 @@ Game Jam 3D 遊戲專案（玩法尚未決定，見 docs/design.md）。多人�
 - `scenes/dungeon_room/`：地牢房間，包含 dungeon 模型實例、材質、碰撞、燈光與攝影機。
 - `scenes/red_dragon/`：紅龍模型子場景。
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
+- `scenes/lobby/`：區網連線大廳（建立房間／輸入 IP 加入）。
+- `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線，autoload 名稱 `NetworkManager`）。
 - `Models/`：模型與貼圖素材。
 - `docs/`：設計、開發慣例與任務清單。
 
