@@ -1,0 +1,15 @@
+# 房間概念美術 v1
+
+使用內建 image_gen 工具生成，作為第一版美術提案；圖中配置與風格尚未確定為實作規格。
+
+- 地下城：`dungeon_room_concept_v1.png`
+- 龍族撫育幼龍房：`dragon_nursery_concept_v1.png`
+
+## 地下城提示詞
+
+Use case: stylized-concept. Asset type: concept art for a 3D fantasy game room, first exploratory proposal. Primary request: a dungeon room, 地下城, designed as a cohesive buildable interior environment. Style/medium: polished stylized 3D game environment concept painting, chunky low-poly-friendly architectural shapes, painterly material treatment, readable silhouettes and clear prop groupings. Scene: one complete underground stone chamber with heavy vaulted arches, thick stone columns and worn floor slabs. Along the walls, wooden storage crates and a small alchemy workbench with glass potion bottles; hanging chains, iron gate and wall torches establish dungeon identity. Keep an open central floor and visible paths; this is a room layout concept rather than a close-up of props. Composition: wide landscape 16:9, elevated three-quarter interior view showing the floor plan and back and side walls, coherent perspective, strong depth, visually practical architecture that could be assembled from modular game assets. Lighting: warm amber torch pools against cool blue ambient stone shadow, atmospheric yet readable, adventurous fantasy mood. Constraints: one single room image, no panels, no text, no logos, no watermark, no UI, no modern objects; architecture and room design are the focus.
+
+## 龍族撫育幼龍房提示詞
+
+Use case: stylized-concept. Asset type: concept art for a 3D fantasy game room, first exploratory proposal. Primary request: 龍族撫育幼龍房, a dragon clan's indoor nursery where hatchling dragons are lovingly raised; one complete interior room. Shared visual language with a fantasy stone dungeon: polished stylized 3D environment concept painting, chunky low-poly-friendly architectural shapes, painterly materials, readable silhouettes, thick stone arches and stone floor; room layout buildable with modular game assets. Scene: warm sheltered stone chamber shaped with dragon motifs, a large shallow round stone nest in the center lined with straw and soft cloth, several softly patterned dragon eggs and small cute red dragon hatchlings resting or curiously peeking from the nest. Around the perimeter, smaller cozy nesting alcoves, low stone feeding bowls, shelves for blankets and care supplies, and a safely enclosed warming hearth. The architecture and furniture clearly belong to dragon caretakers rather than a human hospital. Composition: wide landscape 16:9, elevated three-quarter interior view showing the complete floor and back and side walls, central nest as clear focal point, a visible open circulation path around it, strong depth and coherent scale. Lighting/mood: gentle amber hearth warmth, golden light on hatchlings and eggs, faint cool daylight through a high arched opening; tender, magical, protected and welcoming. Materials: rounded warm stone, wood, woven straw, soft fabric, subtle dragon carvings. Constraints: environment design is primary, dragons are small supporting subjects; one image, no panels, no text, no logos, no watermark, no UI, no modern medical equipment.
+
