@@ -34,6 +34,7 @@
 - [ ] MIC-06 換層防抖：音量在層界線附近時不來回換層（例如遲滯），確定後更新 design.md 未定事項 @山雷
 - [ ] MIC-07 用真人聲音實測，調整音量、音高、吸/吐的預設參數（尤其「吐」開頭爆音被誤判成吸） @山雷
 - [x] MIC-08 修正 Windows 部分裝置的 WASAPI「unsupported channel count in microphone!」錯誤洪水：偵測麥克風沒有訊號時自動停止收音（只留一則警告），設定面板加「啟用麥克風」開關與「重新偵測」按鈕 @山雷
+- [x] MIC-09 單機保底版：game.tscn 加入 `VoiceActionInput` 橋接，麥克風「吸」呼叫 `suck()`、「吐」按住呼叫 `spit_pressed()`／`spit_released()`；玩家 1 仍用鍵盤 1／2／3 換層（J／K 保留當備援），龍的音量換層不接 @Samuel
 
 #### 遊戲機制（露柑）
 - [x] GM-01 建立 `scenes/game/game.tscn` 與獨立的 LaneLayout 節點：依 `@export` 的層數與層距產生各層左右平台（實例化 cube_platform.tscn），提供 `get_lane_position(i)`、`get_lane_at(y)` @露柑

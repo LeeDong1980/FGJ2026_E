@@ -209,4 +209,4 @@ func _on_action_changed(action: StringName) -> void:
 - 開局音量校正（design.md 3.1：以遊戲開始時測到的音量作為基準）。
 - 雙麥克風（玩家 A、玩家 B）的裝置選擇與收音干擾處理（MIC-03）。
 - 用真人聲音實測並調整吸／吐的預設參數。
-- 輸出尚未接進正式遊戲場景（龍的移動、吸與吐的動作）。
+- 單機保底版（鍵盤 1／2／3 控制龍、麥克風控制吸／吐）已接進 game.tscn：`scenes/game/voice_action_input.gd`。音量控制龍的移動（MIC-05）尚未接。
