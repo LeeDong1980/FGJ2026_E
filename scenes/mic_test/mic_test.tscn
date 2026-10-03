@@ -45,3 +45,15 @@ show_percentage = false
 unique_name_in_owner = true
 layout_mode = 2
 text = "-60.0 dB"
+
+[node name="PitchBar" type="ProgressBar" parent="Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+step = 0.001
+show_percentage = false
+
+[node name="PitchLabel" type="Label" parent="Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "--"
