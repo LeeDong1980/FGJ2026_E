@@ -1,3 +1,16 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Export output
+/builds/
+*.exe
+*.pck
+*.zip
+
+# Claude Code personal settings (shared settings.json stays tracked)
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
