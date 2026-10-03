@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="PingFang TC, Noto Sans TC, Microsoft JhengHei, sans-serif">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d1828"/><stop offset="1" stop-color="#3a2f2a"/></linearGradient></defs>
+<rect width="1920" height="1080" fill="url(#bg)"/>
+<rect x="414.0" y="353.4" width="405.6" height="31.200000000000003" rx="6" fill="#6b5a4a" stroke="#2b221b" stroke-width="3"/>
+<rect x="1194.0" y="353.4" width="265.20000000000005" height="31.200000000000003" rx="6" fill="#6b5a4a" stroke="#2b221b" stroke-width="3"/>
+<circle cx="784.5" cy="330" r="26.52" fill="#5fc6d9" stroke="#2a2235" stroke-width="3"/>
+<text x="784.5" y="332" font-size="23" fill="#2a2235" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">史</text>
+<circle cx="710.4" cy="330" r="26.52" fill="#e0b48a" stroke="#2a2235" stroke-width="3"/>
+<text x="710.4" y="332" font-size="23" fill="#2a2235" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">人</text>
+<circle cx="636.3" cy="330" r="26.52" fill="#8fd18b" stroke="#2a2235" stroke-width="3"/>
+<text x="636.3" y="332" font-size="23" fill="#2a2235" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">精</text>
+<text x="375.0" y="330" font-size="34" fill="#ffffff55" text-anchor="middle" font-weight="normal" opacity="1" dominant-baseline="middle">→</text>
+<rect x="1268.1" y="294.9" width="117.0" height="70.2" rx="14.040000000000001" fill="#3b3346" stroke="#1c1724" stroke-width="4"/>
+<ellipse cx="1326.6" cy="294.9" rx="58.5" ry="10.92" fill="#5a4e6b" stroke="#1c1724" stroke-width="4"/>
+<rect x="330.0" y="587.0" width="468.0" height="36.0" rx="6" fill="#6b5a4a" stroke="#2b221b" stroke-width="3"/>
+<rect x="1230.0" y="587.0" width="306.0" height="36.0" rx="6" fill="#6b5a4a" stroke="#2b221b" stroke-width="3"/>
+<circle cx="757.5" cy="560" r="30.6" fill="#8a9a5b" stroke="#2a2235" stroke-width="3"/>
+<text x="757.5" y="562" font-size="27" fill="#2a2235" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">獸</text>
+<circle cx="672.0" cy="560" r="30.6" fill="#c98b5a" stroke="#2a2235" stroke-width="3"/>
+<text x="672.0" y="562" font-size="27" fill="#2a2235" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">矮</text>
+<text x="285.0" y="560" font-size="39" fill="#ffffff55" text-anchor="middle" font-weight="normal" opacity="1" dominant-baseline="middle">→</text>
+<rect x="1315.5" y="519.5" width="135.0" height="81.0" rx="16.2" fill="#3b3346" stroke="#1c1724" stroke-width="4"/>
+<ellipse cx="1383.0" cy="519.5" rx="67.5" ry="12.6" fill="#5a4e6b" stroke="#1c1724" stroke-width="4"/>
+<ellipse cx="978.0" cy="551.0" rx="85.5" ry="49.5" fill="#b8322f" stroke="#5c1414" stroke-width="5"/>
+<circle cx="888.0" cy="524.0" r="37.800000000000004" fill="#c93a36" stroke="#5c1414" stroke-width="5"/>
+<circle cx="874.5" cy="515.0" r="6.3" fill="#ffd34d"/>
+<path d="M 969.0 506.0 L 1014.0 443.0 L 1041.0 510.5 Z" fill="#8e2421" stroke="#5c1414" stroke-width="4"/>
+<text x="978.0" y="556.4" font-size="30" fill="#fff3" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">龍</text>
+<rect x="260.0" y="830.0" width="520.0" height="40.0" rx="6" fill="#6b5a4a" stroke="#2b221b" stroke-width="3"/>
+<rect x="1260.0" y="830.0" width="340.0" height="40.0" rx="6" fill="#6b5a4a" stroke="#2b221b" stroke-width="3"/>
+<circle cx="735.0" cy="800" r="34.0" fill="#8a6fb5" stroke="#2a2235" stroke-width="3"/>
+<text x="735.0" y="802" font-size="30" fill="#2a2235" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">蝠</text>
+<circle cx="640.0" cy="800" r="34.0" fill="#8fd18b" stroke="#2a2235" stroke-width="3"/>
+<text x="640.0" y="802" font-size="30" fill="#2a2235" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">精</text>
+<circle cx="545.0" cy="800" r="34.0" fill="#e0b48a" stroke="#2a2235" stroke-width="3"/>
+<text x="545.0" y="802" font-size="30" fill="#2a2235" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">人</text>
+<circle cx="450.0" cy="800" r="34.0" fill="#5fc6d9" stroke="#2a2235" stroke-width="3"/>
+<text x="450.0" y="802" font-size="30" fill="#2a2235" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">史</text>
+<text x="210.0" y="800" font-size="44" fill="#ffffff55" text-anchor="middle" font-weight="normal" opacity="1" dominant-baseline="middle">→</text>
+<rect x="1355.0" y="755.0" width="150.0" height="90.0" rx="18.0" fill="#3b3346" stroke="#1c1724" stroke-width="4"/>
+<ellipse cx="1430.0" cy="755.0" rx="75.0" ry="14.0" fill="#5a4e6b" stroke="#1c1724" stroke-width="4"/>
+<rect width="1920" height="1080" fill="#0b0912" opacity="0.84"/>
+<rect x="610" y="250" width="700" height="560" rx="28" fill="#151120f2" stroke="#ff6b6e88" stroke-width="4"/>
+<text x="960" y="360" font-size="100" fill="#ff6b6e" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">料理失敗…</text>
+<line x1="720" y1="440" x2="1200" y2="440" stroke="#ffffff33" stroke-width="2"/>
+<text x="960" y="500" font-size="40" fill="#ffffffdd" text-anchor="middle" font-weight="normal" opacity="1" dominant-baseline="middle">完成鍋數 2 / 6</text>
+<text x="960" y="565" font-size="40" fill="#ffffffdd" text-anchor="middle" font-weight="normal" opacity="1" dominant-baseline="middle">清空次數 3 / 3</text>
+<rect x="770.0" y="653.0" width="380" height="104" rx="52.0" fill="#e5484d" stroke="#00000055" stroke-width="4"/>
+<text x="960" y="707" font-size="44" fill="#fff" text-anchor="middle" font-weight="bold" opacity="1" dominant-baseline="middle">重新遊玩</text>
+<rect x="1700" y="20" width="200" height="44" rx="8" fill="#000a"/>
+<text x="1800" y="43" font-size="24" fill="#fff9" text-anchor="middle" font-weight="normal" opacity="1" dominant-baseline="middle">示意圖</text>
+</svg>
