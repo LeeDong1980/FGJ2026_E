@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scenes/game/pots_debug_view.gd" id="6_pots_debug"]
 [ext_resource type="Script" path="res://scenes/game/stomach_debug_view.gd" id="7_stomach_debug"]
 [ext_resource type="Script" path="res://scenes/game/pitch_lane_input.gd" id="8_pitch"]
+[ext_resource type="Script" path="res://scenes/game/voice_action_input.gd" id="9_voice_action"]
+[ext_resource type="Script" path="res://scenes/game/voice_toggle_panel.gd" id="10_toggle_panel"]
 
 [sub_resource type="Environment" id="Environment_game"]
 background_mode = 1
@@ -53,6 +55,13 @@ game_manager = NodePath("..")
 script = ExtResource("8_pitch")
 dragon = NodePath("../Dragon")
 game_manager = NodePath("..")
+
+[node name="VoiceActionInput" type="Node" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("9_voice_action")
+game_manager = NodePath("..")
+
+[node name="VoiceTogglePanel" type="CanvasLayer" parent="."]
+script = ExtResource("10_toggle_panel")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2134861306]
 environment = SubResource("Environment_game")

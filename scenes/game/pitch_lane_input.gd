@@ -1,7 +1,7 @@
 class_name PitchLaneInput
 extends Node
 ## 麥克風音高橋接（單機版玩家 1）：音高區間（MicInput.pitch_value 0～100）平均切成層數段，低／中／高音對應第 1／2／3 層，等同按 1／2／3。
-## 吸與吐仍由 KeyboardInput 的 J／K 處理。
+## 吸與吐由 KeyboardInput（J／K）與 VoiceActionInput（語音）各自處理。MicInput.pitch_input_enabled 可關閉音高輸入。
 
 ## 換層遲滯：音高要超過層界線這麼多（0～100 刻度）才換層，避免在界線附近來回跳。
 @export var hysteresis: float = 3.0
@@ -25,14 +25,14 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	var lane_count: int = game_manager.lane_layout.lane_count
-	if MicInput.pitch_active:
+	if MicInput.pitch_input_enabled and MicInput.pitch_active:
 		var lane := _pick_lane(MicInput.pitch_value, lane_count)
 		if lane != _lane:
 			_lane = lane
 			dragon.set_target_lane(lane)
 	if _label != null:
 		_label.text = "音高 %.0f Hz（%.0f／100）%s → 目標層 %d" % [
-			MicInput.pitch_hz, MicInput.pitch_value, "" if MicInput.pitch_active else "（無音高）", _lane + 1]
+			MicInput.pitch_hz, MicInput.pitch_value, "" if MicInput.pitch_active else "（無音高）" if MicInput.pitch_input_enabled else "（已關閉）", _lane + 1]
 
 
 ## 平均切段；已經在某一層時，要越過界線 hysteresis 才換。
