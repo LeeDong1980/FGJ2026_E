@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://scenes/main/prototype_presentation.tscn" id="9_presentation"]
 [ext_resource type="PackedScene" path="res://scenes/vfx/dragon_effects.tscn" id="10_effects"]
 [ext_resource type="Script" path="res://scenes/game/effects_view.gd" id="11_effects_view"]
+[ext_resource type="Script" path="res://scenes/game/network_game_bridge.gd" id="12_net_bridge"]
 
 [node name="Game" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
 script = ExtResource("4_manager")
@@ -73,3 +74,11 @@ script = ExtResource("10_toggle_panel")
 [node name="PrototypePresentation" parent="." unique_id=1281242266 instance=ExtResource("9_presentation")]
 
 [node name="GameUI" parent="." unique_id=1227268004 instance=ExtResource("8_game_ui")]
+
+[node name="NetworkGameBridge" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "keyboard_input", "voice_action_input", "ui_root")]
+script = ExtResource("12_net_bridge")
+game_manager = NodePath("..")
+dragon = NodePath("../Dragon")
+keyboard_input = NodePath("../KeyboardInput")
+voice_action_input = NodePath("../VoiceActionInput")
+ui_root = NodePath("../GameUI/UIRoot")
