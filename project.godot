@@ -22,7 +22,9 @@ driver/enable_input=true
 [autoload]
 
 MicInput="*res://autoload/mic_controller.gd"
+AudioSettings="*res://autoload/audio_settings.gd"
 PauseMenu="*res://scenes/pause_menu/pause_menu.tscn"
+Sound="*res://autoload/sound.gd"
 NetworkManager="*res://autoload/network_manager.gd"
 RoomManager="*res://autoload/room_manager.gd"
 PhoneMic="*res://autoload/phone_mic_server.gd"

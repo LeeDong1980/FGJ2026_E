@@ -5,6 +5,7 @@
 [ext_resource type="Theme" path="res://scenes/ui/ui_theme.tres" id="3_theme"]
 [ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Bg.Png" id="4_card"]
 [ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Button/Button_Square02_n_Icon.png" id="5_play"]
+[ext_resource type="PackedScene" path="res://scenes/pause_menu/audio_settings_panel.tscn" id="6_audio"]
 
 [sub_resource type="Gradient" id="Gradient_bottom"]
 colors = PackedColorArray(0.043, 0.035, 0.07, 0, 0.043, 0.035, 0.07, 0.85)
@@ -213,6 +214,14 @@ layout_mode = 2
 text = "進入遊戲"
 icon = ExtResource("5_play")
 
+[node name="AudioButton" type="Button" parent="Footer/ButtonRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 34
+text = "音量"
+
 [node name="QuitButton" type="Button" parent="Footer/ButtonRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 100)
@@ -233,3 +242,28 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "開始遊戲時請保持安靜，遊戲會以當下的聲音校正麥克風"
 horizontal_alignment = 1
+
+[node name="AudioOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="AudioSettingsPanel" parent="AudioOverlay" instance=ExtResource("6_audio")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_card")
+show_close_button = true
