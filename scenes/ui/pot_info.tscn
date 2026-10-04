@@ -25,9 +25,9 @@ texture_margin_bottom = 11.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bar_fill"]
 texture = ExtResource("4_bar_fill")
-texture_margin_left = 13.0
+texture_margin_left = 8.0
 texture_margin_top = 11.0
-texture_margin_right = 13.0
+texture_margin_right = 8.0
 texture_margin_bottom = 11.0
 
 [node name="PotInfo" type="PanelContainer"]

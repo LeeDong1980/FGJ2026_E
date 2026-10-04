@@ -2,22 +2,19 @@
 
 [ext_resource type="Script" path="res://scenes/lobby/player_input_panels.gd" id="1_panels"]
 [ext_resource type="Script" path="res://scenes/ui/volume_meter.gd" id="2_meter"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Bg.Png" id="3_panel_frame"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-content_margin_left = 20.0
-content_margin_top = 18.0
-content_margin_right = 20.0
-content_margin_bottom = 20.0
-bg_color = Color(0.08, 0.067, 0.125, 0.9)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 1, 1, 0.2)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
+content_margin_left = 30.0
+content_margin_top = 30.0
+content_margin_right = 30.0
+content_margin_bottom = 34.0
+texture = ExtResource("3_panel_frame")
+texture_margin_left = 56.0
+texture_margin_top = 56.0
+texture_margin_right = 56.0
+texture_margin_bottom = 56.0
+
 
 [node name="PlayerInputPanels" type="Control"]
 layout_mode = 3
@@ -39,7 +36,7 @@ offset_top = -560.0
 offset_right = 336.0
 offset_bottom = -30.0
 grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
 
 [node name="Content" type="VBoxContainer" parent="Player1Panel"]
 layout_mode = 2
@@ -88,7 +85,7 @@ offset_right = -36.0
 offset_bottom = -30.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
 
 [node name="Content" type="VBoxContainer" parent="Player2Panel"]
 layout_mode = 2

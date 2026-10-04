@@ -103,7 +103,7 @@
 <<<<<<< HEAD
 - [x] UI-18 修正 PotInfo 換小龍後面板永久變寬：`set_forbidden()` 舊圖示先移出再釋放（同一幀 `pot_changed`＋`baby_arrived` 呼叫兩次時會疊在一起），並在更新後 `reset_size()` 縮回 @露柑
 =======
-- [x] UI-18 UI 對接遊戲機制：`UIGameBridge`（`scenes/ui/game_ui.tscn`）依 docs/api.md 接上完成鍋數、清空次數、各層鍋子、龍所在層、音量、吸吐、開始／結束／重新遊玩 @GMF
+- [x] UI-33 （原 UI-18，與 PotInfo 修正的 UI-18 重號而改號）UI 對接遊戲機制：`UIGameBridge`（`scenes/ui/game_ui.tscn`）依 docs/api.md 接上完成鍋數、清空次數、各層鍋子、龍所在層、音量、吸吐、開始／結束／重新遊玩 @GMF
 - [x] UI-19 把 `scenes/ui/game_ui.tscn` 實例化進 game.tscn（GameManager 的子節點 `GameUI`），（之後 UI-14 已把開始介面改成獨立主選單，game.tscn 也改名為 scenes/game/main.tscn）。經使用者同意由 GMF 直接修改，已通知露柑：GM-16 改 game.tscn 時請保留 `GameUI` 節點 @GMF
 - [ ] UI-20 遊玩狀態介面顯示胃袋裡的食材（`stomach_changed`）與換小龍中的狀態（`PotState.has_baby`），設計確定後再做
 - [x] UI-21 依 Logo 風格製作暫時美術：開始介面（現為主選單）改用 Logo 當背景；遊戲結束背景（Logo 加工）、資訊面板（九宮格石板火焰框）、龍洞穴 2D 背景（`scenes/backdrop/`，已換成正式美術 FGJ2026TeamE_GameSceneBG），並寫生圖提示詞 `docs/ui_art_prompts.md` @GMF
@@ -115,6 +115,9 @@
 - [x] UI-27 主選單：玩家 A 說明改為「對麥克風發聲，音量大小決定龍的高度」；新增「遊玩方式」「雙人合作」說明卡；套用 ui_theme 與石框卡片、金框按鍵。主選單是露柑的場景，經使用者同意由 GMF 直接修改，節點名稱與腳本接口不變 @GMF
 - [x] UI-28 修正龍洞穴背景遮住龍模型：背景改用深度一律寫成最遠的著色器（`cave_backdrop.gdshader`），所有 3D 物件都畫在背景前面 @GMF
 - [ ] UI-29 鍋子資訊顯示「已收滿，對鍋子吐火」的提示（等 GM-22 提供狀態與 signal）
+- [x] UI-30 連線等候頁改版：`lobby_theme.tres` 改用 UI 素材包（一般按鍵木框、主要按鍵金框、座位灰／橘金石框、輸入框石條、Changa＋中文字型與描邊）；`room_lobby.tscn` 卡片改石框並加寬、`player_input_panels.tscn` 面板改石框。場景與主題是 Samuel 的，經使用者同意由 GMF 直接修改，節點與腳本接口不變 @GMF
+- [x] UI-31 Esc 暫停選單改版：`pause_menu.tscn` 外層加金角石框與「遊戲暫停」木製橫幅、背景加深，麥克風設定面板套用新的小字主題 `scenes/ui/panel_theme.tres`（mic_settings_panel.tscn 本身沒改）。場景是山雷的，經使用者同意由 GMF 直接修改，節點與腳本接口不變 @GMF
+- [x] UI-32 連線等候頁隱藏玩家音高／吸吐側邊面板（`room_lobby.tscn` 的 PlayerPanels 設為不顯示，腳本照常運作）；九宮格面板與按鍵的最小高度不小於圖片上下邊框，延展時邊角不變形；主選單與 design.md 改為「音高控制高度（高音飛高、低音飛低）」；遊戲背景換成新版圖 FGJ2026TeamE_GameBg2 @GMF
 >>>>>>> 修改備份_20261004_1321
 
 #### 區網連線（Samuel）
@@ -186,7 +189,8 @@
 
 2026-10-04：使用者再次授權接續 ART-11～ART-19，上輪因用量中斷，已重新派工。擺頭映射確認為 0＝左、0.5＝前、1＝右，先交接口與展示，玩法自動轉頭另接。吐出軌跡、角色比例與接邊基準討論中；洞穴模型及幼龍動畫素材待提供。本輪成果待使用者驗收後才 commit／push。
 =======
-- [x] ART-11 勇者挑戰房往左加長到超出畫面左緣：`hero_challenge_room.tscn` 複製地板、背牆模組到 x = -16（新增 3 段 4 單位），地基與上方飾帶加長，左端外牆、柱子、飾帶移到新左端，加 2 支壁掛火把；隊伍定位點不變。房間是場景美術的場景，經使用者同意由 GMF 直接修改 @GMF
+- [x] ART-21 勇者挑戰房往左加長到超出畫面左緣（實作 ART-15 的左側延伸，整體布局待場景美術與 ART-12／ART-13 一起定案）：`hero_challenge_room.tscn` 複製地板、背牆模組到 x = -16（新增 3 段 4 單位），地基與上方飾帶加長，左端外牆、柱子、飾帶移到新左端，加 2 支壁掛火把；隊伍定位點不變。房間是場景美術的場景，經使用者同意由 GMF 直接修改 @GMF
+- [x] ART-22 幼龍哺育房往右加長到超出畫面右緣（實作 ART-15 的右側延伸，做法同 ART-21）：`dragon_nursery_room.tscn` 複製地板、背牆模組到 x = 16（新增 3 段 4 單位），地基與上方飾帶加長，右端外牆（前後兩段）、柱子、飾帶移到新右端，加 2 支壁掛火把；鍋子、小龍、龍蛋等定位點不變。房間是場景美術的場景，經使用者同意由 GMF 直接修改 @GMF
 >>>>>>> 修改備份_20261004_1321
 
 ### 音效與 UI

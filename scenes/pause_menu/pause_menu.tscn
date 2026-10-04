@@ -2,7 +2,22 @@
 
 [ext_resource type="Script" path="res://scenes/pause_menu/pause_menu.gd" id="1_menu"]
 [ext_resource type="PackedScene" path="res://scenes/pause_menu/mic_settings_panel.tscn" id="2_panel"]
-[ext_resource type="PackedScene" path="res://scenes/pause_menu/audio_settings_panel.tscn" id="3_audio"]
+[ext_resource type="Theme" path="res://scenes/ui/panel_theme.tres" id="3_theme"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Frame/PanelFrame02_Demo.Png" id="4_frame"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Label-Title/Title_Ribbon01_Brown.Png" id="5_ribbon"]
+
+[ext_resource type="PackedScene" path="res://scenes/pause_menu/audio_settings_panel.tscn" id="6_audio"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frame"]
+content_margin_left = 64.0
+content_margin_top = 64.0
+content_margin_right = 64.0
+content_margin_bottom = 80.0
+texture = ExtResource("4_frame")
+texture_margin_left = 72.0
+texture_margin_top = 100.0
+texture_margin_right = 72.0
+texture_margin_bottom = 110.0
 
 [node name="PauseMenu" type="CanvasLayer"]
 process_mode = 3
@@ -15,22 +30,60 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.75)
+color = Color(0.03, 0.02, 0.02, 0.85)
 
-[node name="Layout" type="VBoxContainer" parent="."]
+[node name="Frame" type="PanelContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = -16.0
+offset_left = 50.0
+offset_top = 96.0
+offset_right = -50.0
+offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("3_theme")
+theme_override_styles/panel = SubResource("StyleBoxTexture_frame")
 
-[node name="MicSettingsPanel" parent="Layout" instance=ExtResource("2_panel")]
+[node name="Layout" type="VBoxContainer" parent="Frame"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MicSettingsPanel" parent="Frame/Layout" instance=ExtResource("2_panel")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 show_close_button = true
 
-[node name="AudioSettingsPanel" parent="Layout" instance=ExtResource("3_audio")]
+[node name="AudioSettingsPanel" parent="Frame/Layout" instance=ExtResource("6_audio")]
 layout_mode = 2
 size_flags_horizontal = 4
+
+[node name="TitleRibbon" type="TextureRect" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 8.0
+offset_right = 300.0
+offset_bottom = 164.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = ExtResource("5_ribbon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="TitleRibbon"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_theme")
+theme_override_colors/font_color = Color(1, 0.9, 0.62, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 46
+text = "遊戲暫停"
+horizontal_alignment = 1
+vertical_alignment = 1
