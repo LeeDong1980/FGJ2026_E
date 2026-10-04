@@ -3,6 +3,7 @@ extends Node
 ## 依 GameManager 的事件播放龍的吸取與噴火特效（scenes/vfx/dragon_effects.tscn）。
 ## 吸：吞下食材時，從所在層隊伍最前端吸向嘴部。吐：噴火期間持續朝隊伍最前端噴（對已滿的鍋子煮時改朝鍋子），停止喊「吐」就停。
 ## 沒有效果的吸或吐不播特效（原因由 ActionHintBanner 在畫面上方提示）。
+## 冰還沒有專用特效，暫時和火共用噴火特效（元素看 FacingIndicator）。
 
 ## 噴火一次播放的秒數，設得很長，實際長度由喊「吐」的時間決定。
 const FIRE_HOLD_DURATION := 3600.0

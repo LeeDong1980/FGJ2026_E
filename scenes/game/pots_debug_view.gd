@@ -42,6 +42,7 @@ func _refresh(lane: int) -> void:
 	var names: PackedStringArray = []
 	for type in pot.forbidden:
 		names.append(IngredientType.NAMES[type])
-	_labels[lane].text = "不吃：%s\n%d / %d" % ["、".join(names), pot.count, pot.required]
+	var element_name := "冰" if pot.element == GameManager.Element.ICE else "火"
+	_labels[lane].text = "用%s煮　不吃：%s\n%d / %d" % [element_name, "、".join(names), pot.count, pot.required]
 	if pot.is_full():
-		_labels[lane].text += "\n滿了！噴火煮 %d%%" % roundi(pot.cook_progress * 100.0)
+		_labels[lane].text += "\n滿了！用%s煮 %d%%" % [element_name, roundi(pot.cook_progress * 100.0)]

@@ -7,6 +7,8 @@ enum GameState { WAITING, PLAYING, ENDED }
 enum BabyLeaveReason { COMPLETED, KICKED }
 ## 龍頭朝向：LEFT 面向食材隊伍，RIGHT 面向鍋子。目前只有狀態與畫面提示，龍的模型不會轉。
 enum Facing { LEFT, RIGHT }
+## 吐出的元素：火燒掉食材、冰凍住食材；鍋子依食譜要用對的元素煮。
+enum Element { FIRE, ICE }
 ## 吸或吐沒有效果的原因（action_missed 使用）。
 enum MissReason {
 	NO_INGREDIENT,  ## 所在層最前端沒有食材
@@ -16,6 +18,7 @@ enum MissReason {
 	NOTHING_TO_SPIT,  ## 面向鍋子、胃空、鍋子未滿
 	POT_FULL,  ## 鍋子已滿，要先噴火煮好
 	NO_BABY,  ## 小龍還沒到位
+	WRONG_ELEMENT,  ## 煮鍋子用錯元素（進度會倒退，不是沒效果；只發 action_missed）
 }
 
 ## start_game() 之後發出，此時已重置完畢並開始遊玩。
@@ -26,6 +29,8 @@ signal ingredient_spawned(lane: int, ingredient: IngredientState)
 signal ingredient_removed(lane: int, ingredient: IngredientState)
 signal ingredient_swallowed(lane: int, ingredient: IngredientState)
 signal ingredient_burned(lane: int, ingredient: IngredientState)
+## 最前端食材被冰凍住（從沒凍住變成凍住時發出，持續噴冰只發一次）。
+signal ingredient_frozen(lane: int, ingredient: IngredientState)
 ## 胃裡的食材吐進了鍋子。
 signal ingredient_spat(lane: int, ingredient: IngredientState)
 ## 喊了吸或吐，但沒有效果（噴火時是一開始就沒有可以燒的食材）。
@@ -49,6 +54,8 @@ signal dragon_stunned
 signal dragon_recovered
 ## 龍頭轉向改變（Facing.LEFT 面向食材、RIGHT 面向鍋子）。
 signal facing_changed(facing: Facing)
+## 吐出的元素改變。
+signal element_changed(element: Element)
 signal game_won
 signal game_lost
 
@@ -86,8 +93,12 @@ signal game_lost
 @export_group("噴火")
 ## 持續噴火多少秒才會燒掉一個食材。
 @export var burn_time: float = 1.0
-## 鍋子加滿後，要對鍋子持續噴火多少秒才完成一鍋。
+## 鍋子加滿後，要對鍋子用對的元素持續噴多少秒才完成一鍋；用錯元素時以同樣速度倒退。
 @export var cook_time: float = 1.0
+
+@export_group("冰")
+## 噴冰碰到最前端食材後凍住的秒數，持續噴就持續凍住。凍住期間不蓄力。
+@export var freeze_time: float = 1.0
 
 @export_group("食材攻擊")
 ## 每次蓄力的秒數在這個範圍內隨機。
@@ -111,6 +122,8 @@ var cleared_count: int = 0
 var state: GameState = GameState.WAITING
 ## 龍頭朝向：LEFT 面向食材（吸、噴火有效），RIGHT 面向鍋子（吐進鍋子有效）。
 var facing: Facing = Facing.LEFT
+## 吐出的元素（玩家 1 大叫或按 4 切換）。
+var element: Element = Element.FIRE
 ## 玩家正在持續喊「吐」。
 var is_spitting: bool = false
 ## 這次按下「吐」已經把食材吐進鍋子，放開前不會接著噴火。
@@ -138,7 +151,7 @@ func _process(delta: float) -> void:
 		_advance_queue(lanes[i], delta)
 		_try_spawn(i, delta)
 		_update_attack(i, delta)
-	_update_burning(delta)
+	_update_breath(delta)
 	_update_cooking(delta)
 
 
@@ -189,6 +202,8 @@ func spit_pressed() -> void:
 			_miss_spit(lane, MissReason.NO_BABY)
 		elif not pots[lane].is_full():
 			_miss_spit(lane, MissReason.NOTHING_TO_SPIT)
+		elif pots[lane].element != element:
+			action_missed.emit(lane, MissReason.WRONG_ELEMENT)
 	elif stomach != null:
 		_miss_spit(lane, MissReason.SPIT_FACING_LEFT)
 	elif get_front(lane) == null:
@@ -201,18 +216,26 @@ func spit_released() -> void:
 	_spit_used_for_pot = false
 
 
-## 正在喊「吐」、面向左邊且胃袋空著（噴火中）。這次按下已經吐進鍋子時回傳 false。
+## 正在喊「吐」、面向左邊且胃袋空著（噴火或噴冰中，看 element）。這次按下已經吐進鍋子時回傳 false。
 func is_breathing_fire() -> bool:
 	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null \
 			and facing == Facing.LEFT and not is_stunned()
 
 
-## 正在喊「吐」、面向右邊、胃袋空著，且所在層鍋子已滿（對鍋子噴火煮）。
+## 正在喊「吐」、面向右邊、胃袋空著，且所在層鍋子已滿（對鍋子噴火或噴冰煮）。
 func is_cooking() -> bool:
-	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null 			and facing == Facing.RIGHT and not is_stunned() and _can_cook(dragon.current_lane)
+	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null \
+			and facing == Facing.RIGHT and not is_stunned() and _can_cook(dragon.current_lane)
 
 
-## 龍頭左右切換（玩家 B 大叫或按 L）。暈眩中不能轉頭。
+## 火、冰切換（玩家 1 大叫或按 4）。暈眩中不能切換。
+func toggle_element() -> void:
+	if state != GameState.PLAYING or is_stunned():
+		return
+	_set_element(Element.ICE if element == Element.FIRE else Element.FIRE)
+
+
+## 龍頭左右切換（玩家 2 按 L）。暈眩中不能轉頭。
 func turn_head() -> void:
 	if state != GameState.PLAYING or is_stunned():
 		return
@@ -244,13 +267,21 @@ func get_spawn_interval() -> float:
 	return maxf(spawn_interval_start - completed_count * spawn_interval_step, spawn_interval_min)
 
 
-## 持續噴火時，累計所在層最前端食材的燒毀進度。
-func _update_burning(delta: float) -> void:
+## 面向食材持續噴吐：火累計燒毀進度；冰凍住最前端食材並把攻擊蓄力歸零。
+func _update_breath(delta: float) -> void:
 	if not is_breathing_fire():
 		return
 	var lane := dragon.current_lane
 	var ingredient := get_front(lane)
 	if ingredient == null:
+		return
+	if element == Element.ICE:
+		var was_frozen := ingredient.is_frozen()
+		ingredient.freeze_remaining = freeze_time
+		ingredient.attack_progress = 0.0
+		ingredient.attack_time = 0.0
+		if not was_frozen:
+			ingredient_frozen.emit(lane, ingredient)
 		return
 	ingredient.burn_progress = minf(ingredient.burn_progress + delta / burn_time, 1.0)
 	if ingredient.burn_progress >= 1.0:
@@ -258,13 +289,17 @@ func _update_burning(delta: float) -> void:
 		ingredient_burned.emit(lane, ingredient)
 
 
-## 對已滿的鍋子持續噴火時累計進度，煮好就完成這一鍋。
+## 對已滿的鍋子持續噴吐：元素和食譜相同就累計進度，煮好完成這一鍋；用錯元素則倒退。
 func _update_cooking(delta: float) -> void:
 	if not is_cooking():
 		return
 	var lane := dragon.current_lane
 	var pot := pots[lane]
-	pot.cook_progress = minf(pot.cook_progress + delta / cook_time, 1.0)
+	var step := delta / cook_time
+	if pot.element != element:
+		pot.cook_progress = maxf(pot.cook_progress - step, 0.0)
+		return
+	pot.cook_progress = minf(pot.cook_progress + step, 1.0)
 	if pot.cook_progress >= 1.0:
 		_complete_pot(lane)
 
@@ -290,6 +325,9 @@ func _update_stun(delta: float) -> void:
 func _update_attack(lane: int, delta: float) -> void:
 	var ingredient := get_front(lane)
 	if ingredient == null:
+		return
+	if ingredient.is_frozen():
+		ingredient.freeze_remaining = maxf(ingredient.freeze_remaining - delta, 0.0)
 		return
 	if ingredient.attack_time <= 0.0:
 		ingredient.attack_time = randf_range(attack_charge_min, attack_charge_max)
@@ -319,6 +357,13 @@ func _set_facing(value: Facing) -> void:
 		return
 	facing = value
 	facing_changed.emit(facing)
+
+
+func _set_element(value: Element) -> void:
+	if value == element:
+		return
+	element = value
+	element_changed.emit(element)
 
 
 func _stun_dragon() -> void:
@@ -409,6 +454,7 @@ func _setup_round() -> void:
 	invincible_remaining = 0.0
 	dragon.stunned = false
 	_set_facing(Facing.LEFT)
+	_set_element(Element.FIRE)
 	completed_count = 0
 	completed_count_changed.emit(completed_count)
 	cleared_count = 0
