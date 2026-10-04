@@ -12,6 +12,8 @@ extends RefCounted
 const SNAPSHOT_INTERVAL: float = 0.05
 ## 完整狀態定期補送的間隔（秒）。
 const FULL_INTERVAL: float = 3.0
+## 食材的位置和快照差超過這麼多（LaneLayout 的本地座標）才硬拉過去，平時靠本機沿隊伍走的預測。
+const INGREDIENT_SNAP_DISTANCE: float = 0.3
 ## 龍的位置和快照差超過這麼多（世界座標）才硬拉過去，平時靠本機移動預測。
 const DRAGON_SNAP_DISTANCE: float = 0.5
 
@@ -30,5 +32,14 @@ const EV_BABY_ARRIVED: String = "baby_arrived"  # lane
 const EV_STOMACH: String = "stomach"  # v: 胃裡食材的種類，胃空時是 -1
 const EV_SPAT: String = "spat"  # lane、v: 吐進鍋子的食材種類
 const EV_SPIT: String = "spit"  # v: [正在喊吐, 這次已經吐進鍋子]
+const EV_SPAWN: String = "spawn"  # lane、id、type、x
+const EV_REMOVED: String = "removed"  # lane、id（食材離開隊伍：被吞、被燒）
+const EV_SWALLOWED: String = "swallowed"  # lane、v: 食材種類（吸取特效）
+const EV_BURNED: String = "burned"  # lane、v: 食材種類
+const EV_ATTACKED: String = "attacked"  # lane、id、hit
+const EV_FROZEN: String = "frozen"  # lane、id
+const EV_SUCK_MISSED: String = "suck_missed"  # lane
+const EV_SPIT_MISSED: String = "spit_missed"  # lane
+const EV_ACTION_MISSED: String = "action_missed"  # lane、v: GameManager.MissReason（畫面上方的提示）
 const EV_WON: String = "won"
 const EV_LOST: String = "lost"

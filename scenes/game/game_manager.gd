@@ -141,6 +141,8 @@ var invincible_remaining: float = 0.0
 var _round: int = 0
 ## 這個 GameManager 是不是副本（見 replica_mode）。副本的 _process 只預測不模擬，輸入函式都沒有作用。
 var replica: bool = false
+## 下一個食材的編號（IngredientState.id）。
+var _next_ingredient_id: int = 1
 
 
 func _ready() -> void:
@@ -463,11 +465,13 @@ func _setup_replica() -> void:
 		pots.append(PotState.new())
 
 
-## 副本每個 frame 只做預測：倒數暈眩與無敵（不發 signal，signal 由 Host 的事件重現）。
+## 副本每個 frame 只做預測：食材沿著隊伍走、倒數暈眩與無敵（不發 signal，signal 由 Host 的事件重現）。
 ## Host 的快照會校正，所以不需要精確。
 func _process_replica(delta: float) -> void:
 	if state != GameState.PLAYING:
 		return
+	for lane_state in lanes:
+		_advance_queue(lane_state, delta)
 	stun_remaining = maxf(stun_remaining - delta, 0.0)
 	invincible_remaining = maxf(invincible_remaining - delta, 0.0)
 
@@ -548,6 +552,8 @@ func _try_spawn(lane: int, delta: float) -> void:
 
 func _spawn(lane: int, x: float) -> void:
 	var ingredient := IngredientState.new(_pick_type(lane), x)
+	ingredient.id = _next_ingredient_id
+	_next_ingredient_id += 1
 	lanes[lane].queue.append(ingredient)
 	ingredient_spawned.emit(lane, ingredient)
 

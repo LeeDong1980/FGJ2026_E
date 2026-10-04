@@ -4,7 +4,8 @@ extends Node
 ## 只在 Host 的連線局啟用；單機與直接 F6 執行遊戲場景時什麼都不做。
 ##
 ## 目前傳送：龍（目標層、位置、暈眩與無敵）、完成鍋數與清空次數、龍頭朝向、火冰元素、遊戲狀態與勝敗、
-## 鍋子與小龍、胃袋、噴吐狀態。之後階段加入：食材、特效事件。
+## 鍋子與小龍、胃袋、噴吐狀態、食材（每層隊伍）與吸取、攻擊、冰凍、無效指令等事件。
+## 食材的組成（誰在隊伍裡）只靠事件與完整狀態，快照只更新已存在食材的位置與進度，避免舊快照蓋掉新事件。
 
 @export var game_manager: GameManager
 @export var dragon: Dragon
@@ -32,6 +33,15 @@ func _ready() -> void:
 	game_manager.baby_arrived.connect(func(lane: int) -> void: _event_with(GameSync.EV_BABY_ARRIVED, {"lane": lane}))
 	game_manager.stomach_changed.connect(func(ingredient: IngredientState) -> void: _event(GameSync.EV_STOMACH, _type_of(ingredient)))
 	game_manager.ingredient_spat.connect(func(lane: int, ingredient: IngredientState) -> void: _event_with(GameSync.EV_SPAT, {"lane": lane, "v": _type_of(ingredient)}))
+	game_manager.ingredient_spawned.connect(func(lane: int, ingredient: IngredientState) -> void: _event_with(GameSync.EV_SPAWN, {"lane": lane, "id": ingredient.id, "type": ingredient.type, "x": ingredient.x}))
+	game_manager.ingredient_removed.connect(func(lane: int, ingredient: IngredientState) -> void: _event_with(GameSync.EV_REMOVED, {"lane": lane, "id": ingredient.id}))
+	game_manager.ingredient_swallowed.connect(func(lane: int, ingredient: IngredientState) -> void: _event_with(GameSync.EV_SWALLOWED, {"lane": lane, "v": ingredient.type}))
+	game_manager.ingredient_burned.connect(func(lane: int, ingredient: IngredientState) -> void: _event_with(GameSync.EV_BURNED, {"lane": lane, "v": ingredient.type}))
+	game_manager.ingredient_attacked.connect(func(lane: int, ingredient: IngredientState, hit: bool) -> void: _event_with(GameSync.EV_ATTACKED, {"lane": lane, "id": ingredient.id, "hit": hit}))
+	game_manager.ingredient_frozen.connect(func(lane: int, ingredient: IngredientState) -> void: _event_with(GameSync.EV_FROZEN, {"lane": lane, "id": ingredient.id}))
+	game_manager.suck_missed.connect(func(lane: int) -> void: _event_with(GameSync.EV_SUCK_MISSED, {"lane": lane}))
+	game_manager.spit_missed.connect(func(lane: int) -> void: _event_with(GameSync.EV_SPIT_MISSED, {"lane": lane}))
+	game_manager.action_missed.connect(func(lane: int, reason: GameManager.MissReason) -> void: _event_with(GameSync.EV_ACTION_MISSED, {"lane": lane, "v": reason}))
 	game_manager.game_won.connect(func() -> void: _event(GameSync.EV_WON))
 	game_manager.game_lost.connect(func() -> void: _event(GameSync.EV_LOST))
 
@@ -68,6 +78,7 @@ func build_full() -> Dictionary:
 		"element": game_manager.element,
 		"target": dragon.target_lane,
 		"pots": game_manager.pots.map(pot_to_dict),
+		"lanes": game_manager.lanes.map(func(lane: LaneState) -> Array: return lane.queue.map(ingredient_to_array)),
 		"stomach": _type_of(game_manager.stomach),
 		"spit": [game_manager.is_spitting, game_manager.is_spit_used_for_pot()],
 		"snapshot": build_snapshot(),
@@ -81,7 +92,14 @@ func build_snapshot() -> Dictionary:
 		"stun": game_manager.stun_remaining,
 		"inv": game_manager.invincible_remaining,
 		"cook": game_manager.pots.map(func(pot: PotState) -> float: return pot.cook_progress),
+		"q": game_manager.lanes.map(func(lane: LaneState) -> Array: return lane.queue.map(ingredient_to_array)),
 	}
+
+
+## 一個食材：[編號, 種類, 位置, 燒毀進度, 攻擊蓄力進度, 冰凍剩餘秒數]。
+func ingredient_to_array(ingredient: IngredientState) -> Array:
+	return [ingredient.id, ingredient.type, ingredient.x, ingredient.burn_progress,
+			ingredient.attack_progress, ingredient.freeze_remaining]
 
 
 ## 一個鍋子與旁邊小龍的資料（cook 是連續值，主要由快照更新）。

@@ -32,6 +32,7 @@ func apply_full(state: Dictionary) -> void:
 	for lane in mini(pots.size(), game_manager.pots.size()):
 		if _apply_pot(lane, pots[lane]):
 			game_manager.pot_changed.emit(lane)
+	_apply_lanes(state.get("lanes", []))
 	_set_stomach(int(state.get("stomach", -1)), true)
 	var spit: Array = state.get("spit", [false, false])
 	game_manager.apply_replica_spit(bool(spit[0]), bool(spit[1]))
@@ -72,6 +73,28 @@ func apply_event(event: Dictionary) -> void:
 		GameSync.EV_SPIT:
 			var spit: Array = value
 			game_manager.apply_replica_spit(bool(spit[0]), bool(spit[1]))
+		GameSync.EV_SPAWN:
+			_spawn(int(event["lane"]), int(event["id"]), int(event["type"]), float(event["x"]))
+		GameSync.EV_REMOVED:
+			_remove(int(event["lane"]), int(event["id"]))
+		GameSync.EV_SWALLOWED:
+			game_manager.ingredient_swallowed.emit(int(event["lane"]), _placeholder(int(value)))
+		GameSync.EV_BURNED:
+			game_manager.ingredient_burned.emit(int(event["lane"]), _placeholder(int(value)))
+		GameSync.EV_ATTACKED:
+			var attacker := _find(int(event["lane"]), int(event["id"]))
+			if attacker != null:
+				game_manager.ingredient_attacked.emit(int(event["lane"]), attacker, bool(event["hit"]))
+		GameSync.EV_FROZEN:
+			var frozen := _find(int(event["lane"]), int(event["id"]))
+			if frozen != null:
+				game_manager.ingredient_frozen.emit(int(event["lane"]), frozen)
+		GameSync.EV_SUCK_MISSED:
+			game_manager.suck_missed.emit(int(event["lane"]))
+		GameSync.EV_SPIT_MISSED:
+			game_manager.spit_missed.emit(int(event["lane"]))
+		GameSync.EV_ACTION_MISSED:
+			game_manager.action_missed.emit(int(event["lane"]), int(value) as GameManager.MissReason)
 		GameSync.EV_STUNNED:
 			game_manager.stun_remaining = game_manager.stun_time
 			dragon.stunned = true
@@ -97,10 +120,79 @@ func apply_snapshot(snapshot: Dictionary, force_position: bool = false) -> void:
 	game_manager.stun_remaining = float(snapshot.get("stun", 0.0))
 	game_manager.invincible_remaining = float(snapshot.get("inv", 0.0))
 	dragon.stunned = game_manager.stun_remaining > 0.0
+	_apply_queue_snapshot(snapshot.get("q", []))
 	# 鍋子煮的進度（連續值）
 	var cook: Array = snapshot.get("cook", [])
 	for lane in mini(cook.size(), game_manager.pots.size()):
 		game_manager.pots[lane].cook_progress = float(cook[lane])
+
+
+## 完整狀態裡的食材隊伍：和本機比對，缺的補上、多的移除（發出 spawned／removed，畫面元件就會跟著增減模型），
+## 已存在的更新位置與進度。每個食材是 [編號, 種類, 位置, 燒毀, 攻擊蓄力, 冰凍]。
+func _apply_lanes(lanes_data: Array) -> void:
+	for lane in mini(lanes_data.size(), game_manager.lanes.size()):
+		var wanted: Array = lanes_data[lane]
+		var wanted_ids: Array = wanted.map(func(item: Array) -> int: return int(item[0]))
+		for ingredient: IngredientState in game_manager.lanes[lane].queue.duplicate():
+			if not wanted_ids.has(ingredient.id):
+				_remove(lane, ingredient.id)
+		for item: Array in wanted:
+			var ingredient := _find(lane, int(item[0]))
+			if ingredient == null:
+				ingredient = _spawn(lane, int(item[0]), int(item[1]), float(item[2]))
+			_update_ingredient(ingredient, item)
+
+
+## 快照裡的食材：只更新已存在的食材，不增減（增減靠事件與完整狀態）。
+func _apply_queue_snapshot(queues: Array) -> void:
+	for lane in mini(queues.size(), game_manager.lanes.size()):
+		for item: Array in queues[lane]:
+			var ingredient := _find(lane, int(item[0]))
+			if ingredient != null:
+				_update_ingredient(ingredient, item)
+
+
+func _update_ingredient(ingredient: IngredientState, item: Array) -> void:
+	# 位置靠本機沿隊伍走的預測，差太多才硬拉，避免一格一格跳
+	var x: float = float(item[2])
+	if absf(ingredient.x - x) > GameSync.INGREDIENT_SNAP_DISTANCE:
+		ingredient.x = x
+	ingredient.burn_progress = float(item[3])
+	ingredient.attack_progress = float(item[4])
+	ingredient.freeze_remaining = float(item[5])
+
+
+func _find(lane: int, id: int) -> IngredientState:
+	if lane < 0 or lane >= game_manager.lanes.size():
+		return null
+	for ingredient: IngredientState in game_manager.lanes[lane].queue:
+		if ingredient.id == id:
+			return ingredient
+	return null
+
+
+func _spawn(lane: int, id: int, type: int, x: float) -> IngredientState:
+	var existing := _find(lane, id)
+	if existing != null:
+		return existing
+	var ingredient := IngredientState.new(type as IngredientType.Type, x)
+	ingredient.id = id
+	game_manager.lanes[lane].queue.append(ingredient)
+	game_manager.ingredient_spawned.emit(lane, ingredient)
+	return ingredient
+
+
+func _remove(lane: int, id: int) -> void:
+	var ingredient := _find(lane, id)
+	if ingredient == null:
+		return
+	game_manager.lanes[lane].queue.erase(ingredient)
+	game_manager.ingredient_removed.emit(lane, ingredient)
+
+
+## 被吞下或燒掉時 signal 帶的食材（食材本身已經由 removed 事件離開隊伍）；畫面元件只用到種類與所在層。
+func _placeholder(type: int) -> IngredientState:
+	return IngredientState.new(type as IngredientType.Type, 0.0)
 
 
 ## 套用一個鍋子的資料，回傳有沒有任何欄位改變（煮的進度不算，那是連續值）。
