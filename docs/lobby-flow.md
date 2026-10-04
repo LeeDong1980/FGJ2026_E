@@ -69,3 +69,12 @@ flowchart TD
 - **連線逾時**：「嘗試連線」上限 20 秒。
 
 兩天 jam 建議優先順序：按鈕限制、Client 的等候提示，其次才是逾時。
+
+## 實作對應
+
+- `autoload/room_manager.gd`（`RoomManager`）：狀態機與換場景。等候頁、遊戲、主選單都只呼叫它，不自己換場景。
+- `autoload/network_manager.gd`（`NetworkManager`）：連線、20 秒逾時、拒絕原因、關房通知、開始／結束連線局、斷線判定（約 6 秒）。
+- `scenes/lobby/room_lobby.tscn`：Host／Client 共用等候頁，可單獨 F6 執行。
+- `scenes/lobby/temp_menu.tscn`：暫用主選單，主選單從 game.tscn 拆出後（UI-14）由正式版取代。
+- 「嘗試連線」期間會先關掉自己的房間（ENet 一次只能是 Server 或 Client），失敗後重新建立，效果等同流程圖的「保留自己的房間」。
+- 遊戲端要回到房間時呼叫 `RoomManager.finish_match()`（Host）；單機結束呼叫 `RoomManager.return_to_menu()`。
