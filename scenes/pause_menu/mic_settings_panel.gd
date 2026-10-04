@@ -181,7 +181,7 @@ func _update_meters() -> void:
 
 	_shout_meter.live_value = c.volume_value
 	_shout_meter.live_active = c.volume_value > c.shout_threshold
-	_shout_title.text = "大叫換元素　音量 %.0f / 100　（超過 %.0f 切換火／冰，降到 %.0f 以下才能再叫）" % [c.volume_value, c.shout_threshold, c.shout_release]
+	_shout_title.text = "大叫轉頭　音量 %.0f / 100　（超過 %.0f 轉頭，降到 %.0f 以下才能再叫）" % [c.volume_value, c.shout_threshold, c.shout_release]
 
 
 ## 右邊：控制器輸出。沒有按住時變淡，數值維持最後的值。

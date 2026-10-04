@@ -16,7 +16,7 @@
 [ext_resource type="Script" path="res://scenes/game/effects_view.gd" id="11_effects_view"]
 [ext_resource type="Script" path="res://scenes/game/network_game_bridge.gd" id="12_net_bridge"]
 [ext_resource type="Script" path="res://scenes/game/stun_banner.gd" id="13_stun_banner"]
-[ext_resource type="Script" path="res://scenes/game/shout_element_input.gd" id="14_shout_element"]
+[ext_resource type="Script" path="res://scenes/game/shout_turn_input.gd" id="14_shout_turn"]
 [ext_resource type="Script" path="res://scenes/game/facing_indicator.gd" id="15_facing_indicator"]
 [ext_resource type="Script" path="res://scenes/game/action_hint_banner.gd" id="16_action_hint"]
 [ext_resource type="Script" path="res://scenes/game/pot_element_view.gd" id="17_pot_element"]
@@ -79,8 +79,8 @@ game_manager = NodePath("..")
 script = ExtResource("9_voice_action")
 game_manager = NodePath("..")
 
-[node name="ShoutElementInput" type="Node" parent="." node_paths=PackedStringArray("game_manager")]
-script = ExtResource("14_shout_element")
+[node name="ShoutTurnInput" type="Node" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("14_shout_turn")
 game_manager = NodePath("..")
 
 [node name="VoiceTogglePanel" type="CanvasLayer" parent="."]
@@ -106,13 +106,13 @@ game_manager = NodePath("..")
 
 [node name="GameUI" parent="." unique_id=1227268004 instance=ExtResource("8_game_ui")]
 
-[node name="NetworkGameBridge" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "keyboard_input", "voice_action_input", "pitch_lane_input", "shout_element_input", "ui_bridge", "ui_root")]
+[node name="NetworkGameBridge" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "keyboard_input", "voice_action_input", "pitch_lane_input", "shout_turn_input", "ui_bridge", "ui_root")]
 script = ExtResource("12_net_bridge")
 game_manager = NodePath("..")
 dragon = NodePath("../Dragon")
 keyboard_input = NodePath("../KeyboardInput")
 voice_action_input = NodePath("../VoiceActionInput")
 pitch_lane_input = NodePath("../PitchLaneInput")
-shout_element_input = NodePath("../ShoutElementInput")
+shout_turn_input = NodePath("../ShoutTurnInput")
 ui_bridge = NodePath("../GameUI")
 ui_root = NodePath("../GameUI/UIRoot")
