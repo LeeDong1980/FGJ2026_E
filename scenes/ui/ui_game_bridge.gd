@@ -1,12 +1,12 @@
 class_name UIGameBridge
 extends Node
 ## 把遊戲機制（GameManager、Dragon）與麥克風輸入（MicInput）的資料接到 UI。接口見 docs/api.md。
-## 放進 game.tscn 時當作 GameManager 的子節點，game_manager 留空會自動使用父節點。
+## 放進遊戲場景（scenes/game/main.tscn）時當作 GameManager 的子節點，game_manager 留空會自動使用父節點。
 ##
-## 遊戲流程：開始遊戲（按鍵或 Enter）→ start_game()；game_started 校正聲音並顯示遊玩狀態介面；
-## game_won／game_lost 顯示遊戲結束介面；重新遊玩 → start_game()（原地重置）。
+## 遊戲流程：場景載入後自動 start_game()（主選單是獨立場景，由 SceneFlow 切過來）；game_started 校正聲音並顯示遊玩狀態介面；
+## game_won／game_lost 顯示遊戲結束介面；重新遊玩 → start_game()（原地重置）；回主選單 → SceneFlow.go_to_main_menu()。
 
-## 「下一關」要等關卡資料完成後才會提供（docs/api.md），目前成功時一律顯示「關閉遊戲」。
+## 「下一關」要等關卡資料完成後才會提供（docs/api.md），目前成功時一律顯示「回主選單」。
 const HAS_NEXT_LEVEL := false
 ## 鍋子資訊跟隨的位置：鍋子定位點往上這麼高（世界座標）。
 const POT_ANCHOR_HEIGHT := 0.6
@@ -17,6 +17,7 @@ const POT_ANCHOR_HEIGHT := 0.6
 var _hud: PlayHud
 var _dragon: Dragon
 var _was_spitting := false
+var _calibrated := false
 
 
 func _ready() -> void:
@@ -27,10 +28,10 @@ func _ready() -> void:
 	_hud = ui_root.play_hud
 	_dragon = game_manager.dragon
 
-	# 「開始遊戲」按鍵與鍵盤 Enter（KeyboardInput）都只呼叫 start_game()，後續一律在 game_started 處理。
-	ui_root.start_requested.connect(game_manager.start_game)
+	# 重新遊玩與鍵盤 Enter（KeyboardInput）都只呼叫 start_game()，後續一律在 game_started 處理。
 	ui_root.retry_requested.connect(game_manager.start_game)
 	ui_root.next_level_requested.connect(game_manager.start_game)
+	ui_root.back_requested.connect(SceneFlow.go_to_main_menu)
 
 	game_manager.game_started.connect(_on_game_started)
 	game_manager.game_won.connect(_show_result.bind(true))
@@ -48,6 +49,8 @@ func _ready() -> void:
 
 	# GameManager 開場的 signal 可能在連接前就發出了，先主動讀一次目前狀態（docs/api.md 注意事項）。
 	_read_current_state.call_deferred()
+	# 從主選單進來就直接開始；GameManager 的 _ready 要先跑完，所以延到下一個 idle
+	game_manager.start_game.call_deferred()
 
 
 func _process(_delta: float) -> void:
@@ -61,10 +64,11 @@ func _process(_delta: float) -> void:
 
 
 func _on_game_started() -> void:
-	# 從開始介面進入遊戲時校正聲音；重新遊玩不重新校正（design.md 未定事項）。
+	# 進入遊戲後第一局校正聲音；重新遊玩不重新校正（design.md 未定事項）。
 	# 開局音量校正由麥克風輸入提供（MIC-04），還沒完成時略過。
-	if ui_root.current_screen == UIRoot.Screen.START and MicInput.has_method(&"calibrate"):
+	if not _calibrated and MicInput.has_method(&"calibrate"):
 		MicInput.call(&"calibrate")
+	_calibrated = true
 	_read_current_state()
 	ui_root.show_playing()
 

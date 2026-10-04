@@ -75,8 +75,10 @@
 - [x] UI-11 建立 UI 測試場景 `ui_test.tscn` 與測試控制中心：依階段切換介面、測試用倒數計時（時間到算失敗）、Ctrl+Shift+W／L 強制成功或失敗（可在 Inspector 開關） @GMF
 - [x] UI-12 擴充 UI 測試快捷鍵：Ctrl+Shift+1／2 增加完成數或清空次數（達到上限跳出結束介面）、4／5／6 重新隨機上／中／下層禁止食材、↑／←／↓ 龍高度顯示、I／O 顯示吸／吐 @GMF
 - [x] UI-13 UI 測試快捷鍵：按住 Ctrl+Shift+I 再按 3／4／5，上／中／下層鍋子增加一個原料，收集滿算完成一鍋並換新鍋子 @GMF
-- [ ] UI-14 把 `StartScreen` 搬出 `UIRoot`，改成獨立的 `main_menu.tscn`（主選單與 game.tscn 分離，由 `RoomManager` 串流程）
-- [ ] UI-15 `ResultScreen` 不再自己 `quit()`，只發 signal（重新遊玩、回到房間／主選單），由流程決定去向
+- [x] UI-14 主選單拆出遊戲場景：StartScreen 搬出 UIRoot 成為獨立的 `scenes/main_menu/main_menu.tscn`（單人開始／多人（停用）／離開，只發 signal）；暫時的 autoload `SceneFlow` 負責主選單 ↔ 遊戲換場景；遊戲場景載入後自動開始並校正 @露柑
+- [x] UI-15 ResultScreen 不再 `quit()`：最後一關成功改顯示「回主選單」，UIRoot 發 `back_requested`，由 UIGameBridge 交給 `SceneFlow` @露柑
+- [x] UI-16 專案主場景改成主選單 main_menu.tscn；遊戲場景 game.tscn 改名為 `scenes/game/main.tscn`（根節點 Main），原美術展示 `scenes/main/main.tscn` 改名為 `art_prev.tscn`（根節點 ArtPrev，F6 預覽） @露柑
+- [ ] UI-17 Samuel 的流程控制器（RoomManager 擴充）完成後，把 `SceneFlow` 併過去，並接上主選單的「多人」→ room_lobby.tscn
 
 #### 區網連線（Samuel）
 - [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel

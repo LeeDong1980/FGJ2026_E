@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scenes/vfx/vfx_preview.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/main/main.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/main/art_prev.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/vfx/dragon_effects.tscn" id="3"]
 
 [sub_resource type="StandardMaterial3D" id="TargetMaterial"]

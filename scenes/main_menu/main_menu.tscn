@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scenes/ui/start_screen.gd" id="1_script"]
+[ext_resource type="Script" path="res://scenes/main_menu/main_menu.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://scenes/ui/game_logo.png" id="2_logo"]
 
 [sub_resource type="Gradient" id="Gradient_bottom"]
@@ -64,7 +64,7 @@ expand_margin_top = 6.0
 expand_margin_right = 6.0
 expand_margin_bottom = 6.0
 
-[node name="StartScreen" type="Control"]
+[node name="MainMenu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -187,8 +187,28 @@ grow_vertical = 0
 theme_override_constants/separation = 18
 alignment = 2
 
-[node name="ButtonRow" type="CenterContainer" parent="Footer"]
+[node name="ButtonRow" type="HBoxContainer" parent="Footer"]
 layout_mode = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="MultiplayerButton" type="Button" parent="Footer/ButtonRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_colors/font_hover_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_colors/font_pressed_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_colors/font_focus_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
+text = "多人"
+disabled = true
+tooltip_text = "等候頁完成後開放"
 
 [node name="StartButton" type="Button" parent="Footer/ButtonRow"]
 unique_name_in_owner = true
@@ -203,7 +223,23 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
-text = "開始遊戲"
+text = "單人開始"
+
+[node name="QuitButton" type="Button" parent="Footer/ButtonRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_colors/font_hover_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_colors/font_pressed_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_colors/font_focus_color = Color(0.165, 0.102, 0.02, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
+text = "離開"
 
 [node name="CalibrationHint" type="Label" parent="Footer"]
 layout_mode = 2
@@ -211,5 +247,5 @@ theme_override_colors/font_color = Color(1, 1, 1, 0.85)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 26
-text = "按下開始遊戲時請保持安靜，遊戲會以當下的聲音校正麥克風"
+text = "開始遊戲時請保持安靜，遊戲會以當下的聲音校正麥克風"
 horizontal_alignment = 1

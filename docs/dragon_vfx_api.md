@@ -6,7 +6,7 @@
 
 本輪在 `def2614` 的現有版本上新增分別可調的 **完整寬度（直徑）**：吸取預設 4.0、噴火預設 3.0 Godot 世界單位。相較原版直徑 0.7，分別約為 5.7 倍、4.3 倍；依使用者的新方向採較大的覆蓋面，而非恢復原版清淡預設。射程仍為 6.0，沒有隨加寬改動。
 
-在 Godot 開啟 `scenes/main/main.tscn`，選取 **Main → Effects（`%Effects`）**，Inspector 的 **Effect Widths** 群組可設定 **Suction Width**／**Fire Width**。兩者皆為正的可調參數，合法範圍 **0.1～8.0**；Inspector 的 **Effect Range** 是另外的長度設定。獨立預覽则選取 `VfxPreview/DragonEffects` 的相同屬性。
+在 Godot 開啟 `scenes/main/art_prev.tscn`，選取 **ArtPrev → Effects（`%Effects`）**，Inspector 的 **Effect Widths** 群組可設定 **Suction Width**／**Fire Width**。兩者皆為正的可調參數，合法範圍 **0.1～8.0**；Inspector 的 **Effect Range** 是另外的長度設定。獨立預覽则選取 `VfxPreview/DragonEffects` 的相同屬性。
 
 寬度定義為錐形／收束流**最寬截面的基準直徑**，內部 `radius = width / 2`；嘴端仍收窄。粒子本體與錐形波動可略超出該基準輪廓，不代表玩法判定區域。角色根倍率 5 不會讓寬度再乘 5。
 

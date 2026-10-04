@@ -16,7 +16,7 @@
 [ext_resource type="Script" path="res://scenes/game/effects_view.gd" id="11_effects_view"]
 [ext_resource type="Script" path="res://scenes/game/network_game_bridge.gd" id="12_net_bridge"]
 
-[node name="Game" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
+[node name="Main" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
 script = ExtResource("4_manager")
 lane_layout = NodePath("LaneLayout")
 dragon = NodePath("Dragon")
