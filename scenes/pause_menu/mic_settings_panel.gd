@@ -38,6 +38,8 @@ const INACTIVE_ALPHA := 0.35
 @onready var _zone_meter: RangeMeter = %ZoneMeter
 @onready var _zone_hold: HSlider = %ZoneHold
 @onready var _zone_hold_label: Label = %ZoneHoldLabel
+@onready var _shout_title: Label = %ShoutTitle
+@onready var _shout_meter: RangeMeter = %ShoutMeter
 
 @onready var _volume_out_label: Label = %VolumeOutLabel
 @onready var _volume_out_bar: ProgressBar = %VolumeOutBar
@@ -123,6 +125,12 @@ func _setup_meters() -> void:
 		_controller.inhale_max = low
 		_controller.exhale_min = high)
 
+	_shout_meter.low = _controller.shout_release
+	_shout_meter.high = _controller.shout_threshold
+	_shout_meter.range_changed.connect(func(low: float, high: float) -> void:
+		_controller.shout_release = low
+		_controller.shout_threshold = high)
+
 
 func _setup_hold_sliders() -> void:
 	_bind_hold_slider(_volume_hold, _volume_hold_label, _controller.volume_release_seconds,
@@ -170,6 +178,10 @@ func _update_meters() -> void:
 	_zone_meter.live_value = c.voicedness
 	_zone_meter.live_active = c.volume_db >= c.action_gate_db
 	_zone_title.text = "氣音區間　現在 %.0f　（吸區 ≤ %.0f，吐區 ≥ %.0f，中間不輸出）" % [c.voicedness, c.inhale_max, c.exhale_min]
+
+	_shout_meter.live_value = c.volume_value
+	_shout_meter.live_active = c.volume_value > c.shout_threshold
+	_shout_title.text = "大叫轉頭　音量 %.0f / 100　（超過 %.0f 轉頭，降到 %.0f 以下才能再叫）" % [c.volume_value, c.shout_threshold, c.shout_release]
 
 
 ## 右邊：控制器輸出。沒有按住時變淡，數值維持最後的值。

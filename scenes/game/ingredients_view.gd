@@ -23,6 +23,7 @@ func _process(_delta: float) -> void:
 		var anchor := lane_layout.get_anchor_position(_lanes[ingredient], &"QueueFrontAnchor")
 		_models[ingredient].position = lane_layout.position + Vector3(ingredient.x, anchor.y, anchor.z)
 		_models[ingredient].set_burn_progress(ingredient.burn_progress)
+		_models[ingredient].set_attack_progress(ingredient.attack_progress)
 
 
 func _on_ingredient_spawned(lane: int, ingredient: IngredientState) -> void:

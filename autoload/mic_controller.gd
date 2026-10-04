@@ -24,6 +24,7 @@ const SAVED_PROPERTIES: PackedStringArray = [
 	"volume_min_db", "volume_max_db", "volume_release_seconds",
 	"pitch_min_hz", "pitch_max_hz", "pitch_release_seconds", "pitch_gate_db",
 	"action_gate_db", "inhale_max", "exhale_min", "action_release_seconds",
+	"shout_threshold", "shout_release",
 	"mic_enabled", "pitch_input_enabled", "action_input_enabled",
 ]
 const MIN_DB := -60.0
@@ -70,6 +71,12 @@ const DETECT_MAX_HZ := 1000.0
 @export var action_min_seconds: float = 0.08
 ## 聲音中斷超過此時間，視為新的一次發音；同一次發音內不會從吸切到吐（或反過來）
 @export var segment_gap_seconds: float = 0.15
+
+@export_group("Shout")
+## 大叫轉頭：音量（volume_value，0~100）往上超過 shout_threshold 算一次大叫（ShoutTurnInput 使用）
+@export_range(0.0, 100.0) var shout_threshold: float = 50.0
+## 音量降到 shout_release 以下才能再叫一次
+@export_range(0.0, 100.0) var shout_release: float = 35.0
 
 ## 目前音量（dB），即時值
 var volume_db: float = MIN_DB

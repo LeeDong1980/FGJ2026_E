@@ -55,6 +55,8 @@ const KIND_ACTION: String = "action"
 const ACTION_NONE: String = "none"
 const ACTION_INHALE: String = "inhale"
 const ACTION_EXHALE: String = "exhale"
+## Client 的轉頭（大叫或 L），用 send_voice_word() 送出，Host 收 voice_word_received。
+const WORD_TURN: String = "turn"
 const REASON_FULL: String = "房間已滿"
 const REASON_IN_MATCH: String = "對方遊戲中"
 ## 送出拒絕原因或關房通知後，等這麼久再中斷連線，讓可靠封包先送完。

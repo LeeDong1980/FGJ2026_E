@@ -2,8 +2,9 @@ class_name ClientPlay
 extends Control
 ## Client 的遊玩畫面。不執行遊戲邏輯，依座位（等候頁決定，RoomManager.get_my_slot）回報輸入給 Host：
 ## - 玩家 1（音高換層）：麥克風音高換成層，傳給 Host 控制龍（PlayerPitchInput）。
-## - 玩家 2（吸／吐）：麥克風與鍵盤 J（吸）、K（吐，按住）的動作傳給 Host（PlayerActionInput）。
-## Host 端由 NetworkGameBridge 接收，座位決定接哪一種。
+## - 玩家 2（吸／吐、轉頭）：麥克風與鍵盤 J（吸）、K（吐，按住）的動作傳給 Host（PlayerActionInput）；
+##   轉頭是大叫（音量超過 ShoutDetector 門檻）或鍵盤 L，送字音 WORD_TURN。
+## Host 端由 NetworkGameBridge 接收（voice_action_received、voice_word_received、pitch_received），座位決定接哪一種。
 
 const LANE_COUNT: int = 3
 const ACTION_TEXT: Dictionary = {
@@ -31,6 +32,7 @@ var _action_input: PlayerActionInput
 var _sent_count: int = 0
 var _ack_count: int = 0
 var _timeout_count: int = 0
+var _shout := ShoutDetector.new()
 
 
 func _ready() -> void:
@@ -45,12 +47,13 @@ func _ready() -> void:
 		_setup_player2()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _slot == 1:
 		_pitch_meter.level = _pitch_input.level
 		_pitch_meter.current_lane = _pitch_input.lane if _pitch_input.controls_dragon else -1
 		_pitch_meter.modulate.a = 1.0 if _pitch_input.controls_dragon else 0.45
 	else:
+		_update_turn(delta)
 		_volume_bar.value = MicInput.volume_value
 	_mic_label.text = _mic_text()
 	_debug_label.text = _debug_text()
@@ -90,7 +93,7 @@ func _even_thresholds(lane_count: int) -> PackedFloat32Array:
 
 func _setup_player2() -> void:
 	_title_label.text = "你是玩家 2｜吸 / 吐"
-	_hint_label.text = "遊戲畫面在房主的電腦上。對麥克風喊「吸」「吐」，或按 J（吸）、K（吐，按住）。"
+	_hint_label.text = "遊戲畫面在房主的電腦上。對麥克風喊「吸」「吐」，或按 J（吸）、K（吐，按住）；大叫或按 L 轉頭。"
 	_voice_toggle.button_pressed = MicInput.action_input_enabled
 	_voice_toggle.toggled.connect(func(on: bool) -> void: MicInput.action_input_enabled = on)
 	NetworkManager.voice_ack_received.connect(_on_ack_received)
@@ -106,6 +109,17 @@ func _setup_player2() -> void:
 func _on_action_changed(action: String) -> void:
 	_sent_count += 1
 	_show_action(action)
+
+
+## 大叫或按 L 時送出轉頭。
+func _update_turn(delta: float) -> void:
+	_shout.threshold = MicInput.shout_threshold
+	_shout.release = MicInput.shout_release
+	var shouted := _shout.update(MicInput.volume_value, delta)
+	if get_tree().paused:
+		return
+	if shouted or Input.is_action_just_pressed(&"turn_head"):
+		NetworkManager.send_voice_word(NetworkManager.WORD_TURN)
 
 
 func _on_ack_received(kind: String, _seq: int, _rtt_msec: int) -> void:

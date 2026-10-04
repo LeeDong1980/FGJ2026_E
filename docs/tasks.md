@@ -60,6 +60,12 @@
 - [x] GM-15 遊戲流程：GameManager 加入遊戲狀態（等待開始／遊玩中／結束），開場擺好但靜止，`start_game()` 原地重置並開始（開始遊戲與重新遊玩共用），發出 `game_started`；鍵盤 Enter 開始；更新 api.md @露柑
 - [x] GM-16 game.tscn 接入原型美術：LaneLayout 改為產生 prototype_floor、隊伍與鍋子位置讀房間定位點、龍沿用展示倍率、改用 PrototypePresentation 鏡頭燈光（特效之後再接） @露柑
 - [x] GM-17 game.tscn 接入吸取與噴火特效：`EffectsView` 依 GameManager 事件播放，吞下或吸空時吸取、胃空喊「吐」期間持續噴火，目標為所在層隊伍最前端；吐進鍋子暫無特效 @露柑
+- [x] GM-18 隊伍節奏：開場排滿後，有空位時每層各自等生成間隔（`@export`，預設 3 秒）才補一個；移動速度改由「走過來的時間」（出生點到最前端秒數，預設 4 秒）換算 @露柑
+- [x] GM-19 食材攻擊：每層最前端食材蓄力（每次隨機 10～20 秒），蓄滿攻擊龍（任何層都打得到），攻擊後重新蓄力；龍暈眩 1.5 秒（不能換層、吸、吐、噴火），醒來後無敵 2 秒，暈眩或無敵時攻擊打空；新增 signal 並更新 api.md @露柑
+- [x] GM-20 攻擊測試畫面：食材上顯示蓄力條；main.tscn 的 `StunBanner` 在螢幕上方（上方資訊列下面）顯示暈眩／無敵倒數，暈眩時文字晃動、被打中時放大彈出 @露柑
+- [x] GM-21 難度：開場每層 1 個食材、上限改 6 個；生成間隔隨完成鍋數變短（8 秒起每鍋 -1 秒，最短 3 秒，`@export`），蓄力與走路時間不變 @露柑
+- [x] GM-22 轉頭：龍頭分左（食材）右（鍋子），玩家 B 大叫（音量 > 50%，`ShoutTurnInput`）或按 L 切換，門檻在麥克風設定面板調整並存檔；面向左才能吸、噴火，面向右才能吐進鍋子；暈眩不能轉頭；畫面下方 `FacingIndicator` 框框顯示目前朝向（模型暫不轉）；連線局 Client 用字音 `turn` 傳給 Host；更新 design.md、api.md @露柑
+- [ ] GM-23 轉頭動畫：龍的模型依 `game_manager.facing`（`facing_changed`）轉向左／右，完成後可移除或保留 `FacingIndicator` 框框
 
 #### UI（GMF）
 - [x] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF
@@ -93,9 +99,9 @@
 - [ ] NET-15 連線局暫停：Host 按 Esc 只凍結 Host 的遊戲並通知 Client（畫面顯示「房主已暫停」，暫停中 Client 的吸／吐不生效，繼續後接上）；Client 的 Esc 只疊出設定選單、不凍結，可繼續回報吸／吐；等候頁與連線中也不凍結；換場景前一律解除暫停（改動 `pause_menu.gd` 需告知 @山雷） @Samuel
 - [ ] NET-16 連線局結束時，Client 也顯示成功／失敗（`match_ended` 帶結果）；目前 Client 只是被帶回等候頁
 - [x] NET-17 單機局結束後回主選單：結果畫面改為「回主選單」，呼叫 `RoomManager.return_to_menu()`（隨 UI-14、UI-15 完成） @露柑
-- [ ] NET-18 房間等候頁介面優化：沿用主選單視覺（logo 背景、深色卡片、橘色按鈕，主題 `lobby_theme.tres`）；顯示玩家 1／2 欄位；左下玩家 1 音高條、右下玩家 2 吸／吐（沿用遊玩介面樣式），讓兩位玩家進遊戲前先測試；Host 的音高經 `send_lobby_pitch` 同步給 Client；吸／吐本機輸入抽成 `PlayerActionInput`（client_play 共用） @Samuel
+- [x] NET-18 房間等候頁介面優化：沿用主選單視覺（logo 背景、深色卡片、橘色按鈕，主題 `lobby_theme.tres`）；顯示玩家 1／2 欄位；左下玩家 1 音高條、右下玩家 2 吸／吐（沿用遊玩介面樣式），讓兩位玩家進遊戲前先測試；Host 的音高經 `send_lobby_pitch` 同步給 Client；吸／吐本機輸入抽成 `PlayerActionInput`（client_play 共用） @Samuel
 - [ ] NET-19 Client 畫面同步顯示遊戲（Host 傳遊戲狀態，Client 以唯讀方式顯示；與 NET-02 一併規劃，做法見討論）@Samuel
-- [ ] NET-20 等候頁自選座位：點選「玩家 1」「玩家 2」切換角色（不需對方同意、不需準備）；`RoomManager.host_slot`；音高與吸／吐改為雙向傳輸；`NetworkGameBridge` 與 `client_play` 依座位切換（Client 可坐玩家 1 以音高換層）；遊玩 HUD 的音高條改讀音高並可讀對方傳來的音高；介面「玩家 A／B」統一改為「玩家 1／2」 @Samuel
+- [x] NET-20 等候頁自選座位：點選「玩家 1」「玩家 2」切換角色（不需對方同意、不需準備）；`RoomManager.host_slot`；音高與吸／吐改為雙向傳輸；`NetworkGameBridge` 與 `client_play` 依座位切換（Client 可坐玩家 1 以音高換層）；遊玩 HUD 的音高條改讀音高並可讀對方傳來的音高；介面「玩家 A／B」統一改為「玩家 1／2」 @Samuel
 
 ### 美術與關卡
 
