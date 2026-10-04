@@ -6,6 +6,8 @@ extends Node
 
 @export var game_manager: GameManager
 @export var dragon: Dragon
+## HUD 的橋接。Client 坐玩家 2 時，玩家 1 的音高來自 Host，由這裡餵給 HUD 的音高條。
+@export var ui_bridge: UIGameBridge
 
 ## 開始事件或完整狀態已經讓 UI 進入遊玩狀態。
 var _started: bool = false
@@ -14,9 +16,22 @@ var _started: bool = false
 func _ready() -> void:
 	NetworkManager.state_full_received.connect(apply_full)
 	NetworkManager.state_event_received.connect(apply_event)
-	NetworkManager.state_snapshot_received.connect(apply_snapshot)
+	NetworkManager.state_snapshot_received.connect(_on_snapshot_received)
+	NetworkManager.pitch_received.connect(_on_pitch_received)
 	# 場景載入完成才要完整狀態（等 GameManager 與各畫面元件都就緒）
 	NetworkManager.request_state.call_deferred()
+
+
+func _on_snapshot_received(snapshot: Dictionary) -> void:
+	if GameSync.debug_snapshot_loss > 0.0 and randf() < GameSync.debug_snapshot_loss:
+		return
+	apply_snapshot(snapshot)
+
+
+## 對方（坐玩家 1 的 Host）的音高，給 HUD 的音高條。自己坐玩家 1 時用本機音高，不用這個。
+func _on_pitch_received(level: float, _lane: int) -> void:
+	if ui_bridge != null and RoomManager.get_my_slot() == 2:
+		ui_bridge.remote_pitch_level = level
 
 
 func apply_full(state: Dictionary) -> void:

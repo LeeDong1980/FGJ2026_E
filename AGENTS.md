@@ -9,7 +9,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 ## 資料夾結構
 - `scenes/main/`：美術展示場景 `art_prev.tscn`（原 main.tscn，三層樓層＋紅龍＋特效的整體構圖預覽）與展示用子場景。
 - `scenes/dungeon_room/`：地牢房間，包含 dungeon 模型實例、材質、碰撞、燈光與攝影機。
-- `scenes/game/`：遊戲場景 `main.tscn`（原 game.tscn），含 GameManager（遊戲狀態）、樓層產生（LaneLayout）、食材畫面、吸吐特效串接（EffectsView）、鍵盤測試輸入與 Client 遊玩畫面 `client_play.tscn`。
+- `scenes/game/`：遊戲場景 `main.tscn`（原 game.tscn），含 GameManager（遊戲狀態）、樓層產生（LaneLayout）、食材畫面、吸吐特效串接（EffectsView）、鍵盤測試輸入與 Client 輸入診斷疊層 `client_play.tscn`（按 F3）；連線畫面同步見 `game_state_sender.gd`（Host）、`game_state_receiver.gd`（Client）、`client_view_bridge.gd`、`game_sync.gd`（封包格式）。
 - `scenes/dragon/`：可操控的龍（移動腳本＋紅龍模型）。
 - `scenes/ingredient/`：食材種類、食材資料與暫時食材模型。
 - `scenes/red_dragon/`：紅龍模型子場景。

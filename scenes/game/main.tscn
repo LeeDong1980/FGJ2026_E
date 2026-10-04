@@ -119,7 +119,7 @@ script = ExtResource("30_state_sender")
 game_manager = NodePath("..")
 dragon = NodePath("../Dragon")
 
-[node name="ClientViewBridge" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "keyboard_input", "voice_action_input", "pitch_lane_input", "shout_element_input", "ui_root")]
+[node name="ClientViewBridge" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "keyboard_input", "voice_action_input", "pitch_lane_input", "shout_element_input", "ui_root", "ui_bridge")]
 script = ExtResource("31_view_bridge")
 game_manager = NodePath("..")
 dragon = NodePath("../Dragon")
@@ -128,3 +128,4 @@ voice_action_input = NodePath("../VoiceActionInput")
 pitch_lane_input = NodePath("../PitchLaneInput")
 shout_element_input = NodePath("../ShoutElementInput")
 ui_root = NodePath("../GameUI/UIRoot")
+ui_bridge = NodePath("../GameUI")

@@ -10,6 +10,9 @@ extends Node
 @export var game_manager: GameManager
 @export var dragon: Dragon
 
+## 房主坐玩家 1 時，持續把自己的音高傳給 Client，讓 Client 的 HUD 音高條有資料可顯示（不用來控制龍）。
+var _pitch_input: PlayerPitchInput
+
 var _snapshot_timer: float = 0.0
 var _full_timer: float = 0.0
 var _last_target: int = -1
@@ -20,6 +23,10 @@ func _ready() -> void:
 	if RoomManager.role != RoomManager.Role.HOST or RoomManager.phase != RoomManager.Phase.MATCH:
 		set_process(false)
 		return
+	if RoomManager.host_slot == 1:
+		_pitch_input = PlayerPitchInput.new()
+		_pitch_input.send_to_peer = true
+		add_child(_pitch_input)
 	NetworkManager.state_requested.connect(send_full)
 	game_manager.game_started.connect(_on_game_started)
 	game_manager.completed_count_changed.connect(func(v: int) -> void: _event(GameSync.EV_COMPLETED, v))

@@ -104,10 +104,10 @@
 - [x] NET-13 新增 `NetworkGameBridge` 串接 game.tscn：依 `RoomManager` 模式切換輸入、直接開局、遊戲結束回房間（game.tscn 加節點需 @露柑 同意） @Samuel
 - [x] NET-14 新增 `scenes/game/client_play.tscn`：Client 遊玩畫面，只顯示麥克風狀態並傳送吸／吐封包 @Samuel
 - [ ] NET-15 連線局暫停：Host 按 Esc 只凍結 Host 的遊戲並通知 Client（畫面顯示「房主已暫停」，暫停中 Client 的吸／吐不生效，繼續後接上）；Client 的 Esc 只疊出設定選單、不凍結，可繼續回報吸／吐；等候頁與連線中也不凍結；換場景前一律解除暫停（改動 `pause_menu.gd` 需告知 @山雷） @Samuel
-- [ ] NET-16 連線局結束時，Client 也顯示成功／失敗（`match_ended` 帶結果）；目前 Client 只是被帶回等候頁
+- [x] NET-16 連線局結束時，Client 也顯示成功／失敗並等房主回到房間（由 NET-19 的畫面同步一併完成，`ClientViewBridge`） @Samuel
 - [x] NET-17 單機局結束後回主選單：結果畫面改為「回主選單」，呼叫 `RoomManager.return_to_menu()`（隨 UI-14、UI-15 完成） @露柑
 - [x] NET-18 房間等候頁介面優化：沿用主選單視覺（logo 背景、深色卡片、橘色按鈕，主題 `lobby_theme.tres`）；顯示玩家 1／2 欄位；左下玩家 1 音高條、右下玩家 2 吸／吐（沿用遊玩介面樣式），讓兩位玩家進遊戲前先測試；Host 的音高經 `send_lobby_pitch` 同步給 Client；吸／吐本機輸入抽成 `PlayerActionInput`（client_play 共用） @Samuel
-- [ ] NET-19 Client 畫面同步顯示遊戲（連線局 Client 載入同一個遊戲場景，GameManager 為副本，由 Host 的事件與快照填入狀態；做法見 docs/lobby-flow.md「畫面同步」）。分階段：①基礎建設、龍、計數、勝敗（已完成）②鍋子、小龍、胃袋、噴吐狀態（已完成）③食材與特效事件（已完成）④收尾（HUD 音高、掉包與斷線測試） @Samuel
+- [x] NET-19 Client 畫面同步顯示遊戲：連線局 Client 載入同一個遊戲場景，GameManager 為副本，由 Host 的事件、快照與完整狀態填入，畫面元件不用改（做法見 docs/lobby-flow.md「畫面同步」）。已完成四階段：①龍、計數、勝敗 ②鍋子、小龍、胃袋、噴吐狀態 ③食材與特效事件 ④HUD 音高、掉包與斷線測試 @Samuel
 - [x] NET-20 等候頁自選座位：點選「玩家 1」「玩家 2」切換角色（不需對方同意、不需準備）；`RoomManager.host_slot`；音高與吸／吐改為雙向傳輸；`NetworkGameBridge` 與 `client_play` 依座位切換（Client 可坐玩家 1 以音高換層）；遊玩 HUD 的音高條改讀音高並可讀對方傳來的音高；介面「玩家 A／B」統一改為「玩家 1／2」 @Samuel
 
 ### 美術與關卡

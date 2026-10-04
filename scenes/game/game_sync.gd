@@ -17,6 +17,9 @@ const INGREDIENT_SNAP_DISTANCE: float = 0.3
 ## 龍的位置和快照差超過這麼多（世界座標）才硬拉過去，平時靠本機移動預測。
 const DRAGON_SNAP_DISTANCE: float = 0.5
 
+## 測試用：Client 隨機丟掉這個比例（0～1）的快照，模擬掉包，驗證狀態仍能靠事件與完整狀態對上。正式遊戲保持 0。
+static var debug_snapshot_loss: float = 0.0
+
 # 事件類型
 const EV_STARTED: String = "started"
 const EV_COMPLETED: String = "completed"  # v: 完成鍋數

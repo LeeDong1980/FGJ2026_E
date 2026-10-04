@@ -20,6 +20,7 @@ const TOGGLE_KEY: Key = KEY_F3
 @export var pitch_lane_input: PitchLaneInput
 @export var shout_element_input: ShoutElementInput
 @export var ui_root: UIRoot
+@export var ui_bridge: UIGameBridge
 
 var _overlay: Control
 var _pause_banner: Label
@@ -36,6 +37,7 @@ func _ready() -> void:
 	var receiver := GameStateReceiver.new()
 	receiver.game_manager = game_manager
 	receiver.dragon = dragon
+	receiver.ui_bridge = ui_bridge
 	add_child(receiver)
 	_build_overlay()
 	_build_pause_banner()

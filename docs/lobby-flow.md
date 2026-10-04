@@ -105,5 +105,6 @@ flowchart TD
   - **snapshot**（不可靠，20 次／秒）：連續變動的值，如龍的位置、暈眩時間。快照不放離散狀態，避免舊快照蓋掉新事件。
 - 各階段：①龍（目標層、位置、暈眩、無敵）、計數、朝向、元素、勝敗 ②鍋子與小龍（禁止清單、需求、數量、食譜元素、小龍是否到位、煮的進度）、胃袋、噴吐狀態（`is_spitting`、這次是否已吐進鍋子，鍋子底下光圈的跳動與特效要用）③食材與特效事件 ④收尾。
 - 第三階段：食材（`IngredientState` 新增 `id`，由 `GameManager` 生成時指定）。誰在隊伍裡只靠事件（`spawn`、`removed`）與完整狀態，快照只更新已存在食材的位置與進度（燒毀、攻擊蓄力、冰凍），避免舊快照蓋掉新事件；Client 本機沿隊伍走預測位置，差超過 0.3 才硬拉。特效與提示靠事件重現：`swallowed`（吸取特效）、`burned`、`attacked`、`frozen`、`suck_missed`、`spit_missed`、`action_missed`（上方提示）；噴火噴冰特效是 `EffectsView` 讀副本的狀態（元素、噴吐狀態、胃袋、朝向、隊伍最前端）自己判斷的，不需要額外事件。
+- 第四階段：Host 坐玩家 1 時，`GameStateSender` 持續用 `PlayerPitchInput` 把音高傳給 Client，Client 坐玩家 2 時 HUD 的音高條讀它（`UIGameBridge.remote_pitch_level`）；自己坐玩家 1 時用本機音高。穩健性測試：隨機丟掉 70% 快照（`GameSync.debug_snapshot_loss`）後，食材位置與進度仍一致；重送完整狀態不會產生重複食材（晚進場、重新對帳都靠它）；Client 中途離開時 Host 回等候頁、Host 被強制中斷時 Client 重建自己的房間。量測：快照約 340 B（20 次／秒）、完整狀態約 1.4 KB。
 - 鍋子的離散資料走事件（`pot`、`baby_left`、`baby_arrived`、`stomach`、`spat`、`spit`），煮的進度（連續值）放在快照；完整狀態每 3 秒對帳一次，Client 比對有差異才補發 signal。
 
