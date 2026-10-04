@@ -48,6 +48,12 @@ custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 show_percentage = false
 
+[node name="VoiceToggle" type="CheckButton" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "吸／吐（語音）"
+
 [node name="MicLabel" type="Label" parent="Center/Panel"]
 unique_name_in_owner = true
 layout_mode = 2

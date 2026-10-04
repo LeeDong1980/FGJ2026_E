@@ -12,6 +12,7 @@ const ACTION_TEXT: Dictionary = {
 
 @onready var _action_label: Label = %ActionLabel
 @onready var _volume_bar: ProgressBar = %VolumeBar
+@onready var _voice_toggle: CheckButton = %VoiceToggle
 @onready var _mic_label: Label = %MicLabel
 @onready var _net_label: Label = %NetLabel
 @onready var _leave_button: Button = %LeaveButton
@@ -23,6 +24,8 @@ func _ready() -> void:
 	# 暫停選單開著時也要持續回報，否則 Host 會一直收不到「放開」。
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_leave_button.pressed.connect(RoomManager.leave_room)
+	_voice_toggle.button_pressed = MicInput.action_input_enabled
+	_voice_toggle.toggled.connect(func(on: bool) -> void: MicInput.action_input_enabled = on)
 	_show_action(_sent_action)
 
 
@@ -34,6 +37,7 @@ func _process(_delta: float) -> void:
 
 
 func _exit_tree() -> void:
+	MicInput.save_settings()
 	NetworkManager.send_voice_action(NetworkManager.ACTION_NONE)
 
 
@@ -76,7 +80,7 @@ func _show_action(action: String) -> void:
 
 func _mic_text() -> String:
 	if not MicInput.action_input_enabled:
-		return "語音吸／吐已關閉（可按 Esc 開設定，或用鍵盤 J／K）"
+		return "語音吸／吐已關閉，請打開上方開關，或用鍵盤 J／K"
 	match MicInput.mic_status:
 		MicController.MicStatus.NO_SIGNAL:
 			return "麥克風沒有訊號，請按 Esc 開設定重新偵測，或用鍵盤 J／K"
