@@ -164,7 +164,7 @@ func _verify() -> void:
 	source = material.get_shader_parameter(&"source_position")
 	_expect(source.distance_to(real_anchor.global_position) < 0.01, "animated mouth matches particle source after skeleton update")
 	effects.stop_effects()
-	var main_scene: Node3D = load("res://scenes/main/main.tscn").instantiate() as Node3D
+	var main_scene: Node3D = load("res://scenes/main/art_prev.tscn").instantiate() as Node3D
 	root.add_child(main_scene)
 	var integrated: DragonEffects = main_scene.get_node_or_null("Effects") as DragonEffects
 	if integrated != null:

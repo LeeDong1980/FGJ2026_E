@@ -9,7 +9,7 @@
 - 工作目錄：`C:/UnityProject/FGJ2026_E`。
 - 初次收尾時分支：`master`；當時 HEAD：`4a87107`。首版成果其後已提交；恢復工作時本機 HEAD 為 def2614（首版與語音／區網功能已整合）。遠端仍可能有其他人的新提交，接續前核對實際 Git 狀態。
 - Godot：專案規格 4.7，驗證執行檔 4.7.2；Forward Plus／D3D12、Jolt。
-- 整體畫面：開 `project.godot`，F5 執行 `scenes/main/main.tscn`。
+- 整體畫面：開 `project.godot`，開啟 `scenes/main/art_prev.tscn` 按 F6（F5 現在是遊戲主選單）。
 - 特效：開 `scenes/vfx/vfx_preview.tscn`，F6；1 吸取、2 噴火、Space 停止、Tab 切目標、+／- 調射程、PageUp／PageDown 切展示高度。
 - 詳細驗收操作：`docs/prototype_art_acceptance.md`。
 - 最新主鏡頭預覽：`docs/prototype_main_preview.png`；整合證據：`docs/prototype_art_review.md`。
@@ -29,7 +29,7 @@
 
 | Session | 完成成果與可編輯範圍 | 接口／文件 |
 |---|---|---|
-| 場景美術 | `scenes/rooms/`：兩類房間、通用天花板、樓層、三種蛋、幼龍；`scenes/main/main.tscn`：三層、主龍與 Effects 接入 | `docs/prototype_rooms.md` |
+| 場景美術 | `scenes/rooms/`：兩類房間、通用天花板、樓層、三種蛋、幼龍；`scenes/main/art_prev.tscn`：三層、主龍與 Effects 接入 | `docs/prototype_rooms.md` |
 | 動畫師 | `scenes/red_dragon/`：七個既有動畫、實例獨立資源、循環／轉場、嘴部骨架掛點 | `docs/dragon_animation_api.md` |
 | 合成師 | `scenes/main/prototype_presentation.tscn` 及專用腳本：攝影機、燈光、WorldEnvironment | `docs/prototype_camera.md` |
 | 技術美術與特效 | `scenes/vfx/`：程序粒子、三個 shader、連續火焰核心、控制器、獨立展示、QA 圖片及驗證工具 | `docs/dragon_vfx_api.md` |
@@ -83,7 +83,7 @@ kitkay 盤點文件由場景美術維護：`docs/kitkay_dungeon_inventory.md`。
 以重新執行 `git status --short` 的結果為準；目前主要範圍：
 
 1. 使用者提供模型：`Models/dragonEggs/`、`Models/dragonBabies/`、`Models/kitkayDungeon/`，及 .import。
-2. 房間／樓層／育幼陳設：`scenes/rooms/`、`scenes/main/main.tscn`、`docs/prototype_rooms.md`。
+2. 房間／樓層／育幼陳設：`scenes/rooms/`、`scenes/main/art_prev.tscn`、`docs/prototype_rooms.md`。
 3. 紅龍動畫／嘴部：`scenes/red_dragon/red_dragon.tscn`、控制腳本、驗證腳本與 .uid、動畫接口文件。
 4. 構圖／燈光：`scenes/main/prototype_presentation.*`、專用腳本 .uid、攝影機文件。
 5. 特效：`scenes/vfx/` 的場景、腳本、shader、.uid、QA 圖／.import 及特效接口文件。

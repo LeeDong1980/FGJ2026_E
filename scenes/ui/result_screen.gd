@@ -4,11 +4,11 @@ extends Control
 
 signal action_pressed(action: Action)
 
-enum Action { NEXT_LEVEL, QUIT, RETRY }
+enum Action { NEXT_LEVEL, MAIN_MENU, RETRY }
 
 const ACTION_TEXTS: Dictionary = {
 	Action.NEXT_LEVEL: "下一關",
-	Action.QUIT: "關閉遊戲",
+	Action.MAIN_MENU: "回主選單",
 	Action.RETRY: "重新遊玩",
 }
 const SUCCESS_TITLE_COLOR := Color("ffd34d")
@@ -34,7 +34,7 @@ func _ready() -> void:
 
 func show_result(success: bool, has_next_level: bool, completed: int, target: int, cleared: int, limit: int) -> void:
 	if success:
-		_action = Action.NEXT_LEVEL if has_next_level else Action.QUIT
+		_action = Action.NEXT_LEVEL if has_next_level else Action.MAIN_MENU
 	else:
 		_action = Action.RETRY
 	var title_color := SUCCESS_TITLE_COLOR if success else FAIL_TITLE_COLOR

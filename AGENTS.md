@@ -4,21 +4,23 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 
 ## 環境
 - Godot 4.7，Forward Plus 渲染器，3D 物理用 Jolt
-- 執行：用 Godot 編輯器開啟 `project.godot`，按 F5 執行主場景，按 F6 執行目前開啟的場景。
+- 執行：用 Godot 編輯器開啟 `project.godot`，按 F5 執行主場景（主選單 `scenes/main_menu/main_menu.tscn`），按 F6 執行目前開啟的場景。
 
 ## 資料夾結構
-- `scenes/main/`：主場景。
+- `scenes/main/`：美術展示場景 `art_prev.tscn`（原 main.tscn，三層樓層＋紅龍＋特效的整體構圖預覽）與展示用子場景。
 - `scenes/dungeon_room/`：地牢房間，包含 dungeon 模型實例、材質、碰撞、燈光與攝影機。
-- `scenes/game/`：遊戲場景，含 GameManager（遊戲狀態）、樓層產生（LaneLayout）、食材畫面、吸吐特效串接（EffectsView）與鍵盤測試輸入。
+- `scenes/game/`：遊戲場景 `main.tscn`（原 game.tscn），含 GameManager（遊戲狀態）、樓層產生（LaneLayout）、食材畫面、吸吐特效串接（EffectsView）、鍵盤測試輸入與 Client 遊玩畫面 `client_play.tscn`。
 - `scenes/dragon/`：可操控的龍（移動腳本＋紅龍模型）。
 - `scenes/ingredient/`：食材種類、食材資料與暫時食材模型。
 - `scenes/red_dragon/`：紅龍模型子場景。
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
-- `scenes/lobby/`：區網連線大廳（建立房間／輸入 IP 加入）。
+- `scenes/lobby/`：區網連線大廳 `lobby.tscn`（舊版）、房間等候頁 `room_lobby.tscn`（流程見 docs/lobby-flow.md）。
 - `scenes/network_test/`：雙機語音封包傳輸測試場景（內含大廳）。
-- `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線與語音封包收發，autoload 名稱 `NetworkManager`）。 `mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。
+- `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線與語音封包收發，autoload 名稱 `NetworkManager`）。`room_manager.gd` 是房間流程與換場景（autoload 名稱 `RoomManager`）。`mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。`phone_mic_server.gd` 是手機網頁麥克風的 server（autoload 名稱 `PhoneMic`，見 docs/voice-input.md 9.1）。
+- `scenes/main_menu/`：主選單（從 UIRoot 的 StartScreen 拆出的獨立場景；「進入遊戲」呼叫 `RoomManager.enter_room()`）。
 - `scenes/pause_menu/`：暫停選單（autoload `PauseMenu`，Esc 開關）、麥克風設定面板 `mic_settings_panel.tscn`、可拖曳區間的觀察條 `range_meter.gd`。
 - `scenes/mic_test/`：麥克風輸入實驗場景，只實例化設定面板，F6 單獨執行用。
+- `scenes/phone_mic/`：手機網頁麥克風（MIC-11）：手機網頁 `phone_mic.html`、每位玩家的聲音換算 `PhoneVoiceSource`、連線測試場景。
 - `scenes/rooms/`：prototype 勇者挑戰房、幼龍哺育房、通用天花板與垂直樓層子場景。
 - `scenes/vfx/`：吸取、噴火的程序材質、粒子子場景、控制接口與獨立展示。
 - `scenes/ui/`：UI 根場景與三個介面（遊戲開始、遊玩狀態、遊戲結束）。`game_ui.tscn` 是接上遊戲機制的完整 UI，已實例化在 game.tscn；`ui_test.tscn` 只測介面流程（假資料與測試快捷鍵）。

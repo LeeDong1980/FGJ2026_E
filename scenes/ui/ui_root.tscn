@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" path="res://scenes/ui/ui_root.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/play_hud.tscn" id="2_hud"]
-[ext_resource type="PackedScene" path="res://scenes/ui/start_screen.tscn" id="3_start"]
 [ext_resource type="PackedScene" path="res://scenes/ui/result_screen.tscn" id="4_result"]
 
 [node name="UIRoot" type="CanvasLayer"]
@@ -10,9 +9,6 @@ layer = 10
 script = ExtResource("1_script")
 
 [node name="PlayHud" parent="." instance=ExtResource("2_hud")]
-unique_name_in_owner = true
-
-[node name="StartScreen" parent="." instance=ExtResource("3_start")]
 unique_name_in_owner = true
 
 [node name="ResultScreen" parent="." instance=ExtResource("4_result")]

@@ -1,9 +1,9 @@
 class_name UITestController
 extends Node
 ## 測試介面用的控制中心：不接遊戲機制，只用假資料依遊戲階段切換介面。
-## 遊戲開始時先關閉所有介面，再顯示遊戲開始介面。按下「開始遊戲」後顯示遊玩狀態介面並開始倒數，
+## 執行後直接顯示遊玩狀態介面並開始倒數（主選單已拆成獨立場景 main_menu.tscn），
 ## 時間到就算失敗。完成數達到 target_pots 算成功，清空次數達到 clear_limit 算失敗。
-## 按下「重新遊玩」或「下一關」會重新開始一局。
+## 按下「重新遊玩」「下一關」或「回主選單」都會重新開始一局（測試場景沒有主選單）。
 ##
 ## 測試快捷鍵（遊玩中有效，可在 Inspector 用 hotkeys_enabled 開關），都要同時按住 Ctrl + Shift：
 ##   W 強制成功　　L 強制失敗
@@ -30,7 +30,7 @@ const ADD_INGREDIENT_KEYS: Dictionary = {KEY_3: TOP_LANE, KEY_4: MIDDLE_LANE, KE
 @export var play_time: float = 60.0
 @export var target_pots: int = 6
 @export var clear_limit: int = 3
-## 成功時是否還有下一關。勾選時成功畫面顯示「下一關」，不勾選時顯示「關閉遊戲」。
+## 成功時是否還有下一關。勾選時成功畫面顯示「下一關」，不勾選時顯示「回主選單」。
 @export var has_next_level: bool = true
 
 @export_group("測試快捷鍵")
@@ -52,11 +52,10 @@ var _pots: Array[Dictionary] = []
 
 
 func _ready() -> void:
-	ui_root.start_requested.connect(_start_round)
 	ui_root.retry_requested.connect(_start_round)
 	ui_root.next_level_requested.connect(_start_round)
-	ui_root.hide_all()
-	ui_root.show_start()
+	ui_root.back_requested.connect(_start_round)
+	_start_round.call_deferred()
 
 
 func _process(delta: float) -> void:
