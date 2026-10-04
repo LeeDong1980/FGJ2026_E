@@ -1,6 +1,7 @@
 [gd_resource type="Theme" format=3]
 
 [ext_resource type="FontFile" path="res://scenes/ui/UI/Fonts/Changa-Bold.ttf" id="1_font"]
+[ext_resource type="FontFile" path="res://scenes/ui/UI/Fonts/NotoSansTC-Bold.ttf" id="cjk_font"]
 [ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Button/Button01_Brown.png" id="2_button"]
 [ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/UI_Etc/ResourceBar_Bg01.Png" id="3_field"]
 [ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Bg.Png" id="4_panel"]
@@ -14,7 +15,7 @@ font_names = PackedStringArray("PingFang TC", "Noto Sans TC", "Noto Sans CJK TC"
 font_weight = 700
 
 [sub_resource type="FontVariation" id="FontVariation_main"]
-fallbacks = Array[Font]([SubResource("SystemFont_cjk")])
+fallbacks = Array[Font]([ExtResource("cjk_font"), SubResource("SystemFont_cjk")])
 base_font = ExtResource("1_font")
 
 [sub_resource type="StyleBoxEmpty" id="focus"]

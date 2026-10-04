@@ -48,6 +48,8 @@ func _ready() -> void:
 		_sources[player].push_sample(db, zcr, hz, seconds))
 	player_disconnected.connect(func(player: int) -> void: _sources[player].reset())
 
+	if OS.has_feature("web"):
+		return  # 瀏覽器版不能開 server，手機麥克風只在電腦版可用
 	_page = FileAccess.get_file_as_bytes(PAGE_PATH)
 	if _page.is_empty():
 		push_error("PhoneMicServer: 讀不到 %s（匯出時要把 *.html 加進匯出篩選）" % PAGE_PATH)

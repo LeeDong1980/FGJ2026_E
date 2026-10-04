@@ -17,6 +17,25 @@
 ## 輸出後檢查
 在乾淨資料夾直接開啟輸出的執行檔，確認：主選單、BGM 與音效、麥克風、區網與遠端連線、手機麥克風網頁。macOS 首次進入遊戲時會跳出麥克風授權。
 
+## 網頁版（Web）
+已實測：單機流程可在瀏覽器執行（Chrome 內測）。限制與設定如下。
+
+**輸出設定**（Project → Export → Add… → Web；`export_presets.cfg` 因各人輸出路徑不同，Web 預設請自行建立）
+- Filters 填 `*.html`，**取消** Thread Support（單執行緒，不需要特殊伺服器標頭，itch.io 可直接用）。
+- 輸出到 `builds/web/index.html`（`builds/` 已被 `.gitignore` 排除）。
+- 渲染器不用改：網頁版自動使用 Compatibility，專案維持 Forward Plus。
+- 本機測試：`python3 -m http.server 8060 --bind 127.0.0.1`，瀏覽器開 `http://127.0.0.1:8060/index.html`（直接開檔案無法執行）。
+- 輸出約 150 MB（pck 約 110 MB、wasm 約 40 MB），首次載入較慢。
+
+**網頁版的差異**
+- 沒有區網房間（瀏覽器不能開 ENet），等候頁只留「單機」「公開房間」與輸入房間代碼加入；程式用 `OS.has_feature("web")` 判斷。
+- 沒有手機麥克風（瀏覽器不能開 TCP server），`PhoneMic` 在網頁版直接略過。
+- 麥克風需要 HTTPS（itch.io 本身是 HTTPS）、玩家先點擊網頁，並允許瀏覽器的麥克風權限。
+- **第一次開啟要重新整理一次**：首次載入時瀏覽器跳出麥克風授權，按「允許」後，需**重新整理網頁**才會開始收音（之後就不用）。上傳頁面要提醒玩家。已實測確認：維持預設的 Sample 播放即可收音；曾試過改成 Stream 播放與延後收音，沒有採用，維持簡單。
+- 瀏覽器沒有系統字型，中文靠內嵌的 `NotoSansTC-Bold.ttf`（專案預設字型 `gui/theme/custom_font` 與三個主題的備援字型）。**新的主題或字型不要只用 SystemFont。**
+
+**尚未驗證**：真實麥克風（吸／吐、音高）、公開房間經中繼的連線、手機瀏覽器、效能與音訊延遲。
+
 ## macOS 的 Gatekeeper 警告
 匯出時會看到「已停用公證」與「使用 ad-hoc 簽名」兩個警告，可以忽略。沒有 Apple Developer 帳號（美金 99 元／年）就無法簽章與公證，所以從瀏覽器下載的 Mac 版第一次開啟會被 Gatekeeper 擋下。上傳頁面要附上下方說明。
 

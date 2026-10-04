@@ -29,6 +29,10 @@ NetworkManager="*res://autoload/network_manager.gd"
 RoomManager="*res://autoload/room_manager.gd"
 PhoneMic="*res://autoload/phone_mic_server.gd"
 
+[gui]
+
+theme/custom_font="res://scenes/ui/UI/Fonts/NotoSansTC-Bold.ttf"
+
 [display]
 
 window/size/viewport_width=1920
