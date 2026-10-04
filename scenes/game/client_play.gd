@@ -48,7 +48,8 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if _slot == 1:
 		_pitch_meter.level = _pitch_input.level
-		_pitch_meter.current_lane = _pitch_input.lane
+		_pitch_meter.current_lane = _pitch_input.lane if _pitch_input.controls_dragon else -1
+		_pitch_meter.modulate.a = 1.0 if _pitch_input.controls_dragon else 0.45
 	else:
 		_volume_bar.value = MicInput.volume_value
 	_mic_label.text = _mic_text()

@@ -58,7 +58,8 @@ func _process(_delta: float) -> void:
 	if RoomManager.phase == RoomManager.Phase.JOINING:
 		_refresh_status()
 	if _pitch_input.enabled:
-		_panels.set_pitch(_pitch_input.level, _pitch_input.lane)
+		_panels.set_pitch(_pitch_input.level, _pitch_input.lane if _pitch_input.controls_dragon else -1)
+	_panels.set_pitch_input_off(_pitch_input.enabled and not MicInput.pitch_input_enabled)
 
 
 func _exit_tree() -> void:
@@ -171,6 +172,7 @@ func _refresh_player_inputs(is_host: bool, joining: bool, count: int) -> void:
 	_panels.set_player2(player2_caption, player2_is_mine)
 	if not player1_is_mine:
 		_panels.set_pitch(0.0, -1)
+		_panels.set_pitch_input_off(false)
 
 
 func _local_ip_text(is_host: bool) -> String:

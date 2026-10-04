@@ -18,15 +18,18 @@ const SEND_INTERVAL: float = 1.0 / 15.0
 
 ## 0～1 的音高比例（沒有聲音時維持最後的值，與 MicInput 一致）。
 var level: float = 0.0
-## 目前的層（0 是最低層），-1 表示還沒有。
+## 目前的層（0 是最低層），-1 表示還沒有。即使「音高輸入」開關關閉也照常量測，讓玩家看得出麥克風有沒有收到。
 var lane: int = -1
+## 這個輸入現在會不會真的控制龍：本元件啟用，而且「音高輸入」開關（MicInput.pitch_input_enabled）是開的。
+## 開關關閉時傳給對方的層是 -1，對方不會用它換層。
+var controls_dragon: bool = false
 
 var _timer: float = 0.0
 
 
 func _process(delta: float) -> void:
-	var previous_lane: int = lane
-	if enabled and MicInput.pitch_input_enabled:
+	var previous_sent_lane: int = _sent_lane()
+	if enabled:
 		var voice: Node = _voice()
 		level = voice.pitch_value / 100.0
 		if voice.pitch_active:
@@ -34,12 +37,18 @@ func _process(delta: float) -> void:
 	else:
 		level = 0.0
 		lane = -1
+	controls_dragon = enabled and MicInput.pitch_input_enabled
 	if not (send_to_peer and enabled):
 		return
 	_timer += delta
-	if lane != previous_lane or _timer >= SEND_INTERVAL:
+	if _sent_lane() != previous_sent_lane or _timer >= SEND_INTERVAL:
 		_timer = 0.0
-		NetworkManager.send_pitch(level, lane)
+		NetworkManager.send_pitch(level, _sent_lane())
+
+
+## 傳給對方的層：開關關閉時是 -1（沒有）。
+func _sent_lane() -> int:
+	return lane if controls_dragon else -1
 
 
 func _voice() -> Node:

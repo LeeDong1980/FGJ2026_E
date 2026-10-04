@@ -13,6 +13,8 @@ const LANE_COUNT: int = 3
 @onready var _p2_toggle: CheckButton = %Player2Toggle
 
 var _word_tween: Tween
+var _p1_caption_text: String = ""
+var _pitch_off: bool = false
 
 
 func _ready() -> void:
@@ -38,8 +40,26 @@ func set_pitch(level: float, lane: int) -> void:
 
 ## 玩家 1 的說明文字與語音開關；is_mine 為 true（這台電腦就是玩家 1）才顯示開關。
 func set_player1(caption: String, is_mine: bool) -> void:
-	_p1_caption.text = caption
+	_p1_caption_text = caption
 	_p1_toggle.visible = is_mine
+	_refresh_p1_caption()
+
+
+## 自己的「音高輸入」開關是關的：音高條照常顯示，但變暗並提示進遊戲後龍不會換層。
+func set_pitch_input_off(off: bool) -> void:
+	if off == _pitch_off:
+		return
+	_pitch_off = off
+	_meter.modulate.a = 0.45 if off else 1.0
+	_refresh_p1_caption()
+
+
+func _refresh_p1_caption() -> void:
+	_p1_caption.text = "音高輸入已關閉：進遊戲後龍不會換層，請打開下方開關" if _pitch_off else _p1_caption_text
+	if _pitch_off:
+		_p1_caption.add_theme_color_override(&"font_color", Color(1, 0.7, 0.3, 1))
+	else:
+		_p1_caption.remove_theme_color_override(&"font_color")
 
 
 ## 玩家 2 的說明文字與語音開關；is_mine 為 true（這台電腦負責玩家 2 的輸入）才顯示開關。
