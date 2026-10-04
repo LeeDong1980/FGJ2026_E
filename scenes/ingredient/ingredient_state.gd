@@ -10,8 +10,14 @@ var burn_progress: float = 0.0
 var attack_progress: float = 0.0
 ## 這一次蓄滿需要的秒數，每次開始蓄力時重新隨機。
 var attack_time: float = 0.0
+## 被冰凍住的剩餘秒數，大於 0 表示凍住（不蓄力）。
+var freeze_remaining: float = 0.0
 
 
 func _init(p_type: IngredientType.Type, p_x: float) -> void:
 	type = p_type
 	x = p_x
+
+
+func is_frozen() -> bool:
+	return freeze_remaining > 0.0

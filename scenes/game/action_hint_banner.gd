@@ -1,6 +1,6 @@
 class_name ActionHintBanner
 extends CanvasLayer
-## 螢幕上方（暈眩提示下面）顯示吸或吐為什麼沒有效果，停留一下後淡出。
+## 螢幕上方（暈眩提示下面）顯示吸或吐為什麼沒有效果（或煮鍋用錯元素），停留一下後淡出。
 
 @export var game_manager: GameManager
 ## 和畫面頂端的距離，放在 StunBanner 下面。
@@ -17,6 +17,7 @@ const TEXTS: Dictionary = {
 	GameManager.MissReason.NOTHING_TO_SPIT: "胃是空的，鍋子還沒滿",
 	GameManager.MissReason.POT_FULL: "鍋子滿了，胃空時對鍋子噴火煮好",
 	GameManager.MissReason.NO_BABY: "小龍還沒到，不能吐進鍋子",
+	GameManager.MissReason.WRONG_ELEMENT: "這鍋要用%s煮！用錯會倒退",
 }
 
 var _label: Label
@@ -42,8 +43,10 @@ func _process(_delta: float) -> void:
 	_label.position = Vector2(0.0, top_margin)
 
 
-func _on_action_missed(_lane: int, reason: GameManager.MissReason) -> void:
+func _on_action_missed(lane: int, reason: GameManager.MissReason) -> void:
 	_label.text = TEXTS.get(reason, "")
+	if reason == GameManager.MissReason.WRONG_ELEMENT:
+		_label.text %= "冰" if game_manager.get_pot(lane).element == GameManager.Element.ICE else "火"
 	if _tween != null:
 		_tween.kill()
 	_label.modulate.a = 1.0

@@ -1,7 +1,7 @@
 class_name FacingIndicator
 extends CanvasLayer
-## 畫面下方正中的框框，顯示龍頭目前看哪邊：左「◀ 食材」、右「鍋子 ▶」，目前朝向的那格亮起。
-## 轉頭動畫完成前用它代替模型轉向。
+## 畫面下方正中的框框：左「◀ 食材」、右「鍋子 ▶」顯示龍頭朝向，目前朝向的那格亮起；
+## 旁邊一格顯示目前的元素（火／冰）。轉頭動畫與冰的特效完成前用它代替。
 
 @export var game_manager: GameManager
 ## 和畫面底部的距離。
@@ -9,10 +9,13 @@ extends CanvasLayer
 
 const ACTIVE_COLOR := Color(1.0, 0.8, 0.25)
 const INACTIVE_COLOR := Color(0.35, 0.35, 0.4)
+const FIRE_COLOR := Color(1.0, 0.45, 0.15)
+const ICE_COLOR := Color(0.45, 0.8, 1.0)
 
 var _box: HBoxContainer
 var _left: PanelContainer
 var _right: PanelContainer
+var _element: PanelContainer
 
 
 func _ready() -> void:
@@ -22,7 +25,9 @@ func _ready() -> void:
 	add_child(_box)
 	_left = _add_slot("◀ 食材")
 	_right = _add_slot("鍋子 ▶")
+	_element = _add_slot("")
 	game_manager.facing_changed.connect(_show.unbind(1))
+	game_manager.element_changed.connect(_show.unbind(1))
 	_show()
 
 
@@ -45,14 +50,19 @@ func _add_slot(text: String) -> PanelContainer:
 
 
 func _show() -> void:
-	_set_active(_left, game_manager.facing == GameManager.Facing.LEFT)
-	_set_active(_right, game_manager.facing == GameManager.Facing.RIGHT)
+	_set_style(_left, ACTIVE_COLOR if game_manager.facing == GameManager.Facing.LEFT else INACTIVE_COLOR,
+			game_manager.facing == GameManager.Facing.LEFT)
+	_set_style(_right, ACTIVE_COLOR if game_manager.facing == GameManager.Facing.RIGHT else INACTIVE_COLOR,
+			game_manager.facing == GameManager.Facing.RIGHT)
+	var ice := game_manager.element == GameManager.Element.ICE
+	(_element.get_child(0) as Label).text = "冰" if ice else "火"
+	_set_style(_element, ICE_COLOR if ice else FIRE_COLOR, true)
 
 
-func _set_active(panel: PanelContainer, active: bool) -> void:
+func _set_style(panel: PanelContainer, border: Color, active: bool) -> void:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.0, 0.0, 0.0, 0.6)
-	style.border_color = ACTIVE_COLOR if active else INACTIVE_COLOR
+	style.border_color = border
 	style.set_border_width_all(4 if active else 2)
 	style.set_corner_radius_all(8)
 	style.set_content_margin_all(10)

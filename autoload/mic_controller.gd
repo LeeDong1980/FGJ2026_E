@@ -73,7 +73,7 @@ const DETECT_MAX_HZ := 1000.0
 @export var segment_gap_seconds: float = 0.15
 
 @export_group("Shout")
-## 大叫轉頭：音量（volume_value，0~100）往上超過 shout_threshold 算一次大叫（ShoutTurnInput 使用）
+## 大叫換元素：音量（volume_value，0~100）往上超過 shout_threshold 算一次大叫（ShoutElementInput 使用）
 @export_range(0.0, 100.0) var shout_threshold: float = 50.0
 ## 音量降到 shout_release 以下才能再叫一次
 @export_range(0.0, 100.0) var shout_release: float = 35.0

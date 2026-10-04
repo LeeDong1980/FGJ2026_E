@@ -24,6 +24,7 @@ func _process(_delta: float) -> void:
 		_models[ingredient].position = lane_layout.position + Vector3(ingredient.x, anchor.y, anchor.z)
 		_models[ingredient].set_burn_progress(ingredient.burn_progress)
 		_models[ingredient].set_attack_progress(ingredient.attack_progress)
+		_models[ingredient].set_frozen(ingredient.is_frozen())
 
 
 func _on_ingredient_spawned(lane: int, ingredient: IngredientState) -> void:
