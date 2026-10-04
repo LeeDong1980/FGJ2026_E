@@ -69,7 +69,7 @@
 - [x] UI-05 遊玩狀態介面：玩家 A 音量條，標出各層門檻線 @GMF
 - [x] UI-06 遊玩狀態介面：顯示玩家 B 最後辨識到的字音（「吸」或「吐」） @GMF
 - [x] UI-07 製作遊戲結束介面：依成功 / 失敗與是否為最後一關，顯示「下一關」「關閉遊戲」或「重新遊玩」 @GMF
-- [ ] UI-08 準備支援繁體中文的字型與 UI Theme
+- [x] UI-08 準備支援繁體中文的字型與 UI Theme：`scenes/ui/ui_theme.tres`（Changa 粗體＋系統中文粗體、文字描邊、金框按鍵） @GMF
 - [x] UI-09 和遊戲機制、麥克風輸入確認 UI 需要的 signal 與資料（鍋子狀態、勝敗、音量、辨識結果） @GMF
 - [ ] UI-10 請主場景負責人把 UI 根場景放進 main.tscn
 - [x] UI-11 建立 UI 測試場景 `ui_test.tscn` 與測試控制中心：依階段切換介面、測試用倒數計時（時間到算失敗）、Ctrl+Shift+W／L 強制成功或失敗（可在 Inspector 開關） @GMF
@@ -83,7 +83,9 @@
 - [x] UI-19 把 `scenes/ui/game_ui.tscn` 實例化進 game.tscn（GameManager 的子節點 `GameUI`），（之後 UI-14 已把開始介面改成獨立主選單，game.tscn 也改名為 scenes/game/main.tscn）。經使用者同意由 GMF 直接修改，已通知露柑：GM-16 改 game.tscn 時請保留 `GameUI` 節點 @GMF
 - [ ] UI-20 遊玩狀態介面顯示胃袋裡的食材（`stomach_changed`）與換小龍中的狀態（`PotState.has_baby`），設計確定後再做
 - [x] UI-21 依 Logo 風格製作暫時美術：開始介面（現為主選單）改用 Logo 當背景；遊戲結束背景（Logo 加工）、資訊面板（九宮格石板火焰框）、龍洞穴 2D 背景（`scenes/backdrop/`，已換成正式美術 FGJ2026TeamE_GameSceneBG），並寫生圖提示詞 `docs/ui_art_prompts.md` @GMF
-- [ ] UI-22 用 `docs/ui_art_prompts.md` 生成遊戲結束背景與資訊面板的正式美術，覆蓋 `result_background.png`、`result_panel.png`（龍洞穴背景已完成）
+- [ ] UI-22 用 `docs/ui_art_prompts.md` 生成遊戲結束背景的正式美術，覆蓋 `result_background.png`（龍洞穴背景已完成；資訊面板改用 UI 素材包，不再需要）
+- [x] UI-23 介面改版：遊玩狀態介面、鍋子資訊、音量條、禁止圖示、遊戲結束介面改用 UI 素材包 `scenes/ui/UI/`（石框、金框按鍵、圖示、VICTORY／DEFEAT 橫幅），說明見 design.md 6.9；修正龍洞穴背景在新鏡頭下擋住 3D 場景 @GMF
+- [ ] UI-24 請露柑讓主選單 `main_menu.tscn` 套用 `scenes/ui/ui_theme.tres` 與相同的石框卡片、金框按鍵（設計見 design.md 6.9）
 
 #### 區網連線（Samuel）
 - [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel

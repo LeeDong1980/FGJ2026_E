@@ -2,38 +2,35 @@
 
 [ext_resource type="Script" path="res://scenes/ui/play_hud.gd" id="1_script"]
 [ext_resource type="Script" path="res://scenes/ui/volume_meter.gd" id="2_meter"]
+[ext_resource type="Theme" path="res://scenes/ui/ui_theme.tres" id="3_theme"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/UI_Etc/ResourceBar_Bg01.Png" id="4_bar"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Bg.Png" id="5_panel"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Trophy.Png" id="6_trophy"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Skull.Png" id="7_skull"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Timer.Png" id="8_timer"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Frame/ProfileFrame_199_Border.Png" id="9_ring"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar"]
-content_margin_left = 40.0
-content_margin_top = 8.0
-content_margin_right = 40.0
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bar"]
+content_margin_left = 14.0
+content_margin_top = 4.0
+content_margin_right = 30.0
 content_margin_bottom = 8.0
-bg_color = Color(0.08, 0.067, 0.125, 0.9)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 1, 1, 0.2)
-corner_radius_top_left = 42
-corner_radius_top_right = 42
-corner_radius_bottom_right = 42
-corner_radius_bottom_left = 42
+texture = ExtResource("4_bar")
+texture_margin_left = 26.0
+texture_margin_top = 26.0
+texture_margin_right = 26.0
+texture_margin_bottom = 26.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-content_margin_left = 20.0
-content_margin_top = 18.0
-content_margin_right = 20.0
-content_margin_bottom = 20.0
-bg_color = Color(0.08, 0.067, 0.125, 0.9)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 1, 1, 0.2)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
+content_margin_left = 30.0
+content_margin_top = 30.0
+content_margin_right = 30.0
+content_margin_bottom = 34.0
+texture = ExtResource("5_panel")
+texture_margin_left = 56.0
+texture_margin_top = 56.0
+texture_margin_right = 56.0
+texture_margin_bottom = 56.0
 
 [node name="PlayHud" type="Control"]
 layout_mode = 3
@@ -43,6 +40,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme = ExtResource("3_theme")
 script = ExtResource("1_script")
 
 [node name="PotInfoContainer" type="Control" parent="."]
@@ -55,40 +53,74 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="TopBar" type="PanelContainer" parent="."]
+[node name="TopBar" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -320.0
-offset_top = 24.0
-offset_right = 320.0
-offset_bottom = 108.0
+offset_left = -360.0
+offset_top = 20.0
+offset_right = 360.0
+offset_bottom = 110.0
 grow_horizontal = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_bar")
-
-[node name="Row" type="HBoxContainer" parent="TopBar"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 32
+theme_override_constants/separation = 28
 alignment = 1
 
-[node name="CompletedLabel" type="Label" parent="TopBar/Row"]
+[node name="CompletedBar" type="PanelContainer" parent="TopBar"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_bar")
+
+[node name="Row" type="HBoxContainer" parent="TopBar/CompletedBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="TopBar/CompletedBar/Row"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_trophy")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CompletedLabel" type="Label" parent="TopBar/CompletedBar/Row"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 38
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 36
 text = "完成 0 / 6"
+horizontal_alignment = 1
 
-[node name="Divider" type="VSeparator" parent="TopBar/Row"]
+[node name="ClearedBar" type="PanelContainer" parent="TopBar"]
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_bar")
 
-[node name="ClearedLabel" type="Label" parent="TopBar/Row"]
+[node name="Row" type="HBoxContainer" parent="TopBar/ClearedBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="TopBar/ClearedBar/Row"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("7_skull")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ClearedLabel" type="Label" parent="TopBar/ClearedBar/Row"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.48, 0.49, 1)
-theme_override_font_sizes/font_size = 38
-text = "✕ 清空 0 / 3"
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.55, 0.5, 1)
+theme_override_font_sizes/font_size = 36
+text = "清空 0 / 3"
+horizontal_alignment = 1
 
 [node name="CountdownPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true
@@ -97,18 +129,32 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -150.0
-offset_top = 120.0
-offset_right = 150.0
-offset_bottom = 184.0
+offset_left = -160.0
+offset_top = 118.0
+offset_right = 160.0
+offset_bottom = 190.0
 grow_horizontal = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_bar")
+theme_override_styles/panel = SubResource("StyleBoxTexture_bar")
 
-[node name="CountdownLabel" type="Label" parent="CountdownPanel"]
+[node name="Row" type="HBoxContainer" parent="CountdownPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="CountdownPanel/Row"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("8_timer")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CountdownLabel" type="Label" parent="CountdownPanel/Row"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 34
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
 text = "剩餘時間 1:00"
 horizontal_alignment = 1
 
@@ -117,22 +163,22 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 36.0
-offset_top = -480.0
-offset_right = 316.0
-offset_bottom = -30.0
+offset_left = 30.0
+offset_top = -500.0
+offset_right = 320.0
+offset_bottom = -24.0
 grow_vertical = 0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
 
 [node name="Content" type="VBoxContainer" parent="PlayerAPanel"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="PlayerAPanel/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_colors/font_color = Color(1, 0.84, 0.45, 1)
 theme_override_font_sizes/font_size = 30
 text = "玩家 A｜高度"
 horizontal_alignment = 1
@@ -151,32 +197,46 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -316.0
-offset_top = -280.0
-offset_right = -36.0
-offset_bottom = -30.0
+offset_left = -320.0
+offset_top = -320.0
+offset_right = -30.0
+offset_bottom = -24.0
 grow_horizontal = 0
 grow_vertical = 0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
 
 [node name="Content" type="VBoxContainer" parent="PlayerBPanel"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="TitleLabel" type="Label" parent="PlayerBPanel/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_colors/font_color = Color(1, 0.84, 0.45, 1)
 theme_override_font_sizes/font_size = 30
 text = "玩家 B｜吸 / 吐"
 horizontal_alignment = 1
 
-[node name="WordLabel" type="Label" parent="PlayerBPanel/Content"]
-unique_name_in_owner = true
+[node name="WordRing" type="TextureRect" parent="PlayerBPanel/Content"]
+custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.75, 0.92, 1, 1)
-theme_override_font_sizes/font_size = 88
+mouse_filter = 2
+texture = ExtResource("9_ring")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WordLabel" type="Label" parent="PlayerBPanel/Content/WordRing"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.5, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 84
 horizontal_alignment = 1
 vertical_alignment = 1

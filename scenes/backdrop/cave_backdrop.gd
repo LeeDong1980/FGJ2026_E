@@ -4,14 +4,15 @@ extends Sprite3D
 ## 所以永遠在 3D 場景的最後面，換攝影機（例如 GM-16 改用 PrototypePresentation 鏡頭）也不用調整。
 ## 構圖：左邊三層山洞隧道，中間是龍飛行的巨大山中洞穴與龍巢，右邊是上中下三個料理洞窟。
 
-## 背景圖離攝影機的距離，要比場景裡所有東西都遠。
-@export var distance: float = 60.0
+## 背景圖放在攝影機最遠可視距離（far）的這個比例處，確保比場景裡所有東西都遠。
+@export_range(0.5, 0.99) var far_ratio: float = 0.95
 
 
 func _process(_delta: float) -> void:
 	var camera := get_viewport().get_camera_3d()
 	if camera == null or texture == null:
 		return
+	var distance := camera.far * far_ratio
 	var view := camera.global_transform
 	global_transform = Transform3D(view.basis, view.origin - view.basis.z * distance)
 

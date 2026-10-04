@@ -2,41 +2,38 @@
 
 [ext_resource type="Script" path="res://scenes/ui/result_screen.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://scenes/ui/result_background.png" id="2_background"]
-[ext_resource type="Texture2D" path="res://scenes/ui/result_panel.png" id="3_panel"]
+[ext_resource type="Theme" path="res://scenes/ui/ui_theme.tres" id="3_theme"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Frame/PanelFrame02_Demo.Png" id="4_panel"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Title_Center.Png" id="5_plate"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Title_DecoLeft.Png" id="6_plate_left"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Title_DecoRight.Png" id="7_plate_right"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Trophy.Png" id="8_trophy"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Skull.Png" id="9_skull"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/ActionText/ActionText_Victory.png" id="10_banner"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Demo/Demo_Image/Image_Deco_Laurel_L.Png" id="11_deco_left"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Demo/Demo_Image/Image_Deco_Laurel_R.Png" id="12_deco_right"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
-content_margin_left = 80.0
-content_margin_top = 60.0
-content_margin_right = 80.0
-content_margin_bottom = 70.0
-texture = ExtResource("3_panel")
-texture_margin_left = 56.0
-texture_margin_top = 56.0
-texture_margin_right = 56.0
-texture_margin_bottom = 56.0
+content_margin_left = 84.0
+content_margin_top = 56.0
+content_margin_right = 84.0
+content_margin_bottom = 84.0
+texture = ExtResource("4_panel")
+texture_margin_left = 72.0
+texture_margin_top = 100.0
+texture_margin_right = 72.0
+texture_margin_bottom = 110.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
-bg_color = Color(0.94, 0.66, 0.19, 1)
-corner_radius_top_left = 52
-corner_radius_top_right = 52
-corner_radius_bottom_right = 52
-corner_radius_bottom_left = 52
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_focus"]
-draw_center = false
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(1, 1, 1, 0.85)
-corner_radius_top_left = 52
-corner_radius_top_right = 52
-corner_radius_bottom_right = 52
-corner_radius_bottom_left = 52
-expand_margin_left = 6.0
-expand_margin_top = 6.0
-expand_margin_right = 6.0
-expand_margin_bottom = 6.0
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_plate"]
+content_margin_left = 70.0
+content_margin_top = 4.0
+content_margin_right = 70.0
+content_margin_bottom = 26.0
+texture = ExtResource("5_plate")
+texture_margin_left = 64.0
+texture_margin_top = 24.0
+texture_margin_right = 64.0
+texture_margin_bottom = 44.0
 
 [node name="ResultScreen" type="Control"]
 layout_mode = 3
@@ -45,6 +42,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("3_theme")
 script = ExtResource("1_script")
 
 [node name="Background" type="TextureRect" parent="."]
@@ -66,47 +64,132 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ResultPanel" type="PanelContainer" parent="Center"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(700, 0)
+[node name="Layout" type="VBoxContainer" parent="Center"]
 layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Banner" type="HBoxContainer" parent="Center/Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 130)
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="DecoLeft" type="TextureRect" parent="Center/Layout/Banner"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 130)
+layout_mode = 2
+texture = ExtResource("11_deco_left")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BannerText" type="TextureRect" parent="Center/Layout/Banner"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(620, 110)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("10_banner")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DecoRight" type="TextureRect" parent="Center/Layout/Banner"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 130)
+layout_mode = 2
+texture = ExtResource("12_deco_right")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ResultPanel" type="PanelContainer" parent="Center/Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 2
+size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
 
-[node name="Content" type="VBoxContainer" parent="Center/ResultPanel"]
+[node name="Content" type="VBoxContainer" parent="Center/Layout/ResultPanel"]
 layout_mode = 2
 theme_override_constants/separation = 30
 
-[node name="ResultLabel" type="Label" parent="Center/ResultPanel/Content"]
+[node name="TitleRow" type="HBoxContainer" parent="Center/Layout/ResultPanel/Content"]
+layout_mode = 2
+theme_override_constants/separation = -14
+alignment = 1
+
+[node name="PlateLeft" type="TextureRect" parent="Center/Layout/ResultPanel/Content/TitleRow"]
+custom_minimum_size = Vector2(90, 50)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("6_plate_left")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitlePlate" type="PanelContainer" parent="Center/Layout/ResultPanel/Content/TitleRow"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_plate")
+
+[node name="ResultLabel" type="Label" parent="Center/Layout/ResultPanel/Content/TitleRow/TitlePlate"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.83, 0.3, 1)
-theme_override_font_sizes/font_size = 100
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 64
 text = "料理成功！"
 horizontal_alignment = 1
 
-[node name="Separator" type="HSeparator" parent="Center/ResultPanel/Content"]
+[node name="PlateRight" type="TextureRect" parent="Center/Layout/ResultPanel/Content/TitleRow"]
+custom_minimum_size = Vector2(90, 50)
 layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("7_plate_right")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="StatsLabel" type="Label" parent="Center/ResultPanel/Content"]
+[node name="Stats" type="HBoxContainer" parent="Center/Layout/ResultPanel/Content"]
+layout_mode = 2
+theme_override_constants/separation = 60
+alignment = 1
+
+[node name="Completed" type="HBoxContainer" parent="Center/Layout/ResultPanel/Content/Stats"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="Center/Layout/ResultPanel/Content/Stats/Completed"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+texture = ExtResource("8_trophy")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CompletedStat" type="Label" parent="Center/Layout/ResultPanel/Content/Stats/Completed"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.87)
-theme_override_constants/line_spacing = 16
-theme_override_font_sizes/font_size = 40
-text = "完成鍋數 0 / 6
-清空次數 0 / 3"
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 38
+text = "完成鍋數 0 / 6"
 
-[node name="ButtonRow" type="CenterContainer" parent="Center/ResultPanel/Content"]
+[node name="Cleared" type="HBoxContainer" parent="Center/Layout/ResultPanel/Content/Stats"]
 layout_mode = 2
+theme_override_constants/separation = 10
 
-[node name="ActionButton" type="Button" parent="Center/ResultPanel/Content/ButtonRow"]
+[node name="Icon" type="TextureRect" parent="Center/Layout/ResultPanel/Content/Stats/Cleared"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+texture = ExtResource("9_skull")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ClearedStat" type="Label" parent="Center/Layout/ResultPanel/Content/Stats/Cleared"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(380, 104)
 layout_mode = 2
-theme_override_font_sizes/font_size = 44
-theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_button_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_button_normal")
-theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
+theme_override_font_sizes/font_size = 38
+text = "清空次數 0 / 3"
+
+[node name="ButtonRow" type="CenterContainer" parent="Center/Layout/ResultPanel/Content"]
+layout_mode = 2
+
+[node name="ActionButton" type="Button" parent="Center/Layout/ResultPanel/Content/ButtonRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 124)
+layout_mode = 2
 text = "下一關"

@@ -242,7 +242,7 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 - 不蓋底色，3D 遊戲畫面完整露出，資訊放在畫面邊緣和鍋子旁邊，避免擋住食材隊伍和龍。
 - **畫面上方正中**：一條橫向資訊列。
   - 左半邊是完成鍋數，鍋子圖示加上「完成 2 / 6」。
-  - 右半邊是清空次數，用紅色顯示「清空 1 / 3」。清空次數只差 1 次就失敗時，文字持續閃爍。
+  - 右半邊是清空次數，用紅色顯示「清空 1 / 3」（兩塊各是一條石框，左邊配獎盃圖示、右邊配骷髏圖示，見 6.9）。清空次數只差 1 次就失敗時，文字持續閃爍。
 - **每一層鍋子旁邊**：一塊小面板，跟著該層鍋子在畫面上的位置（見 6.6）。
 - **畫面左下角**：玩家 A 面板。
   - 標題「玩家 A｜高度」。
@@ -285,7 +285,7 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 **功用：** 顯示單一層鍋子的禁止食材與進度，讓玩家 B 判斷該層最前面的食材要「吸」還是「吐」。
 
 **介面長相：**
-- 一塊小的深色圓角面板，位置跟著該層鍋子，顯示在鍋子上方。
+- 一塊小的石框面板（一般層是灰色石框，龍所在的層換成橘金色石框），位置跟著該層鍋子，顯示在鍋子上方。
 - 上排是禁止食材：1～3 個食材圖示並排，每個圖示上蓋一個紅色禁止符號（圓圈加斜線）。
 - 下排是進度：一條短的橫向進度條，旁邊寫「3 / 5」。
 - 龍所在的那一層，面板外框會亮起，其他層的面板稍微變暗。
@@ -311,7 +311,9 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 
 **介面長相：**
 - 背景是遊戲結束背景圖（`scenes/ui/result_background.png`）：與 Logo 同一個山洞，模糊、調暗並偏暖紅，遊玩狀態介面隱藏。
-- 畫面正中是一塊大面板，外觀是資訊面板圖（`scenes/ui/result_panel.png`，深色石板加火焰邊框，九宮格拉伸）。失敗時面板偏紅。
+- 面板上方是橫幅：成功是「VICTORY」字樣、兩側月桂葉；失敗是「DEFEAT」字樣、兩側牛角骷髏。介面出現時橫幅彈出。
+- 畫面正中是一塊大面板，外觀是金角石框（九宮格拉伸），面板頂端是木製標題牌，牌上寫「料理成功！」或「料理失敗…」。失敗時面板偏紅。
+- 結算以圖示呈現：獎盃配「完成鍋數」，骷髏配「清空次數」。按鍵成功是金色框按鍵，失敗是紅色按鍵。
   - 最上方大字標題：成功時是金色的「料理成功！」，失敗時是紅色的「料理失敗…」。
   - 標題下方兩行結算：「完成鍋數 2 / 6」、「清空次數 3 / 3」。
   - 最下方是一顆大按鍵，文字依情況不同（見下表）。
@@ -327,7 +329,10 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 | 元件 | 節點類型 | 內容 / 功用 |
 |---|---|---|
 | Background | TextureRect | 遊戲結束背景圖，等比例鋪滿畫面 |
-| ResultPanel | PanelContainer | 中央面板，外觀為資訊面板圖（StyleBoxTexture 九宮格，邊框 56 像素） |
+| Banner | HBoxContainer | 上方橫幅：BannerText（VICTORY／DEFEAT 字樣圖）、DecoLeft／DecoRight（月桂葉或骷髏） |
+| ResultPanel | PanelContainer | 中央面板，金角石框（StyleBoxTexture 九宮格） |
+| TitlePlate | PanelContainer | 木製標題牌，放 ResultLabel |
+| CompletedStat／ClearedStat | Label | 完成鍋數、清空次數，各配獎盃、骷髏圖示 |
 | ResultLabel | Label | 「料理成功！」或「料理失敗…」 |
 | StatsLabel | Label | 完成鍋數與清空次數 |
 | ActionButton | Button | 依情況顯示「下一關」「回主選單」或「重新遊玩」 |
@@ -350,6 +355,26 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 | 遊戲結束 | `game_won`／`game_lost` 顯示遊戲結束介面；「重新遊玩」呼叫 `start_game()`。「下一關」等關卡資料完成才提供，目前成功時顯示「關閉遊戲」 |
 
 玩家 B 的「吸」「吐」以遊戲收到的指令為準，所以鍵盤測試（J 吸、按住 K 吐）與麥克風都會顯示。
+
+### 6.9 介面美術風格
+
+介面美術使用 UI 素材包 `scenes/ui/UI/`（Game GUI Kit「The Stone」：石材、木頭與金邊的奇幻風格），配合龍穴與地牢主題。共用主題 `scenes/ui/ui_theme.tres` 統一字型與按鍵樣式，遊玩狀態介面與遊戲結束介面都套用。
+
+| 用途 | 素材 |
+|---|---|
+| 字型 | `Fonts/Changa-Bold.ttf`（英文、數字），中文自動改用系統粗體字型；文字一律加深色描邊 |
+| 一般按鍵 | `Button/Button_Square02_n`（滑過與按下用 `_f`） |
+| 失敗按鍵 | `Button/Button01_Red` |
+| 上方數值條、倒數計時 | `UI_Etc/ResourceBar_Bg01`，圖示 `Icon_ItemIcon_Trophy`、`Icon_ItemIcon_Skull`、`Icon_ItemIcon_Timer` |
+| 玩家 A／B 面板 | `Popup/Popup_Bg` |
+| 玩家 B 字音外圈 | `Frame/ProfileFrame_199_Border` |
+| 音量條底 | `UI_Etc/InputField_Bg_Demo_Normal`（填色為橘金色） |
+| 鍋子資訊 | `Frame/StageFrame_Demo_n`（一般）、`StageFrame_Demo_f`（龍所在層）；進度條 `Slider/Slider_Basic02_Bg_Demo`、`Slider_Basic02_Fill_Orange` |
+| 禁止符號 | `Icon_PictoIcon_Block`（染成紅色） |
+| 遊戲結束面板 | `Frame/PanelFrame02_Demo`、標題牌 `Popup/Popup_Title_Center`（兩側 `Popup_Title_DecoLeft`／`DecoRight`） |
+| 遊戲結束橫幅 | `ActionText/ActionText_Victory`／`ActionText_Defeat`，裝飾 `Image_Deco_Laurel_L／R`、`Image_DefeatScene_Skull2／3` |
+
+路徑都在 `scenes/ui/UI/Sprites/Components/` 或 `scenes/ui/UI/Sprites/Demo/Demo_Image/` 底下。主選單（露柑負責）尚未套用這套風格。
 
 ## 7. 關卡設定參數
 
