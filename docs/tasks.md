@@ -93,7 +93,7 @@
 - [ ] NET-15 連線局暫停：Host 按 Esc 只凍結 Host 的遊戲並通知 Client（畫面顯示「房主已暫停」，暫停中 Client 的吸／吐不生效，繼續後接上）；Client 的 Esc 只疊出設定選單、不凍結，可繼續回報吸／吐；等候頁與連線中也不凍結；換場景前一律解除暫停（改動 `pause_menu.gd` 需告知 @山雷） @Samuel
 - [ ] NET-16 連線局結束時，Client 也顯示成功／失敗（`match_ended` 帶結果）；目前 Client 只是被帶回等候頁
 - [x] NET-17 單機局結束後回主選單：結果畫面改為「回主選單」，呼叫 `RoomManager.return_to_menu()`（隨 UI-14、UI-15 完成） @露柑
-- [ ] NET-18 房間等候頁介面優化（目前只有基本控制項，沒有 Theme 與版面設計）@Samuel
+- [ ] NET-18 房間等候頁介面優化：沿用主選單視覺（logo 背景、深色卡片、橘色按鈕，主題 `lobby_theme.tres`）；顯示玩家 1／2 欄位；左下玩家 1 音高條、右下玩家 2 吸／吐（沿用遊玩介面樣式），讓兩位玩家進遊戲前先測試；Host 的音高經 `send_lobby_pitch` 同步給 Client；吸／吐本機輸入抽成 `PlayerActionInput`（client_play 共用） @Samuel
 - [ ] NET-19 Client 畫面同步顯示遊戲（Host 傳遊戲狀態，Client 以唯讀方式顯示；與 NET-02 一併規劃，做法見討論）@Samuel
 
 ### 美術與關卡

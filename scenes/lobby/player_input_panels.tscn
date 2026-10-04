@@ -1,0 +1,128 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/lobby/player_input_panels.gd" id="1_panels"]
+[ext_resource type="Script" path="res://scenes/ui/volume_meter.gd" id="2_meter"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 20.0
+content_margin_top = 18.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.08, 0.067, 0.125, 0.9)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="PlayerInputPanels" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_panels")
+
+[node name="Player1Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = -560.0
+offset_right = 336.0
+offset_bottom = -30.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Content" type="VBoxContainer" parent="Player1Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="Player1Panel/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_font_sizes/font_size = 30
+text = "玩家 1｜高度"
+horizontal_alignment = 1
+
+[node name="VolumeMeter" type="Control" parent="Player1Panel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+script = ExtResource("2_meter")
+
+[node name="Player1Caption" type="Label" parent="Player1Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.7)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Player1Toggle" type="CheckButton" parent="Player1Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "音高輸入"
+
+[node name="Player2Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -336.0
+offset_top = -400.0
+offset_right = -36.0
+offset_bottom = -30.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Content" type="VBoxContainer" parent="Player2Panel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="Player2Panel/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_font_sizes/font_size = 30
+text = "玩家 2｜吸 / 吐"
+horizontal_alignment = 1
+
+[node name="WordLabel" type="Label" parent="Player2Panel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 130)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.75, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 88
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player2Caption" type="Label" parent="Player2Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.7)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Player2Toggle" type="CheckButton" parent="Player2Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "吸／吐（語音）"

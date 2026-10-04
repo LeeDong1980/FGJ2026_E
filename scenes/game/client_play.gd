@@ -19,7 +19,7 @@ const ACTION_TEXT: Dictionary = {
 @onready var _net_label: Label = %NetLabel
 @onready var _leave_button: Button = %LeaveButton
 
-var _sent_action: String = NetworkManager.ACTION_NONE
+var _input: PlayerActionInput
 var _sent_count: int = 0
 var _ack_count: int = 0
 var _timeout_count: int = 0
@@ -31,14 +31,18 @@ func _ready() -> void:
 	_leave_button.pressed.connect(RoomManager.leave_room)
 	_voice_toggle.button_pressed = MicInput.action_input_enabled
 	_voice_toggle.toggled.connect(func(on: bool) -> void: MicInput.action_input_enabled = on)
-	_show_action(_sent_action)
+	# 吸／吐的本機輸入（鍵盤與語音）交給共用元件，動作改變時它會自己送給 Host。
+	_input = PlayerActionInput.new()
+	_input.send_to_host = true
+	_input.action_changed.connect(_on_action_changed)
+	add_child(_input)
+	_show_action(NetworkManager.ACTION_NONE)
 	NetworkManager.voice_ack_received.connect(_on_ack_received)
 	NetworkManager.voice_ack_timeout.connect(_on_ack_timeout)
 	NetworkManager.host_pause_changed.connect(func(paused: bool) -> void: _paused_label.visible = paused)
 
 
 func _process(_delta: float) -> void:
-	_update_action()
 	_volume_bar.value = MicInput.volume_value
 	_mic_label.text = _mic_text()
 	_debug_label.text = _debug_text()
@@ -47,20 +51,9 @@ func _process(_delta: float) -> void:
 
 func _exit_tree() -> void:
 	MicInput.save_settings()
-	NetworkManager.send_voice_action(NetworkManager.ACTION_NONE)
 
 
-## 鍵盤優先於麥克風；吐優先於吸。動作改變時才送封包。
-func _update_action() -> void:
-	var action: String = NetworkManager.ACTION_NONE
-	if not get_tree().paused:
-		action = _keyboard_action()
-		if action == NetworkManager.ACTION_NONE:
-			action = _mic_action()
-	if action == _sent_action:
-		return
-	_sent_action = action
-	NetworkManager.send_voice_action(action)
+func _on_action_changed(action: String) -> void:
 	_sent_count += 1
 	_show_action(action)
 
@@ -73,25 +66,6 @@ func _on_ack_received(kind: String, _seq: int, _rtt_msec: int) -> void:
 func _on_ack_timeout(kind: String, _seq: int) -> void:
 	if kind == NetworkManager.KIND_ACTION:
 		_timeout_count += 1
-
-
-func _keyboard_action() -> String:
-	if Input.is_action_pressed(&"spit"):
-		return NetworkManager.ACTION_EXHALE
-	if Input.is_action_pressed(&"suck"):
-		return NetworkManager.ACTION_INHALE
-	return NetworkManager.ACTION_NONE
-
-
-func _mic_action() -> String:
-	if not MicInput.action_input_enabled:
-		return NetworkManager.ACTION_NONE
-	match MicInput.action:
-		MicController.INHALE:
-			return NetworkManager.ACTION_INHALE
-		MicController.EXHALE:
-			return NetworkManager.ACTION_EXHALE
-	return NetworkManager.ACTION_NONE
 
 
 func _show_action(action: String) -> void:

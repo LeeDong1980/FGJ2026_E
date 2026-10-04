@@ -23,6 +23,8 @@ signal room_closed_by_host
 ## Client 端：Host 開始或結束連線局。
 signal match_started
 signal match_ended
+## Client 端：等候頁收到房主（玩家 1）目前的音高。level 是 0～1，lane 是對應的層（0 是最低層）。
+signal lobby_pitch_received(level: float, lane: int)
 ## Client 端：房主暫停或繼續遊戲（暫停時 Host 會忽略 Client 的吸／吐）。
 signal host_pause_changed(paused: bool)
 ## Host 端：Client 的吸／吐動作改變（ACTION_INHALE、ACTION_EXHALE、ACTION_NONE）。Host 收到後會回覆確認。
@@ -140,6 +142,14 @@ func start_match() -> void:
 	match_in_progress = true
 	for id: int in _accepted_peers:
 		_rpc_match_started.rpc_id(id)
+
+
+## Host 在等候頁把玩家 1 的音高傳給 Client，讓雙方進遊戲前能一起測試。不可靠傳輸，掉包不補送。
+func send_lobby_pitch(level: float, lane: int) -> void:
+	if not is_host():
+		return
+	for id: int in _accepted_peers:
+		_rpc_lobby_pitch.rpc_id(id, level, lane)
 
 
 ## Host 暫停或繼續遊戲時通知 Client，讓對方畫面顯示提示。
@@ -368,6 +378,11 @@ func _rpc_match_started() -> void:
 @rpc("authority", "call_remote", "reliable")
 func _rpc_match_ended() -> void:
 	match_ended.emit()
+
+
+@rpc("authority", "call_remote", "unreliable_ordered")
+func _rpc_lobby_pitch(level: float, lane: int) -> void:
+	lobby_pitch_received.emit(level, lane)
 
 
 @rpc("authority", "call_remote", "reliable")
