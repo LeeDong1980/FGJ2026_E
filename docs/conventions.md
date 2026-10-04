@@ -54,6 +54,7 @@ autoload/          全域單例
 - `res://scenes/mic_test/mic_test.tscn` @山雷
 - `res://scenes/pause_menu/pause_menu.tscn` @山雷
 - `res://scenes/pause_menu/mic_settings_panel.tscn` @山雷
+- `res://scenes/phone_mic/phone_mic_test.tscn` @露柑
 
 ### Prototype 美術任務分工
 - 場景美術負責主場景整合；動畫師負責紅龍場景及專用動畫控制腳本，交付後由美術總監驗收。

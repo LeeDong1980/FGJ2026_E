@@ -25,6 +25,7 @@ MicInput="*res://autoload/mic_controller.gd"
 PauseMenu="*res://scenes/pause_menu/pause_menu.tscn"
 NetworkManager="*res://autoload/network_manager.gd"
 RoomManager="*res://autoload/room_manager.gd"
+PhoneMic="*res://autoload/phone_mic_server.gd"
 
 [display]
 

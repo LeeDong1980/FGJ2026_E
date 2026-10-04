@@ -36,6 +36,11 @@
 - [x] MIC-08 修正 Windows 部分裝置的 WASAPI「unsupported channel count in microphone!」錯誤洪水：偵測麥克風沒有訊號時自動停止收音（只留一則警告），設定面板加「啟用麥克風」開關與「重新偵測」按鈕 @山雷
 - [x] MIC-09 單機保底版：game.tscn 加入 `PitchLaneInput` 橋接，玩家 1 的音高（`MicInput.pitch_value`）平均切成層數段，低中高音對應 1／2／3 層；玩家 2 用鍵盤 J／K 吸／吐（語音吸吐在實測中無法正確傳遞，已放棄） @Samuel
 - [x] MIC-10 單機保底版語音開關：game.tscn 左下角「音高」「吸／吐」兩個 toggle（`VoiceTogglePanel`，狀態存在 `MicInput.pitch_input_enabled`／`action_input_enabled` 並存檔）；新增 `VoiceActionInput` 語音吸吐橋接（與鍵盤 J／K 各自獨立）；音高音量閥值 `pitch_gate_db` 可存檔、預設改 -35 dB（遊戲畫面不放滑桿，需調整時從 Inspector 或 `user://mic_settings.cfg` 改） @Samuel
+- [ ] MIC-11 手機網頁麥克風：兩位玩家各用一支 Android 手機開網頁收音，網頁端用 JS 算好數值，透過 WebSocket 傳給 Godot；用 Cloudflare Tunnel 提供 HTTPS（現場 Wi-Fi 有用戶端隔離）；`PhoneMic` autoload，`PitchLaneInput`／`VoiceActionInput` 手機有連上就讀手機（玩家 1 音高、玩家 2 吸吐） @露柑
+- [ ] MIC-12 手機麥克風真機遊玩測試：兩支 Android 手機實際玩 game.tscn，確認音高換層與語音吸吐的手感，必要時調整預設參數
+- [ ] MIC-13 手機連線流程：Godot 自動啟動 cloudflared（exe 隨遊戲附帶）並讀出網址，在主選單或等候頁顯示 QR code；網址加隨機房間碼，只接受碼正確的連線（等主選單拆出 main_menu.tscn）
+- [ ] MIC-14 匯出設定：匯出篩選加入 `*.html`，否則匯出版讀不到手機網頁
+- [ ] MIC-15 UI 的音量條與吸吐顯示（`ui_game_bridge.gd`）目前只讀 MicInput，改成手機有連上時讀 `PhoneMic`（GMF 負責的檔案，需協調）
 
 #### 遊戲機制（露柑）
 - [x] GM-01 建立 `scenes/game/game.tscn` 與獨立的 LaneLayout 節點：依 `@export` 的層數與層距產生各層左右平台（實例化 cube_platform.tscn），提供 `get_lane_position(i)`、`get_lane_at(y)` @露柑
