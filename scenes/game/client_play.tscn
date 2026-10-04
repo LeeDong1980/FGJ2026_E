@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/game/client_play.gd" id="1_client_play"]
+[ext_resource type="Script" path="res://scenes/ui/volume_meter.gd" id="2_meter"]
 
 [node name="ClientPlay" type="Control"]
 layout_mode = 3
@@ -25,15 +26,36 @@ layout_mode = 2
 theme_override_constants/separation = 14
 
 [node name="Title" type="Label" parent="Center/Panel"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "你是玩家 B｜吸 / 吐"
+text = "你是玩家 2｜吸 / 吐"
 horizontal_alignment = 1
 
 [node name="Hint" type="Label" parent="Center/Panel"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "遊戲畫面在房主的電腦上。對麥克風喊「吸」「吐」，或按 J（吸）、K（吐，按住）。"
 horizontal_alignment = 1
 autowrap_mode = 3
+
+[node name="PausedLabel" type="Label" parent="Center/Panel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+text = "房主已暫停遊戲，你的操作暫時不會生效"
+horizontal_alignment = 1
+
+[node name="PitchBox" type="CenterContainer" parent="Center/Panel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="PitchMeter" type="Control" parent="Center/Panel/PitchBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 280)
+layout_mode = 2
+script = ExtResource("2_meter")
 
 [node name="ActionLabel" type="Label" parent="Center/Panel"]
 unique_name_in_owner = true

@@ -1,12 +1,17 @@
 class_name NetworkGameBridge
 extends Node
-## 連線局的 Host 端橋接：Host 是玩家 A（音高換層），Client 是玩家 B（吸／吐，經 NetworkManager 傳來）。
+## 連線局的 Host 端橋接。遊戲邏輯只在 Host 執行，玩家 1（音高換層）與玩家 2（吸／吐）誰坐哪個座位
+## 由等候頁決定（RoomManager.host_slot），這裡依座位決定輸入從哪裡來。
 ## 只在 RoomManager 判定「Host 的連線局」時啟用；單機與直接 F6 執行遊戲場景（main.tscn）時什麼都不做。
 ##
 ## 啟用時：
-## - 停用本機鍵盤 J／K／L 吸吐轉頭、語音吸吐與大叫轉頭（都只來自 Client）；鍵盤 1／2／3 換層保留，當作音高不穩時的保底。
+## - 房主坐玩家 1：房主用本機音高換層；停用本機鍵盤 J／K／L 吸吐轉頭、語音吸吐與大叫轉頭，這些都只來自 Client
+##   （inhale 呼叫 suck()，exhale／none 呼叫 spit_pressed()／spit_released()，字音 turn 呼叫 turn_head()）；
+##   鍵盤 1／2／3 換層保留當保底。
+## - 房主坐玩家 2：房主用本機 J／K／L、語音吸吐與大叫轉頭；停用本機音高與數字鍵換層，換層來自 Client 傳來的音高（lane），
+##   音高比例也餵給 HUD 的音高條。
+## - 轉頭（大叫或 L）跟著吸／吐，屬於玩家 2 的輸入。
 ## - 直接開局，不顯示開始介面（開局時 UIGameBridge 會校正聲音並顯示遊玩介面）。
-## - Client 的 inhale 呼叫 suck()，exhale／none 呼叫 spit_pressed()／spit_released()；字音 turn 呼叫 turn_head()。
 ## - 遊戲結束時改顯示「回到房間」，按下後呼叫 RoomManager.finish_match()，Client 會一起回到等候頁。
 ##   等 UI-15（ResultScreen 只發 signal）完成後，這個臨時的結束畫面可以拿掉。
 
@@ -16,32 +21,56 @@ const LANE_ACTIONS: Array[StringName] = [&"lane_1", &"lane_2", &"lane_3"]
 @export var dragon: Dragon
 @export var keyboard_input: KeyboardInput
 @export var voice_action_input: VoiceActionInput
+@export var pitch_lane_input: PitchLaneInput
 @export var shout_turn_input: ShoutTurnInput
+@export var ui_bridge: UIGameBridge
 @export var ui_root: UIRoot
-## 【暫時的診斷顯示】在畫面左上角顯示 Client 最後送來的動作，確認封包有沒有收到。語音參數調好後可關閉或移除。
+## 【暫時的診斷顯示】在畫面左上角顯示 Client 最後送來的輸入，確認封包有沒有收到。語音參數調好後可關閉或移除。
 @export var show_debug: bool = true
 
+var _host_slot: int = 1
 var _remote_action: String = NetworkManager.ACTION_NONE
 var _received_count: int = 0
 var _debug_label: Label
+var _was_paused: bool = false
 
 
 func _ready() -> void:
 	if not _is_host_match():
 		set_process_unhandled_input(false)
 		return
-	_disable_local_action_input()
+	# Host 暫停時本節點也要持續運作，才能在暫停與繼續的瞬間補上噴火的放開與接續。
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	_host_slot = RoomManager.host_slot
+	if _host_slot == 1:
+		_disable_local_action_input()
+		NetworkManager.voice_action_received.connect(_on_remote_action)
+		NetworkManager.voice_word_received.connect(_on_remote_word)
+	else:
+		_disable_local_pitch_input()
+		NetworkManager.pitch_received.connect(_on_remote_pitch)
 	if show_debug:
 		_build_debug_label()
-	NetworkManager.voice_action_received.connect(_on_remote_action)
-	NetworkManager.voice_word_received.connect(_on_remote_word)
 	game_manager.game_won.connect(_show_end.bind(true))
 	game_manager.game_lost.connect(_show_end.bind(false))
 	# 等所有子節點（含 UIGameBridge）都 ready 之後再開局，才收得到 game_started。
 	game_manager.start_game.call_deferred()
 
 
+func _process(_delta: float) -> void:
+	var paused: bool = get_tree().paused
+	if paused == _was_paused:
+		return
+	_was_paused = paused
+	if paused:
+		game_manager.spit_released()
+	elif _remote_action == NetworkManager.ACTION_EXHALE:
+		game_manager.spit_pressed()
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if get_tree().paused or _host_slot != 1:
+		return
 	for i in LANE_ACTIONS.size():
 		if event.is_action_pressed(LANE_ACTIONS[i]):
 			dragon.set_target_lane(i)
@@ -63,6 +92,22 @@ func _disable_local_action_input() -> void:
 			MicInput.action_changed.disconnect(connection["callable"])
 
 
+## 房主坐玩家 2：本機音高不用，數字鍵也不換層，換層交給 Client。
+func _disable_local_pitch_input() -> void:
+	pitch_lane_input.queue_free()
+	keyboard_input.allow_lane_keys = false
+
+
+## Client 坐玩家 1：用對方傳來的層控制龍，音高比例給 HUD 顯示。lane 為 -1 表示對方還沒有音高。
+func _on_remote_pitch(level: float, lane: int) -> void:
+	_received_count += 1
+	if _debug_label != null:
+		_debug_label.text = "Client 音高：%.0f%%，層 %d（已收到 %d 個封包）" % [level * 100.0, lane + 1, _received_count]
+	ui_bridge.remote_pitch_level = level
+	if lane >= 0 and not get_tree().paused:
+		dragon.set_target_lane(lane)
+
+
 ## Client 的動作改變：inhale 吸一次；exhale 開始吐或噴火，直到換成別的動作才放開。
 func _on_remote_action(_peer_id: int, action: String) -> void:
 	_received_count += 1
@@ -70,9 +115,12 @@ func _on_remote_action(_peer_id: int, action: String) -> void:
 		_debug_label.text = "Client 動作：%s（已收到 %d 個封包）" % [action, _received_count]
 	if action == _remote_action:
 		return
-	if _remote_action == NetworkManager.ACTION_EXHALE:
-		game_manager.spit_released()
+	var was_exhale: bool = _remote_action == NetworkManager.ACTION_EXHALE
 	_remote_action = action
+	if get_tree().paused:
+		return  # 暫停中只記下 Client 目前的動作，繼續遊戲時再接上
+	if was_exhale:
+		game_manager.spit_released()
 	match action:
 		NetworkManager.ACTION_INHALE:
 			game_manager.suck()
@@ -90,7 +138,7 @@ func _build_debug_label() -> void:
 	var layer := CanvasLayer.new()
 	_debug_label = Label.new()
 	_debug_label.position = Vector2(12, 40)
-	_debug_label.text = "Client 動作：尚未收到封包"
+	_debug_label.text = "Client %s：尚未收到封包" % ("動作" if _host_slot == 1 else "音高")
 	layer.add_child(_debug_label)
 	add_child(layer)
 

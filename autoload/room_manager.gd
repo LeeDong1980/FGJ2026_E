@@ -20,6 +20,9 @@ var phase: Phase = Phase.MENU
 var notice: String = ""
 ## Host 建立區網房間失敗的原因（例如 port 被占用）；成功時為空字串。
 var room_error: String = ""
+## 房主坐的座位：1＝玩家 1（音高換層），2＝玩家 2（吸／吐）；加入者坐另一個。
+## 座位只決定誰負責哪一種輸入，遊戲邏輯仍然只在房主的電腦上執行。連線局開始後不能換。
+var host_slot: int = 1
 
 
 func _ready() -> void:
@@ -30,6 +33,8 @@ func _ready() -> void:
 	NetworkManager.join_timed_out.connect(func() -> void: _join_failed("連線逾時（%d 秒）" % int(NetworkManager.join_timeout_sec)))
 	NetworkManager.peer_joined.connect(_on_peer_joined)
 	NetworkManager.peer_left.connect(_on_peer_left)
+	NetworkManager.slot_swap_requested.connect(_on_slot_swap_requested)
+	NetworkManager.slot_assignment_received.connect(_on_slot_assignment_received)
 	NetworkManager.server_lost.connect(_on_server_lost)
 	NetworkManager.room_closed_by_host.connect(_on_room_closed_by_host)
 	NetworkManager.match_started.connect(_on_match_started)
@@ -46,6 +51,26 @@ func get_player_count() -> int:
 		Role.CLIENT:
 			return 2
 	return 0
+
+
+## 這台電腦坐的座位（1 或 2）。
+func get_my_slot() -> int:
+	if role == Role.CLIENT:
+		return 3 - host_slot
+	return host_slot
+
+
+## 對方坐的座位。
+func get_peer_slot() -> int:
+	return 3 - get_my_slot()
+
+
+## 按 Esc 開暫停選單時，要不要凍結遊戲（get_tree().paused）。
+## Client 沒有遊戲邏輯，等候頁也沒有東西要凍結，這兩處只疊出設定選單，讓玩家可以繼續操作。
+func pause_freezes_game() -> bool:
+	if role == Role.CLIENT:
+		return false
+	return phase != Phase.ROOM and phase != Phase.JOINING
 
 
 func can_start_solo() -> bool:
@@ -72,6 +97,17 @@ func enter_room(change_scene: bool = true) -> void:
 	if change_scene:
 		_go(LOBBY_SCENE)
 	room_changed.emit()
+
+
+## 點選座位（1 或 2）切換自己的角色，不需要對方同意：
+## 房內只有自己時直接入座；有對方時兩人互換。加入者的要求由房主套用後通知雙方。
+func claim_slot(slot: int) -> void:
+	if phase != Phase.ROOM or slot == get_my_slot() or (slot != 1 and slot != 2):
+		return
+	if role == Role.HOST:
+		_set_host_slot(slot)
+	elif role == Role.CLIENT:
+		NetworkManager.request_slot_swap()
 
 
 ## 以單機遊玩：關閉區網房間，開始單機遊戲。
@@ -164,6 +200,7 @@ func _on_joined_server() -> void:
 
 func _on_peer_joined(_id: int) -> void:
 	notice = "對方已加入"
+	NetworkManager.send_slot_assignment(host_slot)
 	room_changed.emit()
 
 
@@ -177,6 +214,26 @@ func _on_peer_left(_id: int) -> void:
 		_go(LOBBY_SCENE)
 	else:
 		notice = "對方已離開"
+	room_changed.emit()
+
+
+func _set_host_slot(slot: int) -> void:
+	if slot == host_slot:
+		return
+	host_slot = slot
+	NetworkManager.send_slot_assignment(host_slot)
+	room_changed.emit()
+
+
+func _on_slot_swap_requested() -> void:
+	if role == Role.HOST and phase == Phase.ROOM and get_player_count() == 2:
+		_set_host_slot(3 - host_slot)
+
+
+func _on_slot_assignment_received(slot: int) -> void:
+	if role != Role.CLIENT:
+		return
+	host_slot = slot
 	room_changed.emit()
 
 
@@ -220,6 +277,7 @@ func _on_match_ended() -> void:
 # ---- 內部 ----
 
 func _open_room() -> void:
+	host_slot = 1
 	var err: Error = NetworkManager.host_game()
 	if err == OK:
 		room_error = ""
@@ -239,12 +297,20 @@ func _join_failed(reason: String) -> void:
 	room_changed.emit()
 
 
+## 換場景前解除暫停：暫停中被斷線或回房間時，新場景不能還卡在暫停。
+func _release_pause() -> void:
+	if PauseMenu.visible:
+		PauseMenu.close()
+	get_tree().paused = false
+
+
 func _clear_notice() -> void:
 	notice = ""
 
 
 ## 換場景。目前已經在該場景時不重新載入；場景檔還不存在（例如 client_play）時只警告，不中斷流程。
 func _go(path: String) -> void:
+	_release_pause()
 	var current: Node = get_tree().current_scene
 	if current != null and current.scene_file_path == path:
 		return

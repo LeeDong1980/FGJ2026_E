@@ -30,7 +30,7 @@ func _process(_delta: float) -> void:
 	var lane_count: int = game_manager.lane_layout.lane_count
 	var voice: Node = _voice()
 	if MicInput.pitch_input_enabled and voice.pitch_active:
-		var lane := _pick_lane(voice.pitch_value, lane_count)
+		var lane := pick_lane(voice.pitch_value, lane_count, _lane, hysteresis)
 		if lane != _lane:
 			_lane = lane
 			dragon.set_target_lane(lane)
@@ -47,14 +47,15 @@ func _voice() -> Node:
 	return MicInput
 
 
-## 平均切段；已經在某一層時，要越過界線 hysteresis 才換。
-func _pick_lane(value: float, lane_count: int) -> int:
+## 平均切段；已經在 current 層時，要越過界線 hysteresis 才換。current 為 -1 表示還沒有目前的層。
+## 等候頁的玩家 1 顯示也用這個函式，才會和遊戲內換層的結果一致。
+static func pick_lane(value: float, lane_count: int, current: int, hysteresis: float) -> int:
 	var step := 100.0 / lane_count
 	var raw := clampi(int(value / step), 0, lane_count - 1)
-	if _lane < 0 or _lane >= lane_count or raw == _lane:
+	if current < 0 or current >= lane_count or raw == current:
 		return raw
-	var low_edge := _lane * step
-	var high_edge := (_lane + 1) * step
+	var low_edge := current * step
+	var high_edge := (current + 1) * step
 	if value < low_edge - hysteresis or value > high_edge + hysteresis:
 		return raw
-	return _lane
+	return current

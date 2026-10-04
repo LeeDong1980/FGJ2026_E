@@ -6,11 +6,13 @@ const LANE_ACTIONS: Array[StringName] = [&"lane_1", &"lane_2", &"lane_3"]
 
 @export var dragon: Dragon
 @export var game_manager: GameManager
+## 關閉時數字鍵 1／2／3 不換層（連線局房主坐玩家 2 時，換層由對方負責）。
+@export var allow_lane_keys: bool = true
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	for i in LANE_ACTIONS.size():
-		if event.is_action_pressed(LANE_ACTIONS[i]):
+		if allow_lane_keys and event.is_action_pressed(LANE_ACTIONS[i]):
 			dragon.set_target_lane(i)
 			get_viewport().set_input_as_handled()
 			return
