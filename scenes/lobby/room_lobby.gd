@@ -245,7 +245,7 @@ func _refresh_player_inputs(joining: bool, count: int) -> void:
 
 
 func _local_ip_text(is_host: bool) -> String:
-	if not is_host or not NetworkManager.is_host() or RoomManager.is_room_public():
+	if OS.has_feature("web") or not is_host or not NetworkManager.is_host() or RoomManager.is_room_public():
 		return ""
 	return "本機 IP：%s　Port：%d" % [", ".join(NetworkManager.get_local_ips()), NetworkManager.port]
 
