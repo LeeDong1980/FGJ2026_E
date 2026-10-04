@@ -1,0 +1,79 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/lobby/room_lobby.gd" id="1_room_lobby"]
+
+[node name="RoomLobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_room_lobby")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "房間等候"
+horizontal_alignment = 1
+
+[node name="PlayerLabel" type="Label" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="LocalIpLabel" type="Label" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Center/Panel"]
+layout_mode = 2
+
+[node name="SoloButton" type="Button" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "以單機遊玩"
+
+[node name="JoinBox" type="HBoxContainer" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="IpInput" type="LineEdit" parent="Center/Panel/JoinBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "對方的 IP，例如 192.168.1.10"
+
+[node name="JoinButton" type="Button" parent="Center/Panel/JoinBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "加入別人房間"
+
+[node name="StartButton" type="Button" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "開始遊戲"
+
+[node name="LeaveButton" type="Button" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "離開"
+
+[node name="StatusLabel" type="Label" parent="Center/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3

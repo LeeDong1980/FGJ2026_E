@@ -70,12 +70,22 @@
 - [x] UI-11 建立 UI 測試場景 `ui_test.tscn` 與測試控制中心：依階段切換介面、測試用倒數計時（時間到算失敗）、Ctrl+Shift+W／L 強制成功或失敗（可在 Inspector 開關） @GMF
 - [x] UI-12 擴充 UI 測試快捷鍵：Ctrl+Shift+1／2 增加完成數或清空次數（達到上限跳出結束介面）、4／5／6 重新隨機上／中／下層禁止食材、↑／←／↓ 龍高度顯示、I／O 顯示吸／吐 @GMF
 - [x] UI-13 UI 測試快捷鍵：按住 Ctrl+Shift+I 再按 3／4／5，上／中／下層鍋子增加一個原料，收集滿算完成一鍋並換新鍋子 @GMF
+- [ ] UI-14 把 `StartScreen` 搬出 `UIRoot`，改成獨立的 `main_menu.tscn`（主選單與 game.tscn 分離，由 `RoomManager` 串流程）
+- [ ] UI-15 `ResultScreen` 不再自己 `quit()`，只發 signal（重新遊玩、回到房間／主選單），由流程決定去向
 
 #### 區網連線（Samuel）
 - [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel
 - [x] NET-04 語音封包傳輸測試：Client 傳音量與「吸／吐」封包給 Host，兩邊畫面顯示收發狀態與錯誤（掉包、無回應、斷線） @Samuel
 - [ ] NET-02 雙機同步骨架：MultiplayerSpawner／Synchronizer 同步龍的所在層，Server 權威，樓層產生用同一個 seed（等 GM-01、GM-02 完成）
 - [ ] NET-03 雙機分工：Host 與 Client 各自負責移動／動作其中一項輸入（等 DES 決定操作方式）
+- [x] NET-10 `NetworkManager` 房間擴充：加入逾時 20 秒、拒絕原因（房間已滿／對方遊戲中）、房主關房通知、開始／結束連線局 RPC、Client 吸吐「開始／結束」封包 @Samuel（編號原為 NET-05～09，與手機備案撞號，改為 NET-10～14，之前的 commit 訊息仍是舊編號）
+- [x] NET-11 新增 autoload `RoomManager`（`autoload/room_manager.gd`）：依 docs/lobby-flow.md 實作房間狀態機與換場景（單機、加入、開始、斷線、離開） @Samuel
+- [x] NET-12 新增 `scenes/lobby/room_lobby.tscn`（Host／Client 共用等候頁，獨立可 F6 測試）與暫用主選單 `temp_menu.tscn` @Samuel
+- [x] NET-13 新增 `NetworkGameBridge` 串接 game.tscn：依 `RoomManager` 模式切換輸入、直接開局、遊戲結束回房間（game.tscn 加節點需 @露柑 同意） @Samuel
+- [x] NET-14 新增 `scenes/game/client_play.tscn`：Client 遊玩畫面，只顯示麥克風狀態並傳送吸／吐封包 @Samuel
+- [ ] NET-15 連線局中 Esc 暫停選單不要暫停遊戲（目前 `PauseMenu` 會 `get_tree().paused = true`，Host 一按 Esc 兩邊都停住）（需 @山雷 同意改 pause_menu.gd）
+- [ ] NET-16 連線局結束時，Client 也顯示成功／失敗（`match_ended` 帶結果）；目前 Client 只是被帶回等候頁
+- [ ] NET-17 單機局結束後回主選單：現在單機從等候頁進入 game.tscn，結果畫面的「關閉遊戲」仍是 `quit()`（等 UI-14、UI-15）
 
 ### 美術與關卡
 
