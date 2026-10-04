@@ -16,9 +16,9 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
 - `scenes/lobby/`：區網連線大廳 `lobby.tscn`（舊版）、房間等候頁 `room_lobby.tscn`（流程見 docs/lobby-flow.md）、玩家 1／2 輸入顯示 `player_input_panels.tscn`、等候頁主題 `lobby_theme.tres`。
 - `scenes/network_test/`：雙機語音封包傳輸測試場景（內含大廳）。
-- `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線與語音封包收發，autoload 名稱 `NetworkManager`）。`room_manager.gd` 是房間流程與換場景（autoload 名稱 `RoomManager`）。`mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。`phone_mic_server.gd` 是手機網頁麥克風的 server（autoload 名稱 `PhoneMic`，見 docs/voice-input.md 9.1）。
+- `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線與語音封包收發，autoload 名稱 `NetworkManager`）。`room_manager.gd` 是房間流程與換場景（autoload 名稱 `RoomManager`）。`mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。`phone_mic_server.gd` 是手機網頁麥克風的 server（autoload 名稱 `PhoneMic`，見 docs/voice-input.md 9.1）。`audio_settings.gd` 是總音量／音樂／音效設定（autoload 名稱 `AudioSettings`，bus 為 Master、Music、SFX，設定存在 `user://audio_settings.cfg`）。`sound.gd` 播放 BGM 與 UI／遊戲音效（autoload 名稱 `Sound`，`Sound.play(&"notify")`，音效種類見檔案開頭的 SOUNDS）。
 - `scenes/main_menu/`：主選單（從 UIRoot 的 StartScreen 拆出的獨立場景；「進入遊戲」呼叫 `RoomManager.enter_room()`）。
-- `scenes/pause_menu/`：暫停選單（autoload `PauseMenu`，Esc 開關）、麥克風設定面板 `mic_settings_panel.tscn`、可拖曳區間的觀察條 `range_meter.gd`。
+- `scenes/pause_menu/`：暫停選單（autoload `PauseMenu`，Esc 開關）、麥克風設定面板 `mic_settings_panel.tscn`、音量設定面板 `audio_settings_panel.tscn`（暫停選單與主選單共用）、可拖曳區間的觀察條 `range_meter.gd`。
 - `scenes/mic_test/`：麥克風輸入實驗場景，只實例化設定面板，F6 單獨執行用。
 - `scenes/phone_mic/`：手機網頁麥克風（MIC-11）：手機網頁 `phone_mic.html`、每位玩家的聲音換算 `PhoneVoiceSource`、連線測試場景。
 - `scenes/rooms/`：prototype 勇者挑戰房、幼龍哺育房、通用天花板與垂直樓層子場景。
@@ -26,6 +26,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `scenes/ui/`：UI 根場景與三個介面（遊戲開始、遊玩狀態、遊戲結束）。`game_ui.tscn` 是接上遊戲機制的完整 UI，已實例化在 game.tscn；`ui_test.tscn` 只測介面流程（假資料與測試快捷鍵）。
 - `scenes/backdrop/`：遊戲中 3D 場景最後面的 2D 龍洞穴背景圖（`cave_backdrop.tscn`，由 `game_ui.tscn` 實例化，自動對齊攝影機）。
 - `Models/`：模型與貼圖素材。
+- `SFX/`：音樂 `BGM.mp3` 與 UI 音效（依用途分資料夾，每種 4 個版本）。
 - `docs/`：設計、開發慣例與任務清單；`docs/images/` 放企劃書用的示意圖。
 
 新資料夾依 docs/conventions.md 的規則建立，建好後更新這一節。

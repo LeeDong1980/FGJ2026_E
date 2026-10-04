@@ -190,5 +190,9 @@
 >>>>>>> 修改備份_20261004_1321
 
 ### 音效與 UI
+- [x] SND-01 音量設定：新增 `default_bus_layout.tres`（Master、Music、SFX，Music／SFX 送到 Master）與 autoload `AudioSettings`（`autoload/audio_settings.gd`，0～1 音量、存 `user://audio_settings.cfg`）；共用面板 `scenes/pause_menu/audio_settings_panel.tscn` 放進暫停選單（麥克風設定下方）與主選單（「音量」按鈕開視窗）；之後加音樂、音效的 AudioStreamPlayer 要把 bus 設成 `Music`／`SFX`。改動 `pause_menu.tscn` 需告知 @山雷 @露柑
+- [x] SND-02 套用音樂與音效：autoload `Sound`（`autoload/sound.gd`）循環播放 `SFX/BGM.mp3`（全程同一首，換場景、暫停不中斷）；所有按鈕自動加滑過與按下音效（依節點名稱分確認／取消／點擊，可用 metadata `ui_sound` 指定）；暫停選單與主選單音量視窗開關音效；main.tscn 新增 `GameSounds` 播遊戲事件音效（開局、完成一鍋、打翻、無效指令、轉頭、換元素、快速加分、勝敗） @露柑
+- [ ] SND-03 遊戲動作專用音效（吸、噴火、冰息、吐進鍋子、食材攻擊、龍暈眩）：目前音效庫只有 UI 音效，需要素材
+- [ ] SND-04 `SFX/` 的音效與 BGM 來源與授權補進 docs/asset_credits.md
 
 ## 有時間再做

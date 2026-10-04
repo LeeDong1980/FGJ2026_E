@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/pause_menu/pause_menu.gd" id="1_menu"]
 [ext_resource type="PackedScene" path="res://scenes/pause_menu/mic_settings_panel.tscn" id="2_panel"]
+[ext_resource type="PackedScene" path="res://scenes/pause_menu/audio_settings_panel.tscn" id="3_audio"]
 
 [node name="PauseMenu" type="CanvasLayer"]
 process_mode = 3
@@ -16,9 +17,20 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.75)
 
-[node name="MicSettingsPanel" parent="." instance=ExtResource("2_panel")]
-unique_name_in_owner = true
+[node name="Layout" type="VBoxContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MicSettingsPanel" parent="Layout" instance=ExtResource("2_panel")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
 show_close_button = true
+
+[node name="AudioSettingsPanel" parent="Layout" instance=ExtResource("3_audio")]
+layout_mode = 2
+size_flags_horizontal = 4

@@ -1,0 +1,98 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/pause_menu/audio_settings_panel.gd" id="1_audio"]
+
+[node name="AudioSettingsPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(520, 0)
+script = ExtResource("1_audio")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="Root" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Margin/Root"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Root/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "音量設定"
+
+[node name="CloseButton" type="Button" parent="Margin/Root/Header"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "關閉"
+
+[node name="Grid" type="GridContainer" parent="Margin/Root"]
+layout_mode = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 8
+columns = 3
+
+[node name="MasterCaption" type="Label" parent="Margin/Root/Grid"]
+layout_mode = 2
+text = "總音量"
+
+[node name="MasterSlider" type="HSlider" parent="Margin/Root/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 1.0
+value = 100.0
+
+[node name="MasterValue" type="Label" parent="Margin/Root/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="MusicCaption" type="Label" parent="Margin/Root/Grid"]
+layout_mode = 2
+text = "音樂"
+
+[node name="MusicSlider" type="HSlider" parent="Margin/Root/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 1.0
+value = 100.0
+
+[node name="MusicValue" type="Label" parent="Margin/Root/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SfxCaption" type="Label" parent="Margin/Root/Grid"]
+layout_mode = 2
+text = "音效"
+
+[node name="SfxSlider" type="HSlider" parent="Margin/Root/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 1.0
+value = 100.0
+
+[node name="SfxValue" type="Label" parent="Margin/Root/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2

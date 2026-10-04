@@ -23,6 +23,7 @@
 [ext_resource type="Script" path="res://scenes/game/score_banner.gd" id="18_score_banner"]
 [ext_resource type="Script" path="res://scenes/game/game_state_sender.gd" id="30_state_sender"]
 [ext_resource type="Script" path="res://scenes/game/client_view_bridge.gd" id="31_view_bridge"]
+[ext_resource type="Script" path="res://scenes/game/game_sounds.gd" id="32_game_sounds"]
 
 [node name="Main" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
 script = ExtResource("4_manager")
@@ -94,6 +95,10 @@ game_manager = NodePath("..")
 
 [node name="ActionHintBanner" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]
 script = ExtResource("16_action_hint")
+game_manager = NodePath("..")
+
+[node name="GameSounds" type="Node" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("32_game_sounds")
 game_manager = NodePath("..")
 
 [node name="ScoreBanner" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]

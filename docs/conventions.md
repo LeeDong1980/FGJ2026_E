@@ -55,6 +55,7 @@ autoload/          全域單例
 - `res://scenes/mic_test/mic_test.tscn` @山雷
 - `res://scenes/pause_menu/pause_menu.tscn` @山雷
 - `res://scenes/pause_menu/mic_settings_panel.tscn` @山雷
+- `res://scenes/pause_menu/audio_settings_panel.tscn` @露柑
 - `res://scenes/ui/ui_root.tscn` @GMF
 - `res://scenes/ui/play_hud.tscn` @GMF
 - `res://scenes/ui/pot_info.tscn` @GMF
