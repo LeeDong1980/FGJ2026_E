@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ingredient/human_character.tscn" id="1_human"]
+[ext_resource type="PackedScene" path="res://scenes/ingredient/slime_character.tscn" id="2_slime"]
+[ext_resource type="PackedScene" path="res://scenes/ingredient/bat_character.tscn" id="3_bat"]
+[ext_resource type="Script" path="res://scenes/ingredient/ingredient_preview.gd" id="4_script"]
+
+[node name="IngredientPreview" type="Node3D"]
+script = ExtResource("4_script")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9659, 0.2588, 0, -0.2588, 0.9659, 0, 1.2, 3.2)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 3, 0)
+
+[node name="Human" parent="." instance=ExtResource("1_human")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
+
+[node name="Slime" parent="." instance=ExtResource("2_slime")]
+unique_name_in_owner = true
+
+[node name="Bat" parent="." instance=ExtResource("3_bat")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
