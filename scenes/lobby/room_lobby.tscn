@@ -102,13 +102,48 @@ theme_override_colors/font_color = Color(1, 1, 1, 0.7)
 theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
 
+[node name="RoomCodeBox" type="HBoxContainer" parent="Center/Card/Panel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="RoomCodeLabel" type="Label" parent="Center/Card/Panel/RoomCodeBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_font_sizes/font_size = 44
+
+[node name="CopyCodeButton" type="Button" parent="Center/Card/Panel/RoomCodeBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "複製代碼"
+
 [node name="HSeparator" type="HSeparator" parent="Center/Card/Panel"]
 layout_mode = 2
 
-[node name="SoloButton" type="Button" parent="Center/Card/Panel"]
+[node name="ActionRow" type="HBoxContainer" parent="Center/Card/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SoloButton" type="Button" parent="Center/Card/Panel/ActionRow"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "以單機遊玩"
+
+[node name="PublishButton" type="Button" parent="Center/Card/Panel/ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "公開房間"
+
+[node name="DiagnosticsButton" type="Button" parent="Center/Card/Panel/ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "連線診斷"
 
 [node name="JoinBox" type="HBoxContainer" parent="Center/Card/Panel"]
 unique_name_in_owner = true
@@ -119,7 +154,7 @@ theme_override_constants/separation = 12
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "對方的 IP，例如 192.168.1.10"
+placeholder_text = "對方的房間代碼，或區網 IP"
 
 [node name="JoinButton" type="Button" parent="Center/Card/Panel/JoinBox"]
 unique_name_in_owner = true

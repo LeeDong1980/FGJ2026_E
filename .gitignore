@@ -14,3 +14,7 @@
 # OS
 .DS_Store
 Thumbs.db
+
+# Cloudflare 中繼伺服器
+relay_server/node_modules/
+relay_server/.wrangler/

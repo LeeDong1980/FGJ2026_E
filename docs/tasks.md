@@ -134,6 +134,10 @@
 - [x] NET-18 房間等候頁介面優化：沿用主選單視覺（logo 背景、深色卡片、橘色按鈕，主題 `lobby_theme.tres`）；顯示玩家 1／2 欄位；左下玩家 1 音高條、右下玩家 2 吸／吐（沿用遊玩介面樣式），讓兩位玩家進遊戲前先測試；Host 的音高經 `send_lobby_pitch` 同步給 Client；吸／吐本機輸入抽成 `PlayerActionInput`（client_play 共用） @Samuel
 - [x] NET-19 Client 畫面同步顯示遊戲：連線局 Client 載入同一個遊戲場景，GameManager 為副本，由 Host 的事件、快照與完整狀態填入，畫面元件不用改（做法見 docs/lobby-flow.md「畫面同步」）。已完成四階段：①龍、計數、勝敗 ②鍋子、小龍、胃袋、噴吐狀態 ③食材與特效事件 ④HUD 音高、掉包與斷線測試 @Samuel
 - [x] NET-20 等候頁自選座位：點選「玩家 1」「玩家 2」切換角色（不需對方同意、不需準備）；`RoomManager.host_slot`；音高與吸／吐改為雙向傳輸；`NetworkGameBridge` 與 `client_play` 依座位切換（Client 可坐玩家 1 以音高換層）；遊玩 HUD 的音高條改讀音高並可讀對方傳來的音高；介面「玩家 A／B」統一改為「玩家 1／2」 @Samuel
+- [ ] NET-21 遠端連線中繼伺服器：`relay_server/`（Cloudflare Worker + Durable Object，WebSocket 轉送，房間代碼配對），部署到 workers.dev，附 `/health`、`/echo` @Samuel
+- [ ] NET-22 Godot 端中繼連線：`scenes/relay/relay_multiplayer_peer.gd`（`MultiplayerPeerExtension`，兩端都只做出站 wss），`NetworkManager` 支援公開房間與用代碼加入，F6 測試場景 `scenes/relay/relay_test.tscn` @Samuel
+- [ ] NET-23 等候頁「公開房間」按鈕、房間代碼顯示與複製、用代碼加入（`RoomManager.publish_room()`／`unpublish_room()`）；更新 docs/lobby-flow.md @Samuel
+- [ ] NET-24 連線診斷（HTTPS、WebSocket 握手、echo 來回時間，失敗時顯示白話原因）與跨網路實測 @Samuel
 
 ### 美術與關卡
 
