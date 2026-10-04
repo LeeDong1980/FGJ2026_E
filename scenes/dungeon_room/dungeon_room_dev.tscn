@@ -1,0 +1,609 @@
+[gd_scene format=3 uid="uid://d336qdpq37udn"]
+
+[ext_resource type="PackedScene" uid="uid://cp7feud7m4t0" path="res://Models/dungeon/Ground_01.fbx" id="1_bwsc0"]
+[ext_resource type="Texture2D" uid="uid://dj6y4la7c2buu" path="res://Models/dungeon/LowPolyDungeonsLite_Texture_01.png" id="2_hw3gk"]
+[ext_resource type="PackedScene" uid="uid://bfhvl0bnhm22s" path="res://Models/dungeon/Wall_27.fbx" id="3_ne64m"]
+[ext_resource type="PackedScene" uid="uid://lrhe1cnu7ew8" path="res://Models/dungeon/Column_01.fbx" id="4_5r64o"]
+[ext_resource type="PackedScene" uid="uid://ckpgd5shckkgc" path="res://Models/dungeon/Table_01.fbx" id="5_1fra2"]
+[ext_resource type="PackedScene" uid="uid://ccq8py5t24gsd" path="res://Models/dungeon/Chair_05.fbx" id="6_4evfi"]
+[ext_resource type="PackedScene" uid="uid://c5mlmutfklmgj" path="res://Models/dungeon/Book_09.fbx" id="7_mnt2k"]
+[ext_resource type="PackedScene" uid="uid://dsqmyi5vbaea8" path="res://Models/dungeon/Jug_02.fbx" id="8_y3qla"]
+[ext_resource type="PackedScene" uid="uid://dgpjur62gi2ac" path="res://Models/dungeon/Bottle_05.fbx" id="9_nbvtd"]
+[ext_resource type="PackedScene" uid="uid://bdg47f30t1x2d" path="res://Models/dungeon/Candle_01.fbx" id="10_pygtv"]
+[ext_resource type="PackedScene" uid="uid://bqh130yue16k" path="res://Models/dungeon/Pot_01.fbx" id="11_y02x0"]
+[ext_resource type="PackedScene" uid="uid://hucxrrvnb6w5" path="res://Models/dungeon/WallDecor_05.fbx" id="12_u7sfu"]
+[ext_resource type="PackedScene" uid="uid://dprxnpsmdxfnl" path="res://Models/dungeon/Box_02.fbx" id="13_qgbtu"]
+[ext_resource type="PackedScene" uid="uid://hp136ergdqll" path="res://Models/dungeon/Wood_02.fbx" id="14_tvp47"]
+[ext_resource type="PackedScene" uid="uid://dddvu03f1nora" path="res://Models/dungeon/Ground_03.fbx" id="15_2hvtc"]
+[ext_resource type="PackedScene" uid="uid://dlumpr68xdjgm" path="res://Models/dungeon/Rock_01.fbx" id="16_hw0wy"]
+[ext_resource type="PackedScene" uid="uid://cgeff0onmrrey" path="res://Models/dungeon/Mud_04.fbx" id="17_x6qyg"]
+[ext_resource type="PackedScene" uid="uid://crfocyn60gcgs" path="res://Models/dungeon/Light_08.fbx" id="18_cx0db"]
+
+[sub_resource type="StandardMaterial3D" id="Material_dungeon"]
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("2_hw3gk")
+roughness = 0.92
+
+[sub_resource type="BoxShape3D" id="Shape_BackWall1"]
+size = Vector3(4, 4, 0.1939718)
+
+[sub_resource type="BoxShape3D" id="Shape_BackWall2"]
+size = Vector3(4, 4, 0.1939718)
+
+[sub_resource type="BoxShape3D" id="Shape_floor"]
+size = Vector3(8, 0.2, 8)
+
+[sub_resource type="BoxShape3D" id="Shape_WorkTable"]
+size = Vector3(2.5, 1.100605, 1.533545)
+
+[sub_resource type="BoxShape3D" id="Shape_Chair"]
+size = Vector3(0.5316986, 0.9669391, 0.4856089)
+
+[sub_resource type="StandardMaterial3D" id="Material_flame"]
+shading_mode = 0
+albedo_color = Color(1, 0.65, 0.1, 1)
+
+[sub_resource type="SphereMesh" id="Mesh_candle_flame"]
+material = SubResource("Material_flame")
+radius = 0.024
+height = 0.085
+radial_segments = 6
+rings = 3
+
+[sub_resource type="StandardMaterial3D" id="Material_potion"]
+albedo_color = Color(0.16, 0.48, 0.025, 1)
+roughness = 0.24
+emission_enabled = true
+emission = Color(0.12, 0.58, 0.01, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="CylinderMesh" id="Mesh_potion"]
+material = SubResource("Material_potion")
+top_radius = 0.35
+bottom_radius = 0.35
+height = 0.02
+radial_segments = 24
+
+[sub_resource type="SphereMesh" id="Mesh_bubble"]
+material = SubResource("Material_potion")
+radius = 0.032
+height = 0.064
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxShape3D" id="Shape_CrateLeft"]
+size = Vector3(1, 1.000354, 0.9966392)
+
+[sub_resource type="BoxShape3D" id="Shape_CrateRight"]
+size = Vector3(1, 1.000354, 0.9966392)
+
+[sub_resource type="BoxShape3D" id="Shape_CrateTop"]
+size = Vector3(1, 1.000354, 0.9966392)
+
+[sub_resource type="Environment" id="Environment_dungeon"]
+background_mode = 1
+background_color = Color(0.035, 0.025, 0.03, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.5, 0.44, 0.5, 1)
+ambient_light_energy = 0.32
+reflected_light_source = 2
+tonemap_mode = 2
+ssao_enabled = true
+ssao_radius = 0.6
+ssao_intensity = 1.6
+glow_enabled = true
+glow_intensity = 0.7
+glow_bloom = 0.05
+glow_hdr_threshold = 1.6
+
+[node name="DungeonRoom" type="Node3D" unique_id=1993679215]
+
+[node name="Architecture" type="Node3D" parent="." unique_id=1175162549]
+
+[node name="Floor11" type="Node3D" parent="Architecture" unique_id=1219956795]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+
+[node name="Model" parent="Architecture/Floor11" unique_id=307210859 instance=ExtResource("1_bwsc0")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 4.857226e-15, 0, 4.857226e-15)
+
+[node name="Ground_01" parent="Architecture/Floor11/Model" index="0" unique_id=477728221]
+material_override = SubResource("Material_dungeon")
+
+[node name="Floor12" type="Node3D" parent="Architecture" unique_id=297135704]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+
+[node name="Model" parent="Architecture/Floor12" unique_id=1290345097 instance=ExtResource("1_bwsc0")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 4.857226e-15, 0, 4.857226e-15)
+
+[node name="Ground_01" parent="Architecture/Floor12/Model" index="0" unique_id=477728221]
+material_override = SubResource("Material_dungeon")
+
+[node name="Floor21" type="Node3D" parent="Architecture" unique_id=744121220]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+
+[node name="Model" parent="Architecture/Floor21" unique_id=1997075186 instance=ExtResource("1_bwsc0")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 4.857226e-15, 0, 4.857226e-15)
+
+[node name="Ground_01" parent="Architecture/Floor21/Model" index="0" unique_id=477728221]
+material_override = SubResource("Material_dungeon")
+
+[node name="Floor22" type="Node3D" parent="Architecture" unique_id=1115881031]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+
+[node name="Model" parent="Architecture/Floor22" unique_id=769218998 instance=ExtResource("1_bwsc0")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 4.857226e-15, 0, 4.857226e-15)
+
+[node name="Ground_01" parent="Architecture/Floor22/Model" index="0" unique_id=477728221]
+material_override = SubResource("Material_dungeon")
+
+[node name="BackWall1" type="Node3D" parent="Architecture" unique_id=1690772445]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -4)
+
+[node name="Model" parent="Architecture/BackWall1" unique_id=1188234165 instance=ExtResource("3_ne64m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.264073e-07, -0.09698508)
+
+[node name="Wall_27" parent="Architecture/BackWall1/Model" index="0" unique_id=1364809020]
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Architecture/BackWall1" unique_id=2057546473]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Architecture/BackWall1/StaticBody3D" unique_id=1982422810]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("Shape_BackWall1")
+
+[node name="BackWall2" type="Node3D" parent="Architecture" unique_id=911009356]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -4)
+
+[node name="Model" parent="Architecture/BackWall2" unique_id=346140999 instance=ExtResource("3_ne64m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.264073e-07, -0.09698508)
+
+[node name="Wall_27" parent="Architecture/BackWall2/Model" index="0" unique_id=1364809020]
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Architecture/BackWall2" unique_id=193963200]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Architecture/BackWall2/StaticBody3D" unique_id=41782539]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("Shape_BackWall2")
+
+[node name="ColumnBackLeft" type="Node3D" parent="Architecture" unique_id=1827077072]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.7, 0, -3.7)
+
+[node name="Model" parent="Architecture/ColumnBackLeft" unique_id=252125137 instance=ExtResource("4_5r64o")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, -5.20417e-16, 0, -5.20417e-16)
+
+[node name="Column_01" parent="Architecture/ColumnBackLeft/Model" index="0" unique_id=688867279]
+material_override = SubResource("Material_dungeon")
+
+[node name="ColumnBackRight" type="Node3D" parent="Architecture" unique_id=826801479]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, 0, -3.7)
+
+[node name="Model" parent="Architecture/ColumnBackRight" unique_id=852179065 instance=ExtResource("4_5r64o")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, -5.20417e-16, 0, -5.20417e-16)
+
+[node name="Column_01" parent="Architecture/ColumnBackRight/Model" index="0" unique_id=688867279]
+material_override = SubResource("Material_dungeon")
+
+[node name="FloorBody" type="StaticBody3D" parent="Architecture" unique_id=1124171806]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Architecture/FloorBody" unique_id=1734070864]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+shape = SubResource("Shape_floor")
+
+[node name="AlchemyCorner" type="Node3D" parent="." unique_id=180619785]
+visible = false
+
+[node name="WorkTable" type="Node3D" parent="AlchemyCorner" unique_id=1772535305]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.95, 0, -2.65)
+
+[node name="Model" parent="AlchemyCorner/WorkTable" unique_id=545803778 instance=ExtResource("5_1fra2")]
+transform = Transform3D(123.5231, 0, 0, 0, 123.5231, 0, 0, 0, 123.5231, -0.00051929, 0, -0.01786598)
+
+[node name="Table_01" parent="AlchemyCorner/WorkTable/Model" index="0" unique_id=141992901]
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="AlchemyCorner/WorkTable" unique_id=332230767]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AlchemyCorner/WorkTable/StaticBody3D" unique_id=835225390]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5503024, 0)
+shape = SubResource("Shape_WorkTable")
+
+[node name="Chair" type="Node3D" parent="AlchemyCorner" unique_id=500380038]
+transform = Transform3D(-0.9928086, 0, -0.11971265, 0, 1, 0, 0.11971265, 0, -0.9928086, -1.9, 0, -1.35)
+
+[node name="Model" parent="AlchemyCorner/Chair" unique_id=1641352383 instance=ExtResource("6_4evfi")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, -0.005453919, -0.0002551749, 0.005228801)
+
+[node name="Chair_05" parent="AlchemyCorner/Chair/Model" index="0" unique_id=1942752968]
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="AlchemyCorner/Chair" unique_id=1700987772]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AlchemyCorner/Chair/StaticBody3D" unique_id=1659738679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4834695, 0)
+shape = SubResource("Shape_Chair")
+
+[node name="SpellBook" type="Node3D" parent="AlchemyCorner" unique_id=1475362018]
+transform = Transform3D(0.9887711, 0, -0.14943814, 0, 1, 0, 0.14943814, 0, 0.9887711, -2.18, 1.112605, -2.2)
+
+[node name="Model" parent="AlchemyCorner/SpellBook" unique_id=1679865849 instance=ExtResource("7_mnt2k")]
+transform = Transform3D(105, 0, 0, 0, 105, 0, 0, 0, 105, 0.01557794, 0.03568816, -0.000223142)
+
+[node name="Book_09" parent="AlchemyCorner/SpellBook/Model" index="0" unique_id=1127469919]
+material_override = SubResource("Material_dungeon")
+
+[node name="LargeJug" type="Node3D" parent="AlchemyCorner" unique_id=2021033412]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.75, 1.110605, -2.92)
+
+[node name="Model" parent="AlchemyCorner/LargeJug" unique_id=901640597 instance=ExtResource("8_y3qla")]
+transform = Transform3D(110, 0, 0, 0, 110, 0, 0, 0, 110, 5.247539e-16, -3.268415e-09, 5.247539e-16)
+
+[node name="Jug_02" parent="AlchemyCorner/LargeJug/Model" index="0" unique_id=1531365157]
+material_override = SubResource("Material_dungeon")
+
+[node name="SmallJug" type="Node3D" parent="AlchemyCorner" unique_id=1228793886]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.23, 1.110605, -2.89)
+
+[node name="Model" parent="AlchemyCorner/SmallJug" unique_id=1010556850 instance=ExtResource("8_y3qla")]
+transform = Transform3D(78, 0, 0, 0, 78, 0, 0, 0, 78, 3.720982e-16, -2.317604e-09, 3.720982e-16)
+
+[node name="Jug_02" parent="AlchemyCorner/SmallJug/Model" index="0" unique_id=1531365157]
+material_override = SubResource("Material_dungeon")
+
+[node name="PotionBottleRed" type="Node3D" parent="AlchemyCorner" unique_id=560093784]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.110605, -2.95)
+
+[node name="Model" parent="AlchemyCorner/PotionBottleRed" unique_id=1285727009 instance=ExtResource("9_nbvtd")]
+transform = Transform3D(105, 0, 0, 0, 105, 0, 0, 0, 105, -6.111804e-09, -4.024818e-15, 2.162983e-16)
+
+[node name="Bottle_05" parent="AlchemyCorner/PotionBottleRed/Model" index="0" unique_id=1234557900]
+material_override = SubResource("Material_dungeon")
+
+[node name="PotionBottleSmall" type="Node3D" parent="AlchemyCorner" unique_id=2066388096]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.42, 1.110605, -2.97)
+
+[node name="Model" parent="AlchemyCorner/PotionBottleSmall" unique_id=616749527 instance=ExtResource("9_nbvtd")]
+transform = Transform3D(85, 0, 0, 0, 85, 0, 0, 0, 85, -4.947651e-09, -3.258186e-15, 1.750987e-16)
+
+[node name="Bottle_05" parent="AlchemyCorner/PotionBottleSmall/Model" index="0" unique_id=1234557900]
+material_override = SubResource("Material_dungeon")
+
+[node name="CandleLeft" type="Node3D" parent="AlchemyCorner" unique_id=338585730]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.92, 1.110605, -2.88)
+
+[node name="Model" parent="AlchemyCorner/CandleLeft" unique_id=1782742399 instance=ExtResource("10_pygtv")]
+transform = Transform3D(110, 0, 0, 0, 110, 0, 0, 0, 110, 0, 2.054075e-08, -1.920853e-08)
+
+[node name="Candle_01" parent="AlchemyCorner/CandleLeft/Model" index="0" unique_id=532868639]
+material_override = SubResource("Material_dungeon")
+
+[node name="Flame" type="MeshInstance3D" parent="AlchemyCorner/CandleLeft" unique_id=992697193]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2111752, 0)
+mesh = SubResource("Mesh_candle_flame")
+
+[node name="CandleLight" type="OmniLight3D" parent="AlchemyCorner/CandleLeft" unique_id=1588907183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2631752, 0)
+light_color = Color(1, 0.6, 0.24, 1)
+light_energy = 1.3
+omni_range = 2.5
+omni_attenuation = 1.4
+
+[node name="CandleRight" type="Node3D" parent="AlchemyCorner" unique_id=1554153417]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.98, 1.110605, -2.88)
+
+[node name="Model" parent="AlchemyCorner/CandleRight" unique_id=1008535755 instance=ExtResource("10_pygtv")]
+transform = Transform3D(110, 0, 0, 0, 110, 0, 0, 0, 110, 0, 2.054075e-08, -1.920853e-08)
+
+[node name="Candle_01" parent="AlchemyCorner/CandleRight/Model" index="0" unique_id=532868639]
+material_override = SubResource("Material_dungeon")
+
+[node name="Flame" type="MeshInstance3D" parent="AlchemyCorner/CandleRight" unique_id=1920289232]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2111752, 0)
+mesh = SubResource("Mesh_candle_flame")
+
+[node name="CandleLight" type="OmniLight3D" parent="AlchemyCorner/CandleRight" unique_id=581311529]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2631752, 0)
+light_color = Color(1, 0.6, 0.24, 1)
+light_energy = 1.3
+omni_range = 2.5
+omni_attenuation = 1.4
+
+[node name="Cauldron" type="Node3D" parent="AlchemyCorner" unique_id=1307164382]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0, -2.5)
+
+[node name="Model" parent="AlchemyCorner/Cauldron" unique_id=432770924 instance=ExtResource("11_y02x0")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 9.313226e-08, 0.001491642, -4.656613e-08)
+
+[node name="Pot_01" parent="AlchemyCorner/Cauldron/Model" index="0" unique_id=1857073160]
+material_override = SubResource("Material_dungeon")
+
+[node name="PotionSurface" type="MeshInstance3D" parent="AlchemyCorner/Cauldron" unique_id=772936265]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.765, 0)
+mesh = SubResource("Mesh_potion")
+
+[node name="Bubble1" type="MeshInstance3D" parent="AlchemyCorner/Cauldron" unique_id=31618082]
+transform = Transform3D(1, 0, 0, 0, 0.6, 0, 0, 0, 1, -0.17, 0.776, 0.04)
+mesh = SubResource("Mesh_bubble")
+
+[node name="Bubble2" type="MeshInstance3D" parent="AlchemyCorner/Cauldron" unique_id=779867550]
+transform = Transform3D(0.7, 0, 0, 0, 0.6, 0, 0, 0, 0.7, 0.13, 0.776, -0.12)
+mesh = SubResource("Mesh_bubble")
+
+[node name="Bubble3" type="MeshInstance3D" parent="AlchemyCorner/Cauldron" unique_id=301225974]
+transform = Transform3D(0.8, 0, 0, 0, 0.6, 0, 0, 0, 0.8, 0.06, 0.776, 0.15)
+mesh = SubResource("Mesh_bubble")
+
+[node name="Bubble4" type="MeshInstance3D" parent="AlchemyCorner/Cauldron" unique_id=1242083018]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, -0.06, 0.776, -0.13)
+mesh = SubResource("Mesh_bubble")
+
+[node name="PotionLight" type="OmniLight3D" parent="AlchemyCorner/Cauldron" unique_id=1081616284]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.97, 0)
+light_color = Color(0.39, 1, 0.065, 1)
+light_energy = 1.35
+omni_range = 1.6
+omni_attenuation = 1.7
+
+[node name="Banner" type="Node3D" parent="AlchemyCorner" unique_id=149712533]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 1.65, -3.82)
+
+[node name="Model" parent="AlchemyCorner/Banner" unique_id=933421809 instance=ExtResource("12_u7sfu")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, -5.20417e-16, 1.796161, -0.0584663)
+
+[node name="WallDecor_05" parent="AlchemyCorner/Banner/Model" index="0" unique_id=1801586946]
+material_override = SubResource("Material_dungeon")
+
+[node name="StorageCorner" type="Node3D" parent="." unique_id=37458003]
+
+[node name="CrateLeft" type="Node3D" parent="StorageCorner" unique_id=190795871]
+transform = Transform3D(0.99820054, 0, -0.059964005, 0, 1, 0, 0.059964005, 0, 0.99820054, 2.05, 0, -2.95)
+
+[node name="Model" parent="StorageCorner/CrateLeft" unique_id=1067150943 instance=ExtResource("13_qgbtu")]
+transform = Transform3D(109.1344, 0, 0, 0, 109.1344, 0, 0, 0, 109.1344, -0.001536024, 0.4988859, 6.332128e-05)
+
+[node name="Box_02" parent="StorageCorner/CrateLeft/Model" index="0" unique_id=920878057]
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="StorageCorner/CrateLeft" unique_id=1485457307]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StorageCorner/CrateLeft/StaticBody3D" unique_id=792935565]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5001772, 0)
+shape = SubResource("Shape_CrateLeft")
+
+[node name="CrateRight" type="Node3D" parent="StorageCorner" unique_id=394272463]
+transform = Transform3D(0.9992001, 0, 0.039989334, 0, 1, 0, -0.039989334, 0, 0.9992001, 3.1, 0, -2.96)
+
+[node name="Model" parent="StorageCorner/CrateRight" unique_id=1926224552 instance=ExtResource("13_qgbtu")]
+transform = Transform3D(109.1344, 0, 0, 0, 109.1344, 0, 0, 0, 109.1344, -0.001536024, 0.4988859, 6.332128e-05)
+
+[node name="Box_02" parent="StorageCorner/CrateRight/Model" index="0" unique_id=920878057]
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="StorageCorner/CrateRight" unique_id=1172413412]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StorageCorner/CrateRight/StaticBody3D" unique_id=1391066779]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5001772, 0)
+shape = SubResource("Shape_CrateRight")
+
+[node name="CrateTop" type="Node3D" parent="StorageCorner" unique_id=1817908879]
+transform = Transform3D(0.9950042, 0, -0.09983342, 0, 1, 0, 0.09983342, 0, 0.9950042, 2.72, 1.015354, -3.03)
+
+[node name="Model" parent="StorageCorner/CrateTop" unique_id=31150376 instance=ExtResource("13_qgbtu")]
+transform = Transform3D(109.1344, 0, 0, 0, 109.1344, 0, 0, 0, 109.1344, -0.001536024, 0.4988859, 6.332128e-05)
+
+[node name="Box_02" parent="StorageCorner/CrateTop/Model" index="0" unique_id=920878057]
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="StorageCorner/CrateTop" unique_id=1876410047]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StorageCorner/CrateTop/StaticBody3D" unique_id=573976228]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5001772, 0)
+shape = SubResource("Shape_CrateTop")
+
+[node name="StorageCorner2" type="Node3D" parent="." unique_id=509972185]
+transform = Transform3D(0.9303936, 0, 0.3665621, 0, 1, 0, -0.3665621, 0, 0.9303936, -3.584524, 0, 1.0470707)
+
+[node name="CrateLeft" type="Node3D" parent="StorageCorner2" unique_id=1331561896]
+transform = Transform3D(0.99820054, 0, -0.059964005, 0, 1, 0, 0.059964005, 0, 0.99820054, 2.05, 0, -2.95)
+
+[node name="Model" parent="StorageCorner2/CrateLeft" unique_id=1327778795 instance=ExtResource("13_qgbtu")]
+transform = Transform3D(109.1344, 0, 0, 0, 109.1344, 0, 0, 0, 109.1344, -0.001536024, 0.4988859, 6.332128e-05)
+
+[node name="Box_02" parent="StorageCorner2/CrateLeft/Model" index="0" unique_id=920878057]
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="StorageCorner2/CrateLeft" unique_id=1861606874]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StorageCorner2/CrateLeft/StaticBody3D" unique_id=109451300]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5001772, 0)
+shape = SubResource("Shape_CrateLeft")
+
+[node name="CrateRight" type="Node3D" parent="StorageCorner2" unique_id=1018049581]
+transform = Transform3D(0.9992001, 0, 0.039989334, 0, 1, 0, -0.039989334, 0, 0.9992001, 3.1, 0, -2.96)
+
+[node name="Model" parent="StorageCorner2/CrateRight" unique_id=478666173 instance=ExtResource("13_qgbtu")]
+transform = Transform3D(109.1344, 0, 0, 0, 109.1344, 0, 0, 0, 109.1344, -0.001536024, 0.4988859, 6.332128e-05)
+
+[node name="Box_02" parent="StorageCorner2/CrateRight/Model" index="0" unique_id=920878057]
+transform = Transform3D(1.0000001, 0, 2.9802322e-08, 0, 1.0000001, 0, -2.9802322e-08, 0, 1.0000001, -0.0005541174, 0, 0.0070876945)
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="StorageCorner2/CrateRight" unique_id=234522273]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StorageCorner2/CrateRight/StaticBody3D" unique_id=1218481116]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5001772, 0)
+shape = SubResource("Shape_CrateRight")
+
+[node name="CrateTop" type="Node3D" parent="StorageCorner2" unique_id=1512126803]
+transform = Transform3D(0.9950042, 0, -0.09983342, 0, 1, 0, 0.09983342, 0, 0.9950042, 2.72, 1.015354, -3.03)
+
+[node name="Model" parent="StorageCorner2/CrateTop" unique_id=34967490 instance=ExtResource("13_qgbtu")]
+transform = Transform3D(109.1344, 0, 0, 0, 109.1344, 0, 0, 0, 109.1344, -0.001536024, 0.4988859, 6.332128e-05)
+
+[node name="Box_02" parent="StorageCorner2/CrateTop/Model" index="0" unique_id=920878057]
+material_override = SubResource("Material_dungeon")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="StorageCorner2/CrateTop" unique_id=1192861878]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StorageCorner2/CrateTop/StaticBody3D" unique_id=354042605]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5001772, 0)
+shape = SubResource("Shape_CrateTop")
+
+[node name="FloorDetails" type="Node3D" parent="." unique_id=1538377437]
+
+[node name="LooseBoardLeft" type="Node3D" parent="FloorDetails" unique_id=679267540]
+transform = Transform3D(0.3342377, 0, 0.9424888, 0, 1, 0, -0.9424888, 0, 0.3342377, 2.55, 0.012, -0.75)
+
+[node name="Model" parent="FloorDetails/LooseBoardLeft" unique_id=288418032 instance=ExtResource("14_tvp47")]
+transform = Transform3D(82, 0, 0, 0, 82, 0, 0, 0, 82, 0.005141706, 0.01789456, 0)
+
+[node name="Wood_02" parent="FloorDetails/LooseBoardLeft/Model" index="0" unique_id=520748280]
+material_override = SubResource("Material_dungeon")
+
+[node name="LooseBoardRight" type="Node3D" parent="FloorDetails" unique_id=128026769]
+transform = Transform3D(0.7518057, 0, -0.65938467, 0, 1, 0, 0.65938467, 0, 0.7518057, 2.92, 0.016, -0.08)
+
+[node name="Model" parent="FloorDetails/LooseBoardRight" unique_id=75725930 instance=ExtResource("14_tvp47")]
+transform = Transform3D(75, 0, 0, 0, 75, 0, 0, 0, 75, 0.00470278, 0.01636697, 0)
+
+[node name="Wood_02" parent="FloorDetails/LooseBoardRight/Model" index="0" unique_id=520748280]
+material_override = SubResource("Material_dungeon")
+
+[node name="FloorGrate" type="Node3D" parent="FloorDetails" unique_id=1918275410]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.72, 0.028, 1.03)
+
+[node name="Model" parent="FloorDetails/FloorGrate" unique_id=1801589053 instance=ExtResource("15_2hvtc")]
+transform = Transform3D(72, 0, 0, 0, 72, 0, 0, 0, 72, -1.373901e-15, -0.02205768, -1.373901e-15)
+
+[node name="Ground_03" parent="FloorDetails/FloorGrate/Model" index="0" unique_id=1254267275]
+material_override = SubResource("Material_dungeon")
+
+[node name="CauldronRockLeft" type="Node3D" parent="FloorDetails" unique_id=1986182679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0, -2.31)
+
+[node name="Model" parent="FloorDetails/CauldronRockLeft" unique_id=1923630634 instance=ExtResource("16_hw0wy")]
+transform = Transform3D(35, 0, 0, 0, 20, 0, 0, 0, 35, 0.02428249, 0.1478379, 0.02914193)
+
+[node name="Rock_01" parent="FloorDetails/CauldronRockLeft/Model" index="0" unique_id=445782845]
+transform = Transform3D(0.94537, 0, 0.32599902, 0, 0.9999998, 0, -0.32599902, 0, 0.94537, 0.024515847, 0, -0.0017071664)
+material_override = SubResource("Material_dungeon")
+
+[node name="CauldronRockRight" type="Node3D" parent="FloorDetails" unique_id=1020829180]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.17, 0, -2.34)
+
+[node name="Model" parent="FloorDetails/CauldronRockRight" unique_id=222501170 instance=ExtResource("16_hw0wy")]
+transform = Transform3D(40, 0, 0, 0, 22, 0, 0, 0, 40, 0.02775142, 0.1626217, 0.03330506)
+
+[node name="Rock_01" parent="FloorDetails/CauldronRockRight/Model" index="0" unique_id=445782845]
+transform = Transform3D(0.81313956, 0, -0.58206886, 0, 1, 0, 0.58206886, 0, 0.81313956, -0.046580117, 0, 0.022836298)
+material_override = SubResource("Material_dungeon")
+
+[node name="SmallCornerRock" type="Node3D" parent="FloorDetails" unique_id=1535492328]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.37, 0, -1.61)
+
+[node name="Model" parent="FloorDetails/SmallCornerRock" unique_id=1498762321 instance=ExtResource("16_hw0wy")]
+transform = Transform3D(28, 0, 0, 0, 16, 0, 0, 0, 28, 0.01942599, 0.1182703, 0.02331354)
+
+[node name="Rock_01" parent="FloorDetails/SmallCornerRock/Model" index="0" unique_id=445782845]
+material_override = SubResource("Material_dungeon")
+
+[node name="FloorRubble" type="Node3D" parent="FloorDetails" unique_id=1516970893]
+transform = Transform3D(0.9800666, 0, 0.19866933, 0, 1, 0, -0.19866933, 0, 0.9800666, -2.65, -0.025, 0.1)
+
+[node name="Model" parent="FloorDetails/FloorRubble" unique_id=1669457506 instance=ExtResource("17_x6qyg")]
+transform = Transform3D(65, 0, 0, 0, 10, 0, 0, 0, 65, 0.04249595, 0.01136808, -0.03236235)
+
+[node name="Mud_04" parent="FloorDetails/FloorRubble/Model" index="0" unique_id=1512097321]
+material_override = SubResource("Material_dungeon")
+
+[node name="Lighting" type="Node3D" parent="." unique_id=1010963822]
+
+[node name="WallTorchLeft" type="Node3D" parent="Lighting" unique_id=1399159115]
+transform = Transform3D(3.1391647e-07, 0, 1, 0, 1, 0, -1, 0, 3.1391647e-07, -3.73, 1.86, -2.75)
+
+[node name="Model" parent="Lighting/WallTorchLeft" unique_id=1596783638 instance=ExtResource("18_cx0db")]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 0, 0.2981289, -0.1596712)
+
+[node name="Light_08" parent="Lighting/WallTorchLeft/Model" index="0" unique_id=709259358]
+surface_material_override/0 = SubResource("Material_dungeon")
+surface_material_override/1 = SubResource("Material_flame")
+
+[node name="TorchLight" type="OmniLight3D" parent="Lighting/WallTorchLeft" unique_id=2137276526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 0.76, 0)
+light_color = Color(1, 0.55, 0.2, 1)
+light_energy = 3.4
+shadow_enabled = true
+shadow_bias = 0.04
+shadow_normal_bias = 0.5
+omni_range = 6.5
+omni_attenuation = 1.35
+
+[node name="WallTorchRight" type="Node3D" parent="Lighting" unique_id=281799211]
+transform = Transform3D(3.1391647e-07, 0, -1, 0, 1, 0, 1, 0, 3.1391647e-07, 3.73, 1.86, -2.75)
+
+[node name="Model" parent="Lighting/WallTorchRight" unique_id=1821156180 instance=ExtResource("18_cx0db")]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 0, 0.2981289, -0.1596712)
+
+[node name="Light_08" parent="Lighting/WallTorchRight/Model" index="0" unique_id=709259358]
+surface_material_override/0 = SubResource("Material_dungeon")
+surface_material_override/1 = SubResource("Material_flame")
+
+[node name="TorchLight" type="OmniLight3D" parent="Lighting/WallTorchRight" unique_id=1822351076]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28, 0.76, 0)
+light_color = Color(1, 0.55, 0.2, 1)
+light_energy = 3.4
+shadow_enabled = true
+shadow_bias = 0.04
+shadow_normal_bias = 0.5
+omni_range = 6.5
+omni_attenuation = 1.35
+
+[node name="RoomFill" type="OmniLight3D" parent="Lighting" unique_id=1585638298]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0.7)
+light_color = Color(0.53, 0.59, 0.76, 1)
+light_energy = 0.55
+omni_range = 7.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1618351577]
+environment = SubResource("Environment_dungeon")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=2089362673]
+transform = Transform3D(0.99846035, 0.0120154815, -0.05415304, 0, 0.97625774, 0.21661216, 0.055470023, -0.21627866, 0.97475463, -0.25, 2.2, 1.7)
+current = true
+fov = 58.0
+far = 40.0
+
+[editable path="Architecture/Floor11/Model"]
+[editable path="Architecture/Floor12/Model"]
+[editable path="Architecture/Floor21/Model"]
+[editable path="Architecture/Floor22/Model"]
+[editable path="Architecture/BackWall1/Model"]
+[editable path="Architecture/BackWall2/Model"]
+[editable path="Architecture/ColumnBackLeft/Model"]
+[editable path="Architecture/ColumnBackRight/Model"]
+[editable path="AlchemyCorner/WorkTable/Model"]
+[editable path="AlchemyCorner/Chair/Model"]
+[editable path="AlchemyCorner/SpellBook/Model"]
+[editable path="AlchemyCorner/LargeJug/Model"]
+[editable path="AlchemyCorner/SmallJug/Model"]
+[editable path="AlchemyCorner/PotionBottleRed/Model"]
+[editable path="AlchemyCorner/PotionBottleSmall/Model"]
+[editable path="AlchemyCorner/CandleLeft/Model"]
+[editable path="AlchemyCorner/CandleRight/Model"]
+[editable path="AlchemyCorner/Cauldron/Model"]
+[editable path="AlchemyCorner/Banner/Model"]
+[editable path="StorageCorner/CrateLeft/Model"]
+[editable path="StorageCorner/CrateRight/Model"]
+[editable path="StorageCorner/CrateTop/Model"]
+[editable path="StorageCorner2/CrateLeft/Model"]
+[editable path="StorageCorner2/CrateRight/Model"]
+[editable path="StorageCorner2/CrateTop/Model"]
+[editable path="FloorDetails/LooseBoardLeft/Model"]
+[editable path="FloorDetails/LooseBoardRight/Model"]
+[editable path="FloorDetails/FloorGrate/Model"]
+[editable path="FloorDetails/CauldronRockLeft/Model"]
+[editable path="FloorDetails/CauldronRockRight/Model"]
+[editable path="FloorDetails/SmallCornerRock/Model"]
+[editable path="FloorDetails/FloorRubble/Model"]
+[editable path="Lighting/WallTorchLeft/Model"]
+[editable path="Lighting/WallTorchRight/Model"]

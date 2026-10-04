@@ -1,7 +1,7 @@
-extends Node3D
+﻿extends Node3D
 ## 食材角色展示：F6 執行。按鍵切換動畫：1 待機、2 移動、3 動作。
 
-@onready var _characters: Array[IngredientCharacter] = [%Human, %Slime, %Bat]
+@onready var _characters: Array[IngredientCharacter] = [%Human, %Elf, %Slime, %Bat]
 
 
 func _ready() -> void:
