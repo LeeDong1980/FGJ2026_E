@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scenes/ingredient/ingredient_model.gd" id="1_script"]
 
@@ -12,6 +12,14 @@ albedo_color = Color(1, 0.45, 0.1, 1)
 
 [sub_resource type="BoxMesh" id="Mesh_burn_bar"]
 material = SubResource("Material_burn")
+size = Vector3(0.6, 0.08, 0.02)
+
+[sub_resource type="StandardMaterial3D" id="Material_attack"]
+shading_mode = 0
+albedo_color = Color(0.9, 0.1, 0.15, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_attack_bar"]
+material = SubResource("Material_attack")
 size = Vector3(0.6, 0.08, 0.02)
 
 [node name="IngredientModel" type="Node3D"]
@@ -34,3 +42,9 @@ unique_name_in_owner = true
 visible = false
 position = Vector3(0, 0.88, 0.25)
 mesh = SubResource("Mesh_burn_bar")
+
+[node name="AttackBar" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+visible = false
+position = Vector3(0, 0.76, 0.25)
+mesh = SubResource("Mesh_attack_bar")

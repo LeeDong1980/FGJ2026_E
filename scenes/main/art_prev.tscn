@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/main/prototype_presentation.tscn" id="Ext3"]
 [ext_resource type="PackedScene" path="res://scenes/vfx/dragon_effects.tscn" id="DragonEffects"]
 
-[node name="Main" type="Node3D" unique_id=1308509842]
+[node name="ArtPrev" type="Node3D" unique_id=1308509842]
 
 [node name="Floors" type="Node3D" parent="." unique_id=697491627]
 

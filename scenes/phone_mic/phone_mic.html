@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>手機麥克風</title>
+<style>
+  :root { --bg: #16161d; --fg: #f2f2f2; --dim: #8a8a99; --ok: #3ccf7a; --warn: #f0b429; --bad: #ef5350; --accent: #ff7043; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif;
+         display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 16px; text-align: center; }
+  h1 { margin: 0; font-size: 40px; }
+  button { font-size: 28px; padding: 20px 32px; border: 0; border-radius: 16px; background: var(--accent); color: #fff; width: 100%; max-width: 360px; }
+  .row { display: flex; gap: 16px; width: 100%; max-width: 360px; }
+  .row button { flex: 1; }
+  #status { font-size: 20px; color: var(--dim); }
+  #status.ok { color: var(--ok); } #status.warn { color: var(--warn); } #status.bad { color: var(--bad); }
+  .meter { width: 100%; max-width: 360px; height: 24px; background: #2a2a35; border-radius: 12px; overflow: hidden; }
+  .meter div { height: 100%; width: 0; background: var(--ok); }
+  #readout { font: 16px ui-monospace, monospace; color: var(--dim); }
+  #tap { background: #3d5afe; padding: 48px 32px; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+  #tap:active { filter: brightness(1.3); }
+  #latency { font-size: 22px; }
+  #latency.bad { color: var(--bad); font-weight: bold; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="title">選擇玩家</h1>
+<div id="pick" class="row">
+  <button data-player="1">玩家 1</button>
+  <button data-player="2">玩家 2</button>
+</div>
+<button id="start" class="hidden">開始收音</button>
+<div id="status">尚未開始</div>
+<div class="meter"><div id="level"></div></div>
+<div id="readout"></div>
+<button id="tap" class="hidden">按我測延遲</button>
+<div id="latency"></div>
+
+<script>
+// 手機只負責算原始量（音量 dB、零交越率、音高 Hz），換算與吸吐判斷交給 Godot 的 MicInput 設定。
+// 演算法對應 autoload/mic_controller.gd 的 _consume_capture() 與 _detect_pitch_hz()，改那邊時這裡也要跟著改。
+const MIN_DB = -60;
+const BUFFER_SIZE = 1024;      // 每次送出的取樣數（48 kHz 約 21 ms）
+const WINDOW_SIZE = 2048;      // 音高分析視窗
+const DOWNSAMPLE = 4;
+const DETECT_MIN_HZ = 70;
+const DETECT_MAX_HZ = 1000;
+const MIN_CORRELATION = 0.5;
+const PING_INTERVAL_MS = 1000;
+const WARN_ONE_WAY_MS = 150;   // 單程超過這個值就顯示紅字
+
+const params = new URLSearchParams(location.search);
+let player = params.get("player");
+let socket = null;
+let wakeLock = null;
+const windowSamples = new Float32Array(WINDOW_SIZE);
+
+const $ = (id) => document.getElementById(id);
+
+function setStatus(text, cls) {
+  $("status").textContent = text;
+  $("status").className = cls || "";
+}
+
+function choosePlayer(p) {
+  player = p;
+  history.replaceState(null, "", "?player=" + p);
+  $("title").textContent = "玩家 " + p;
+  $("pick").classList.add("hidden");
+  $("start").classList.remove("hidden");
+}
+
+document.querySelectorAll("#pick button").forEach((b) => b.onclick = () => choosePlayer(b.dataset.player));
+if (player === "1" || player === "2") choosePlayer(player);
+
+$("start").onclick = async () => {
+  $("start").classList.add("hidden");
+  try {
+    await startAudio();
+  } catch (e) {
+    setStatus("無法使用麥克風：" + e.message, "bad");
+    $("start").classList.remove("hidden");
+    return;
+  }
+  connect();
+  keepScreenOn();
+  $("tap").classList.remove("hidden");
+};
+
+// 延遲監測：送出手機的時間戳，server 原樣傳回，相減就是來回時間。
+// 每秒自動 ping 一次，並把最近的平均來回時間一起帶給 server 顯示；按「按我測延遲」也算一次，另外會讓電腦畫面閃一下。
+const roundTrips = [];
+
+function sendTimed(key) {
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+  const message = { [key]: performance.now() };
+  if (roundTrips.length > 0) message.rtt = +averageRoundTrip().toFixed(1);
+  socket.send(JSON.stringify(message));
+}
+
+function averageRoundTrip() {
+  return roundTrips.reduce((a, b) => a + b, 0) / roundTrips.length;
+}
+
+$("tap").addEventListener("pointerdown", () => sendTimed("tap"));
+setInterval(() => sendTimed("ping"), PING_INTERVAL_MS);
+
+function onEcho(message) {
+  const sent = message.ping ?? message.tap;
+  if (sent === undefined) return;
+  roundTrips.push(performance.now() - sent);
+  if (roundTrips.length > 10) roundTrips.shift();
+  const oneWay = averageRoundTrip() / 2;
+  $("latency").textContent = `延遲（單程）約 ${oneWay.toFixed(0)} ms` + (oneWay > WARN_ONE_WAY_MS ? "　太慢了，試試換網路" : "");
+  $("latency").className = oneWay > WARN_ONE_WAY_MS ? "bad" : "";
+}
+
+function connect() {
+  const scheme = location.protocol === "https:" ? "wss://" : "ws://";
+  socket = new WebSocket(scheme + location.host + "/ws?player=" + player);
+  setStatus("連線中…", "warn");
+  socket.onopen = () => setStatus("已連線", "ok");
+  socket.onmessage = (e) => onEcho(JSON.parse(e.data));
+  socket.onclose = () => {
+    setStatus("連線中斷，重新連線…", "bad");
+    setTimeout(connect, 1000);
+  };
+}
+
+async function keepScreenOn() {
+  try {
+    wakeLock = await navigator.wakeLock.request("screen");
+  } catch (e) { /* 不支援就算了 */ }
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && wakeLock) keepScreenOn();
+});
+
+async function startAudio() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    // 這三項一定要關：自動增益會把音量拉平，降噪會把「吸」的嘶聲濾掉
+    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
+  });
+  const ctx = new AudioContext();
+  await ctx.resume();
+  const source = ctx.createMediaStreamSource(stream);
+  const processor = ctx.createScriptProcessor(BUFFER_SIZE, 1, 1);
+  const mute = ctx.createGain();
+  mute.gain.value = 0;
+  source.connect(processor);
+  processor.connect(mute);
+  mute.connect(ctx.destination);
+  processor.onaudioprocess = (e) => onChunk(e.inputBuffer.getChannelData(0), ctx.sampleRate);
+}
+
+function onChunk(samples, rate) {
+  const n = samples.length;
+  let sumSquares = 0;
+  let crossings = 0;
+  for (let i = 0; i < n; i++) {
+    sumSquares += samples[i] * samples[i];
+    if (i > 0 && (samples[i] >= 0) !== (samples[i - 1] >= 0)) crossings++;
+  }
+  const rms = Math.sqrt(sumSquares / n);
+  const db = Math.max(rms > 0 ? 20 * Math.log10(rms) : MIN_DB, MIN_DB);
+  const zcr = crossings / n;
+
+  windowSamples.copyWithin(0, n);
+  windowSamples.set(samples, WINDOW_SIZE - n);
+  const hz = detectPitchHz(rate);
+
+  $("level").style.width = ((db - MIN_DB) / -MIN_DB * 100) + "%";
+  $("readout").textContent = `${db.toFixed(1)} dB   ${hz ? hz.toFixed(0) + " Hz" : "-- Hz"}   zcr ${zcr.toFixed(3)}`;
+
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ db: +db.toFixed(2), zcr: +zcr.toFixed(4), hz: +hz.toFixed(1), seconds: n / rate }));
+  }
+}
+
+// 自相關法判定音高，回傳 Hz；沒有明確音高時回傳 0。
+function detectPitchHz(sampleRate) {
+  const rate = sampleRate / DOWNSAMPLE;
+  const count = WINDOW_SIZE / DOWNSAMPLE;
+  const samples = new Float32Array(count);
+  for (let i = 0; i < count; i++) {
+    let total = 0;
+    for (let j = 0; j < DOWNSAMPLE; j++) total += windowSamples[i * DOWNSAMPLE + j];
+    samples[i] = total / DOWNSAMPLE;
+  }
+  const minLag = Math.max(Math.floor(rate / DETECT_MAX_HZ), 2);
+  const maxLag = Math.min(Math.floor(rate / DETECT_MIN_HZ), count / 2);
+  const span = count - maxLag;
+
+  let energy = 0;
+  for (let i = 0; i < span; i++) energy += samples[i] * samples[i];
+  if (energy <= 0) return 0;
+
+  // 正規化自相關：在 [minLag, maxLag] 找第一個夠高的峰，避免抓到倍頻
+  const correlations = new Float32Array(maxLag + 2);
+  let bestCorr = 0;
+  for (let lag = minLag - 1; lag < maxLag + 2; lag++) {
+    if (lag > count - span) break;
+    let sum = 0, lagEnergy = 0;
+    for (let i = 0; i < span; i++) {
+      sum += samples[i] * samples[i + lag];
+      lagEnergy += samples[i + lag] * samples[i + lag];
+    }
+    const denom = Math.sqrt(energy * lagEnergy);
+    const corr = denom > 0 ? sum / denom : 0;
+    correlations[lag] = corr;
+    if (lag >= minLag && lag <= maxLag) bestCorr = Math.max(bestCorr, corr);
+  }
+  if (bestCorr < MIN_CORRELATION) return 0;
+
+  const threshold = bestCorr * 0.9;
+  let bestLag = -1;
+  for (let lag = minLag; lag <= maxLag; lag++) {
+    const c = correlations[lag];
+    if (c >= threshold && c >= correlations[lag - 1] && c >= correlations[lag + 1]) { bestLag = lag; break; }
+  }
+  if (bestLag === -1) return 0;
+
+  // 拋物線內插，取得次取樣精度
+  const prev = correlations[bestLag - 1], curr = correlations[bestLag], next = correlations[bestLag + 1];
+  const curvature = prev - 2 * curr + next;
+  const shift = curvature !== 0 ? 0.5 * (prev - next) / curvature : 0;
+  return rate / (bestLag + shift);
+}
+</script>
+</body>
+</html>

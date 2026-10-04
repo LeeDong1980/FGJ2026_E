@@ -36,22 +36,27 @@ autoload/          全域單例
 
 ### 歸屬表
 <!-- 一行一個場景，格式：- `res://路徑.tscn` @負責人 -->
-- `res://scenes/main/main.tscn` @場景美術
+- `res://scenes/main/art_prev.tscn` @場景美術
 - `res://scenes/main/prototype_presentation.tscn` @合成師
 - `res://scenes/red_dragon/red_dragon.tscn` @動畫師
 - `res://scenes/red_dragon/head_turn_preview.tscn` @動畫師
 - `res://scenes/platforms/cube_platform.tscn` @Codex
 - `res://scenes/platforms/platform_layout.tscn` @Codex
-- `res://scenes/game/game.tscn` @露柑
+- `res://scenes/game/main.tscn` @露柑
 - `res://scenes/dragon/dragon.tscn` @露柑
 - `res://scenes/ingredient/ingredient_model.tscn` @露柑
 - `res://scenes/dungeon_room/dungeon_room.tscn` @Codex
 - `res://scenes/main/dragon_platform_showcase.tscn` @Codex
 - `res://scenes/lobby/lobby.tscn` @Samuel
+- `res://scenes/lobby/room_lobby.tscn` @Samuel
+- `res://scenes/lobby/player_input_panels.tscn` @Samuel
+- `res://scenes/game/client_play.tscn` @Samuel
 - `res://scenes/network_test/network_test.tscn` @Samuel
 - `res://scenes/mic_test/mic_test.tscn` @山雷
 - `res://scenes/pause_menu/pause_menu.tscn` @山雷
 - `res://scenes/pause_menu/mic_settings_panel.tscn` @山雷
+- `res://scenes/phone_mic/phone_mic_test.tscn` @露柑
+- `res://scenes/main_menu/main_menu.tscn` @露柑
 
 ### Prototype 美術任務分工
 - 場景美術負責主場景整合；動畫師負責紅龍場景及專用動畫控制腳本，交付後由美術總監驗收。

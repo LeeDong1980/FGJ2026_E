@@ -170,6 +170,15 @@ func _on_action_changed(action: StringName) -> void:
 預設值是用合成資料調的，還沒用真人聲音長時間實測。
 「tu」開頭的爆音（t）可能被誤判成吸，遇到時優先調 `action_min_seconds` 和 `noisy_zcr`。
 
+### 大叫轉頭
+
+| 參數 | 預設 | 存檔 | 說明 |
+|---|---|---|---|
+| `shout_threshold` | 50 | 是 | 音量（`volume_value`，0~100）往上超過此值算一次大叫，龍頭左右切換（`ShoutTurnInput`） |
+| `shout_release` | 35 | 是 | 音量降到此值以下才能再叫一次 |
+
+設定面板的「大叫轉頭」條：左把手是 `shout_release`，右把手是 `shout_threshold`，白線是目前音量。門檻是音量輸出的百分比，調整「音量」的小聲／大聲區間也會改變實際需要的 dB。
+
 ## 6. 暫停選單與存檔
 
 - **Esc 暫停選單**（autoload `PauseMenu`，`scenes/pause_menu/pause_menu.tscn`）：任何場景按 Esc 都會暫停場景（`get_tree().paused = true`）並顯示設定面板，再按 Esc 或「繼續遊戲」回到遊戲。
@@ -204,9 +213,21 @@ func _on_action_changed(action: StringName) -> void:
 - **新增設定參數時：** 在 `mic_controller.gd` 加 `@export`，需要存檔就加進 `SAVED_PROPERTIES`，需要玩家調整就在 `mic_settings_panel` 加對應的控制項。
 - **改 autoload 或設定面板的 .tscn 前**，依 [conventions.md](conventions.md) 先找負責人（歸屬表中 `pause_menu`、`mic_settings_panel`、`mic_test` 為山雷）。
 
+## 9.1 手機麥克風（PhoneMic，MIC-11）
+
+兩位玩家可以各用一支 Android 手機的網頁收音，取代電腦麥克風。
+
+- **流程**：手機網頁（`scenes/phone_mic/phone_mic.html`）用 JS 算出音量 dB、零交越率、音高 Hz，透過 WebSocket 傳給 autoload **`PhoneMic`**（`autoload/phone_mic_server.gd`，監聽 `127.0.0.1:8080`），再交給每位玩家的 `PhoneVoiceSource` 換算。
+- **介面與 `MicInput` 相同**：`PhoneMic.get_source(1 或 2)` 有 `volume_*`、`pitch_*`、`voicedness`、`action`、`last_action` 與 `action_changed`。區間與閥值直接讀 `MicInput` 的設定，暫停選單調的數值對手機一樣有效。`PhoneMic.is_player_connected(player)` 查連線。
+- **遊戲橋接**：`PitchLaneInput`、`VoiceActionInput` 的 `phone_player`（預設 1、2）是優先讀的手機；手機有連上就讀手機，沒連上就讀電腦麥克風。設成 0 只用電腦麥克風。
+- **HTTPS**：瀏覽器只有 HTTPS 才能用麥克風，用 Cloudflare Quick Tunnel 提供：執行 `cloudflared tunnel --url http://localhost:8080`，手機開它印出的 `https://….trycloudflare.com`，選玩家後按「開始收音」。網址每次啟動都不同，任何拿到網址的人都能連，用完要關掉。
+- **延遲**：手機每秒自動量一次來回時間，單程超過 150 ms 顯示紅字。實測（現場 Wi-Fi 經 Cloudflare）單程約 17 ms。
+- **測試**：`scenes/phone_mic/phone_mic_test.tscn` 按 F6，顯示兩位玩家的連線、封包數、延遲與即時數值；手機按「按我測延遲」，對應的半邊畫面會閃一下。
+- **改判定邏輯時**：`phone_mic.html` 的音量與音高演算法對應 `_consume_capture()`、`_detect_pitch_hz()`，`phone_voice_source.gd` 的吸／吐與按住對應 `_on_chunk()`、`_update_outputs()`，兩邊要一起改。
+
 ## 10. 尚未完成
 
 - 開局音量校正（design.md 3.1：以遊戲開始時測到的音量作為基準）。
 - 雙麥克風（玩家 A、玩家 B）的裝置選擇與收音干擾處理（MIC-03）。
 - 用真人聲音實測並調整吸／吐的預設參數。
-- 單機保底版已接進 game.tscn：`scenes/game/pitch_lane_input.gd` 用音高切三段控制龍的層（鍵盤 1／2／3 保留備援），吸／吐用鍵盤 J／K。`VoiceActionInput` 接語音吸／吐，左下角 `VoiceTogglePanel` 可分別開關音高與語音吸吐（`MicInput.pitch_input_enabled`／`action_input_enabled`）。音量換層尚未接。
+- 單機保底版已接進遊戲場景 `scenes/game/main.tscn`：`scenes/game/pitch_lane_input.gd` 用音高切三段控制龍的層（鍵盤 1／2／3 保留備援），吸／吐用鍵盤 J／K。`VoiceActionInput` 接語音吸／吐，左下角 `VoiceTogglePanel` 可分別開關音高與語音吸吐（`MicInput.pitch_input_enabled`／`action_input_enabled`）。音量換層尚未接。

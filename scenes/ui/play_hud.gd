@@ -105,7 +105,7 @@ func set_volume_thresholds(thresholds: PackedFloat32Array) -> void:
 	_volume_meter.thresholds = thresholds
 
 
-## 顯示玩家 B 最後辨識到的字音，剛辨識到時放大並閃一下，之後變淡。
+## 顯示玩家 2 最後辨識到的字音，剛辨識到時放大並閃一下，之後變淡。
 func show_word(word: String) -> void:
 	_word_label.text = word
 	_word_label.pivot_offset = _word_label.size / 2.0
@@ -142,7 +142,7 @@ func _layout_pot_infos() -> void:
 		if _camera != null and i < _pot_anchors.size() and not _camera.is_position_behind(_pot_anchors[i]):
 			bottom_center = _camera.unproject_position(_pot_anchors[i]) - Vector2(0.0, pot_info_gap)
 		else:
-			# 排在畫面右側、上方資訊列與右下玩家 B 面板之間，最高層在最上面。
+			# 排在畫面右側、上方資訊列與右下玩家 2 面板之間，最高層在最上面。
 			var area := _pot_container.size
 			var top := 200.0
 			var bottom := area.y - 320.0

@@ -36,6 +36,11 @@
 - [x] MIC-08 修正 Windows 部分裝置的 WASAPI「unsupported channel count in microphone!」錯誤洪水：偵測麥克風沒有訊號時自動停止收音（只留一則警告），設定面板加「啟用麥克風」開關與「重新偵測」按鈕 @山雷
 - [x] MIC-09 單機保底版：game.tscn 加入 `PitchLaneInput` 橋接，玩家 1 的音高（`MicInput.pitch_value`）平均切成層數段，低中高音對應 1／2／3 層；玩家 2 用鍵盤 J／K 吸／吐（語音吸吐在實測中無法正確傳遞，已放棄） @Samuel
 - [x] MIC-10 單機保底版語音開關：game.tscn 左下角「音高」「吸／吐」兩個 toggle（`VoiceTogglePanel`，狀態存在 `MicInput.pitch_input_enabled`／`action_input_enabled` 並存檔）；新增 `VoiceActionInput` 語音吸吐橋接（與鍵盤 J／K 各自獨立）；音高音量閥值 `pitch_gate_db` 可存檔、預設改 -35 dB（遊戲畫面不放滑桿，需調整時從 Inspector 或 `user://mic_settings.cfg` 改） @Samuel
+- [ ] MIC-11 手機網頁麥克風：兩位玩家各用一支 Android 手機開網頁收音，網頁端用 JS 算好數值，透過 WebSocket 傳給 Godot；用 Cloudflare Tunnel 提供 HTTPS（現場 Wi-Fi 有用戶端隔離）；`PhoneMic` autoload，`PitchLaneInput`／`VoiceActionInput` 手機有連上就讀手機（玩家 1 音高、玩家 2 吸吐） @露柑
+- [ ] MIC-12 手機麥克風真機遊玩測試：兩支 Android 手機實際玩遊戲場景（scenes/game/main.tscn），確認音高換層與語音吸吐的手感，必要時調整預設參數
+- [ ] MIC-13 手機連線流程：Godot 自動啟動 cloudflared（exe 隨遊戲附帶）並讀出網址，在主選單或等候頁顯示 QR code；網址加隨機房間碼，只接受碼正確的連線（等主選單拆出 main_menu.tscn）
+- [ ] MIC-14 匯出設定：匯出篩選加入 `*.html`，否則匯出版讀不到手機網頁
+- [ ] MIC-15 UI 的音量條與吸吐顯示（`ui_game_bridge.gd`）目前只讀 MicInput，改成手機有連上時讀 `PhoneMic`（GMF 負責的檔案，需協調）
 
 #### 遊戲機制（露柑）
 - [x] GM-01 建立 `scenes/game/game.tscn` 與獨立的 LaneLayout 節點：依 `@export` 的層數與層距產生各層左右平台（實例化 cube_platform.tscn），提供 `get_lane_position(i)`、`get_lane_at(y)` @露柑
@@ -57,6 +62,14 @@
 - [x] GM-17 game.tscn 接入吸取與噴火特效：`EffectsView` 依 GameManager 事件播放，吞下或吸空時吸取、胃空喊「吐」期間持續噴火，目標為所在層隊伍最前端；吐進鍋子暫無特效 @露柑
 - [ ] GM-18 ART-14 特效交付後，將 ingredient_spat 事件接至吐食材接口，使用當層 PotAnchor、食材外觀與清場事件；維持立即入鍋判定 @露柑
 - [ ] GM-19 ART-17 比例定案後，將左側食材角色顯示高度調至房間高度的 1/2～2/3，配合隊伍間隔、標籤及噴火目標高度，維持腳底落地 @露柑
+- [x] GM-18 隊伍節奏：開場排滿後，有空位時每層各自等生成間隔（`@export`，預設 3 秒）才補一個；移動速度改由「走過來的時間」（出生點到最前端秒數，預設 4 秒）換算 @露柑
+- [x] GM-19 食材攻擊：每層最前端食材蓄力（每次隨機 10～20 秒），蓄滿攻擊龍（任何層都打得到），攻擊後重新蓄力；龍暈眩 1.5 秒（不能換層、吸、吐、噴火），醒來後無敵 2 秒，暈眩或無敵時攻擊打空；新增 signal 並更新 api.md @露柑
+- [x] GM-20 攻擊測試畫面：食材上顯示蓄力條；main.tscn 的 `StunBanner` 在螢幕上方（上方資訊列下面）顯示暈眩／無敵倒數，暈眩時文字晃動、被打中時放大彈出 @露柑
+- [x] GM-21 難度：開場每層 1 個食材、上限改 6 個；生成間隔隨完成鍋數變短（8 秒起每鍋 -1 秒，最短 3 秒，`@export`），蓄力與走路時間不變 @露柑
+- [x] GM-22 轉頭：龍頭分左（食材）右（鍋子），玩家 B 大叫（音量 > 50%，`ShoutTurnInput`）或按 L 切換，門檻在麥克風設定面板調整並存檔；面向左才能吸、噴火，面向右才能吐進鍋子；暈眩不能轉頭；畫面下方 `FacingIndicator` 框框顯示目前朝向（模型暫不轉）；連線局 Client 用字音 `turn` 傳給 Host；更新 design.md、api.md @露柑
+- [ ] GM-23 轉頭動畫：龍的模型依 `game_manager.facing`（`facing_changed`）轉向左／右，完成後可移除或保留 `FacingIndicator` 框框
+- [x] GM-24 煮鍋子：鍋子加滿後不直接完成，面向右、胃空時對鍋子持續噴火累計 1 秒（`cook_time`，中斷保留進度）才完成；滿鍋時再吐食材沒有效果；噴火特效改朝鍋子；PotsDebugView 顯示煮的進度；更新 design.md、api.md @露柑
+- [x] GM-25 無效指令提示：吸／吐沒有效果時不播特效（吸空不吸、空層不噴火），`action_missed(lane, reason)` 附原因，main.tscn 的 `ActionHintBanner` 在上方顯示原因後淡出；更新 design.md、api.md @露柑
 
 #### UI（GMF）
 - [x] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF
@@ -72,12 +85,28 @@
 - [x] UI-11 建立 UI 測試場景 `ui_test.tscn` 與測試控制中心：依階段切換介面、測試用倒數計時（時間到算失敗）、Ctrl+Shift+W／L 強制成功或失敗（可在 Inspector 開關） @GMF
 - [x] UI-12 擴充 UI 測試快捷鍵：Ctrl+Shift+1／2 增加完成數或清空次數（達到上限跳出結束介面）、4／5／6 重新隨機上／中／下層禁止食材、↑／←／↓ 龍高度顯示、I／O 顯示吸／吐 @GMF
 - [x] UI-13 UI 測試快捷鍵：按住 Ctrl+Shift+I 再按 3／4／5，上／中／下層鍋子增加一個原料，收集滿算完成一鍋並換新鍋子 @GMF
+- [x] UI-14 主選單拆出遊戲場景：StartScreen 搬出 UIRoot 成為獨立的 `scenes/main_menu/main_menu.tscn`（進入遊戲／離開，呼叫 `RoomManager`，取代暫用主選單 temp_menu）；遊戲場景載入後自動開始並校正（連線局由 NetworkGameBridge 開局） @露柑
+- [x] UI-15 ResultScreen 不再 `quit()`：最後一關成功改顯示「回主選單」，UIRoot 發 `back_requested`，由 UIGameBridge 呼叫 `RoomManager.return_to_menu()` @露柑
+- [x] UI-16 專案主場景改成主選單 main_menu.tscn；遊戲場景 game.tscn 改名為 `scenes/game/main.tscn`（根節點 Main），原美術展示 `scenes/main/main.tscn` 改名為 `art_prev.tscn`（根節點 ArtPrev，F6 預覽） @露柑
+- [ ] UI-17 連線局結束改用正式的 ResultScreen（目前是 NetworkGameBridge 的臨時「回到房間」畫面，需與 Samuel 協調）
+- [x] UI-18 修正 PotInfo 換小龍後面板永久變寬：`set_forbidden()` 舊圖示先移出再釋放（同一幀 `pot_changed`＋`baby_arrived` 呼叫兩次時會疊在一起），並在更新後 `reset_size()` 縮回 @露柑
 
 #### 區網連線（Samuel）
 - [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel
 - [x] NET-04 語音封包傳輸測試：Client 傳音量與「吸／吐」封包給 Host，兩邊畫面顯示收發狀態與錯誤（掉包、無回應、斷線） @Samuel
 - [ ] NET-02 雙機同步骨架：MultiplayerSpawner／Synchronizer 同步龍的所在層，Server 權威，樓層產生用同一個 seed（等 GM-01、GM-02 完成）
 - [ ] NET-03 雙機分工：Host 與 Client 各自負責移動／動作其中一項輸入（等 DES 決定操作方式）
+- [x] NET-10 `NetworkManager` 房間擴充：加入逾時 20 秒、拒絕原因（房間已滿／對方遊戲中）、房主關房通知、開始／結束連線局 RPC、Client 吸吐「開始／結束」封包 @Samuel（編號原為 NET-05～09，與手機備案撞號，改為 NET-10～14，之前的 commit 訊息仍是舊編號）
+- [x] NET-11 新增 autoload `RoomManager`（`autoload/room_manager.gd`）：依 docs/lobby-flow.md 實作房間狀態機與換場景（單機、加入、開始、斷線、離開） @Samuel
+- [x] NET-12 新增 `scenes/lobby/room_lobby.tscn`（Host／Client 共用等候頁，獨立可 F6 測試）與暫用主選單 `temp_menu.tscn` @Samuel
+- [x] NET-13 新增 `NetworkGameBridge` 串接 game.tscn：依 `RoomManager` 模式切換輸入、直接開局、遊戲結束回房間（game.tscn 加節點需 @露柑 同意） @Samuel
+- [x] NET-14 新增 `scenes/game/client_play.tscn`：Client 遊玩畫面，只顯示麥克風狀態並傳送吸／吐封包 @Samuel
+- [ ] NET-15 連線局暫停：Host 按 Esc 只凍結 Host 的遊戲並通知 Client（畫面顯示「房主已暫停」，暫停中 Client 的吸／吐不生效，繼續後接上）；Client 的 Esc 只疊出設定選單、不凍結，可繼續回報吸／吐；等候頁與連線中也不凍結；換場景前一律解除暫停（改動 `pause_menu.gd` 需告知 @山雷） @Samuel
+- [ ] NET-16 連線局結束時，Client 也顯示成功／失敗（`match_ended` 帶結果）；目前 Client 只是被帶回等候頁
+- [x] NET-17 單機局結束後回主選單：結果畫面改為「回主選單」，呼叫 `RoomManager.return_to_menu()`（隨 UI-14、UI-15 完成） @露柑
+- [x] NET-18 房間等候頁介面優化：沿用主選單視覺（logo 背景、深色卡片、橘色按鈕，主題 `lobby_theme.tres`）；顯示玩家 1／2 欄位；左下玩家 1 音高條、右下玩家 2 吸／吐（沿用遊玩介面樣式），讓兩位玩家進遊戲前先測試；Host 的音高經 `send_lobby_pitch` 同步給 Client；吸／吐本機輸入抽成 `PlayerActionInput`（client_play 共用） @Samuel
+- [ ] NET-19 Client 畫面同步顯示遊戲（Host 傳遊戲狀態，Client 以唯讀方式顯示；與 NET-02 一併規劃，做法見討論）@Samuel
+- [x] NET-20 等候頁自選座位：點選「玩家 1」「玩家 2」切換角色（不需對方同意、不需準備）；`RoomManager.host_slot`；音高與吸／吐改為雙向傳輸；`NetworkGameBridge` 與 `client_play` 依座位切換（Client 可坐玩家 1 以音高換層）；遊玩 HUD 的音高條改讀音高並可讀對方傳來的音高；介面「玩家 A／B」統一改為「玩家 1／2」 @Samuel
 
 ### 美術與關卡
 

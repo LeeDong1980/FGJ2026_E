@@ -1,6 +1,6 @@
 class_name PotsDebugView
 extends Node3D
-## 測試用：在各層鍋子上方顯示禁止清單與進度。正式介面由 UI 負責。
+## 測試用：在各層鍋子上方顯示禁止清單與進度；加滿後顯示噴火煮的進度。正式介面由 UI 負責。
 
 @export var game_manager: GameManager
 @export var lane_layout: LaneLayout
@@ -26,6 +26,14 @@ func _ready() -> void:
 	game_manager.game_lost.connect(func() -> void: print("遊戲失敗"))
 
 
+func _process(_delta: float) -> void:
+	# 煮的進度每幀變動，不會發 pot_changed，加滿的鍋子每幀更新
+	for i in _labels.size():
+		var pot := game_manager.get_pot(i)
+		if pot.has_baby and pot.is_full():
+			_refresh(i)
+
+
 func _refresh(lane: int) -> void:
 	var pot := game_manager.get_pot(lane)
 	if not pot.has_baby:
@@ -35,3 +43,5 @@ func _refresh(lane: int) -> void:
 	for type in pot.forbidden:
 		names.append(IngredientType.NAMES[type])
 	_labels[lane].text = "不吃：%s\n%d / %d" % ["、".join(names), pot.count, pot.required]
+	if pot.is_full():
+		_labels[lane].text += "\n滿了！噴火煮 %d%%" % roundi(pot.cook_progress * 100.0)

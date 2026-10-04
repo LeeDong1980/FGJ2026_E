@@ -4,7 +4,7 @@
 
 ## 檢視方式
 
-在 Godot 開啟 `project.godot` 後按 F5，執行 `scenes/main/main.tscn`。房間是供主場景實例化的子場景，本身不含攝影機；單獨按 F6 並非完整展示畫面。
+在 Godot 開啟 `project.godot` 後開啟 `scenes/main/art_prev.tscn` 按 F6（F5 現在是遊戲主選單）。房間是供主場景實例化的子場景，本身不含攝影機；單獨按 F6 並非完整展示畫面。
 
 成果及逐項檢視操作見 `prototype_art_acceptance.md`；特效展示開啟 `scenes/vfx/vfx_preview.tscn` 後按 F6。
 

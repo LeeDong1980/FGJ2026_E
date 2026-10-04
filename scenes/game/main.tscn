@@ -1,0 +1,107 @@
+[gd_scene format=3 uid="uid://cqoj7ho2pahhq"]
+
+[ext_resource type="Script" uid="uid://c47hsqb0ccaeq" path="res://scenes/game/lane_layout.gd" id="1_lanes"]
+[ext_resource type="PackedScene" uid="uid://c5ry0dajlv2f1" path="res://scenes/dragon/dragon.tscn" id="2_dragon"]
+[ext_resource type="Script" uid="uid://bc0iq51h7egnb" path="res://scenes/game/keyboard_input.gd" id="3_keyboard"]
+[ext_resource type="Script" uid="uid://bybrbei38wcup" path="res://scenes/game/game_manager.gd" id="4_manager"]
+[ext_resource type="Script" uid="uid://b2o72utqq3y5u" path="res://scenes/game/ingredients_view.gd" id="5_view"]
+[ext_resource type="Script" uid="uid://ceky3v20nmnfn" path="res://scenes/game/pots_debug_view.gd" id="6_pots_debug"]
+[ext_resource type="Script" uid="uid://dnii3rm7ek82h" path="res://scenes/game/stomach_debug_view.gd" id="7_stomach_debug"]
+[ext_resource type="Script" path="res://scenes/game/pitch_lane_input.gd" id="8_pitch"]
+[ext_resource type="Script" path="res://scenes/game/voice_action_input.gd" id="9_voice_action"]
+[ext_resource type="Script" path="res://scenes/game/voice_toggle_panel.gd" id="10_toggle_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/game_ui.tscn" id="8_game_ui"]
+[ext_resource type="PackedScene" path="res://scenes/main/prototype_presentation.tscn" id="9_presentation"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/dragon_effects.tscn" id="10_effects"]
+[ext_resource type="Script" path="res://scenes/game/effects_view.gd" id="11_effects_view"]
+[ext_resource type="Script" path="res://scenes/game/network_game_bridge.gd" id="12_net_bridge"]
+[ext_resource type="Script" path="res://scenes/game/stun_banner.gd" id="13_stun_banner"]
+[ext_resource type="Script" path="res://scenes/game/shout_turn_input.gd" id="14_shout_turn"]
+[ext_resource type="Script" path="res://scenes/game/facing_indicator.gd" id="15_facing_indicator"]
+[ext_resource type="Script" path="res://scenes/game/action_hint_banner.gd" id="16_action_hint"]
+
+[node name="Main" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
+script = ExtResource("4_manager")
+lane_layout = NodePath("LaneLayout")
+dragon = NodePath("Dragon")
+
+[node name="LaneLayout" type="Node3D" parent="." unique_id=835830840 node_paths=PackedStringArray("presentation")]
+script = ExtResource("1_lanes")
+presentation = NodePath("../PrototypePresentation")
+
+[node name="Dragon" parent="." unique_id=1188782568 node_paths=PackedStringArray("lane_layout") instance=ExtResource("2_dragon")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, -4.252825, -11.913324)
+lane_layout = NodePath("../LaneLayout")
+
+[node name="IngredientsView" type="Node3D" parent="." unique_id=351790369 node_paths=PackedStringArray("game_manager", "lane_layout")]
+script = ExtResource("5_view")
+game_manager = NodePath("..")
+lane_layout = NodePath("../LaneLayout")
+
+[node name="PotsDebugView" type="Node3D" parent="." unique_id=2085635605 node_paths=PackedStringArray("game_manager", "lane_layout")]
+script = ExtResource("6_pots_debug")
+game_manager = NodePath("..")
+lane_layout = NodePath("../LaneLayout")
+
+[node name="StomachDebugView" type="Node3D" parent="." unique_id=2010740378 node_paths=PackedStringArray("game_manager", "dragon")]
+script = ExtResource("7_stomach_debug")
+game_manager = NodePath("..")
+dragon = NodePath("../Dragon")
+
+[node name="Effects" parent="." instance=ExtResource("10_effects")]
+effect_range = 12.0
+
+[node name="EffectsView" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "lane_layout", "effects")]
+script = ExtResource("11_effects_view")
+game_manager = NodePath("..")
+dragon = NodePath("../Dragon")
+lane_layout = NodePath("../LaneLayout")
+effects = NodePath("../Effects")
+
+[node name="KeyboardInput" type="Node" parent="." unique_id=109144308 node_paths=PackedStringArray("dragon", "game_manager")]
+script = ExtResource("3_keyboard")
+dragon = NodePath("../Dragon")
+game_manager = NodePath("..")
+
+[node name="PitchLaneInput" type="Node" parent="." node_paths=PackedStringArray("dragon", "game_manager")]
+script = ExtResource("8_pitch")
+dragon = NodePath("../Dragon")
+game_manager = NodePath("..")
+
+[node name="VoiceActionInput" type="Node" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("9_voice_action")
+game_manager = NodePath("..")
+
+[node name="ShoutTurnInput" type="Node" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("14_shout_turn")
+game_manager = NodePath("..")
+
+[node name="VoiceTogglePanel" type="CanvasLayer" parent="."]
+script = ExtResource("10_toggle_panel")
+
+[node name="StunBanner" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("13_stun_banner")
+game_manager = NodePath("..")
+
+[node name="ActionHintBanner" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("16_action_hint")
+game_manager = NodePath("..")
+
+[node name="FacingIndicator" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("15_facing_indicator")
+game_manager = NodePath("..")
+
+[node name="PrototypePresentation" parent="." unique_id=1281242266 instance=ExtResource("9_presentation")]
+
+[node name="GameUI" parent="." unique_id=1227268004 instance=ExtResource("8_game_ui")]
+
+[node name="NetworkGameBridge" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "keyboard_input", "voice_action_input", "pitch_lane_input", "shout_turn_input", "ui_bridge", "ui_root")]
+script = ExtResource("12_net_bridge")
+game_manager = NodePath("..")
+dragon = NodePath("../Dragon")
+keyboard_input = NodePath("../KeyboardInput")
+voice_action_input = NodePath("../VoiceActionInput")
+pitch_lane_input = NodePath("../PitchLaneInput")
+shout_turn_input = NodePath("../ShoutTurnInput")
+ui_bridge = NodePath("../GameUI")
+ui_root = NodePath("../GameUI/UIRoot")

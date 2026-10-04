@@ -14,7 +14,7 @@
 | `res://scenes/rooms/dragon_egg_lowpoly.tscn` | 保留原材質的黑紅鱗片龍蛋，展示高 0.9 |
 | `res://scenes/rooms/stylized_dragon_egg.tscn` | 保留原材質的綠色龍蛋，展示高 0.9 |
 | `res://scenes/rooms/prototype_floor.tscn` | 包含左右房間及中央 `DragonAnchor` 的可重用樓層 |
-| `res://scenes/main/main.tscn` | 三層靜態試排、中央一隻紅龍與合成師提供的展示子場景 |
+| `res://scenes/main/art_prev.tscn`（原 main.tscn） | 三層靜態試排、中央一隻紅龍與合成師提供的展示子場景 |
 
 原有 dungeon_room、dragon_platform_showcase、platform_layout 場景保留。完整關卡生成、麥克風控制、食材生成及鍋子規則由程式接入。
 

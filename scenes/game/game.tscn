@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cqoj7ho2pahhq"]
+[gd_scene format=3 uid="uid://llovwt808xad"]
 
 [ext_resource type="Script" uid="uid://c47hsqb0ccaeq" path="res://scenes/game/lane_layout.gd" id="1_lanes"]
 [ext_resource type="PackedScene" uid="uid://c5ry0dajlv2f1" path="res://scenes/dragon/dragon.tscn" id="2_dragon"]
@@ -7,13 +7,14 @@
 [ext_resource type="Script" uid="uid://b2o72utqq3y5u" path="res://scenes/game/ingredients_view.gd" id="5_view"]
 [ext_resource type="Script" uid="uid://ceky3v20nmnfn" path="res://scenes/game/pots_debug_view.gd" id="6_pots_debug"]
 [ext_resource type="Script" uid="uid://dnii3rm7ek82h" path="res://scenes/game/stomach_debug_view.gd" id="7_stomach_debug"]
-[ext_resource type="Script" path="res://scenes/game/pitch_lane_input.gd" id="8_pitch"]
-[ext_resource type="Script" path="res://scenes/game/voice_action_input.gd" id="9_voice_action"]
-[ext_resource type="Script" path="res://scenes/game/voice_toggle_panel.gd" id="10_toggle_panel"]
 [ext_resource type="PackedScene" path="res://scenes/ui/game_ui.tscn" id="8_game_ui"]
+[ext_resource type="Script" uid="uid://re7nyv4mayqf" path="res://scenes/game/pitch_lane_input.gd" id="8_pitch"]
 [ext_resource type="PackedScene" path="res://scenes/main/prototype_presentation.tscn" id="9_presentation"]
+[ext_resource type="Script" uid="uid://dvaiqmpid0ac5" path="res://scenes/game/voice_action_input.gd" id="9_voice_action"]
 [ext_resource type="PackedScene" path="res://scenes/vfx/dragon_effects.tscn" id="10_effects"]
-[ext_resource type="Script" path="res://scenes/game/effects_view.gd" id="11_effects_view"]
+[ext_resource type="Script" uid="uid://xy17uvqje2d" path="res://scenes/game/voice_toggle_panel.gd" id="10_toggle_panel"]
+[ext_resource type="Script" uid="uid://ddujmykk546cf" path="res://scenes/game/effects_view.gd" id="11_effects_view"]
+[ext_resource type="Script" uid="uid://cu48dmemaj404" path="res://scenes/game/network_game_bridge.gd" id="12_net_bridge"]
 
 [node name="Game" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
 script = ExtResource("4_manager")
@@ -43,10 +44,10 @@ script = ExtResource("7_stomach_debug")
 game_manager = NodePath("..")
 dragon = NodePath("../Dragon")
 
-[node name="Effects" parent="." instance=ExtResource("10_effects")]
+[node name="Effects" parent="." unique_id=696518967 instance=ExtResource("10_effects")]
 effect_range = 12.0
 
-[node name="EffectsView" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "lane_layout", "effects")]
+[node name="EffectsView" type="Node" parent="." unique_id=595044353 node_paths=PackedStringArray("game_manager", "dragon", "lane_layout", "effects")]
 script = ExtResource("11_effects_view")
 game_manager = NodePath("..")
 dragon = NodePath("../Dragon")
@@ -58,18 +59,26 @@ script = ExtResource("3_keyboard")
 dragon = NodePath("../Dragon")
 game_manager = NodePath("..")
 
-[node name="PitchLaneInput" type="Node" parent="." node_paths=PackedStringArray("dragon", "game_manager")]
+[node name="PitchLaneInput" type="Node" parent="." unique_id=1840817649 node_paths=PackedStringArray("dragon", "game_manager")]
 script = ExtResource("8_pitch")
 dragon = NodePath("../Dragon")
 game_manager = NodePath("..")
 
-[node name="VoiceActionInput" type="Node" parent="." node_paths=PackedStringArray("game_manager")]
+[node name="VoiceActionInput" type="Node" parent="." unique_id=2121492995 node_paths=PackedStringArray("game_manager")]
 script = ExtResource("9_voice_action")
 game_manager = NodePath("..")
 
-[node name="VoiceTogglePanel" type="CanvasLayer" parent="."]
+[node name="VoiceTogglePanel" type="CanvasLayer" parent="." unique_id=2029794683]
 script = ExtResource("10_toggle_panel")
 
 [node name="PrototypePresentation" parent="." unique_id=1281242266 instance=ExtResource("9_presentation")]
 
 [node name="GameUI" parent="." unique_id=1227268004 instance=ExtResource("8_game_ui")]
+
+[node name="NetworkGameBridge" type="Node" parent="." unique_id=441889437 node_paths=PackedStringArray("game_manager", "dragon", "keyboard_input", "voice_action_input", "ui_root")]
+script = ExtResource("12_net_bridge")
+game_manager = NodePath("..")
+dragon = NodePath("../Dragon")
+keyboard_input = NodePath("../KeyboardInput")
+voice_action_input = NodePath("../VoiceActionInput")
+ui_root = NodePath("../GameUI/UIRoot")
