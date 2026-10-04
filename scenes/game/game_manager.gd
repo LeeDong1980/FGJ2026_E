@@ -5,6 +5,8 @@ extends Node3D
 
 enum GameState { WAITING, PLAYING, ENDED }
 enum BabyLeaveReason { COMPLETED, KICKED }
+## 龍頭朝向：LEFT 面向食材隊伍，RIGHT 面向鍋子。目前只有狀態與畫面提示，龍的模型不會轉。
+enum Facing { LEFT, RIGHT }
 
 ## start_game() 之後發出，此時已重置完畢並開始遊玩。
 signal game_started
@@ -33,6 +35,8 @@ signal ingredient_attacked(lane: int, ingredient: IngredientState, hit: bool)
 signal dragon_stunned
 ## 龍暈眩結束，接著進入無敵時間。
 signal dragon_recovered
+## 龍頭轉向改變（Facing.LEFT 面向食材、RIGHT 面向鍋子）。
+signal facing_changed(facing: Facing)
 signal game_won
 signal game_lost
 
@@ -91,6 +95,8 @@ var completed_count: int = 0
 var cleared_count: int = 0
 ## WAITING：場景擺好但靜止，等待 start_game()。PLAYING：遊玩中。ENDED：已分出勝敗。
 var state: GameState = GameState.WAITING
+## 龍頭朝向：LEFT 面向食材（吸、噴火有效），RIGHT 面向鍋子（吐進鍋子有效）。
+var facing: Facing = Facing.LEFT
 ## 玩家正在持續喊「吐」。
 var is_spitting: bool = false
 ## 這次按下「吐」已經把食材吐進鍋子，放開前不會接著噴火。
@@ -129,12 +135,14 @@ func start_game() -> void:
 	game_started.emit()
 
 
-## 胃袋空著時，把所在層最前端的食材吞進胃袋。
+## 面向左邊且胃袋空著時，把所在層最前端的食材吞進胃袋。
 func suck() -> void:
 	if state != GameState.PLAYING or is_stunned():
 		return
 	var lane := dragon.current_lane
-	var ingredient: IngredientState = get_front(lane) if stomach == null else null
+	var ingredient: IngredientState = null
+	if facing == Facing.LEFT and stomach == null:
+		ingredient = get_front(lane)
 	if ingredient == null:
 		suck_missed.emit(lane)
 		return
@@ -144,7 +152,8 @@ func suck() -> void:
 	stomach_changed.emit(stomach)
 
 
-## 開始喊「吐」。胃袋有食材就立刻吐進所在層的鍋子；胃袋空著就開始噴火，持續到 spit_released()。
+## 開始喊「吐」。面向右邊且胃袋有食材，立刻吐進所在層的鍋子；
+## 面向左邊且胃袋空著，開始噴火，持續到 spit_released()。其他情況沒有效果。
 func spit_pressed() -> void:
 	if state != GameState.PLAYING:
 		return
@@ -152,10 +161,13 @@ func spit_pressed() -> void:
 	if is_stunned():
 		return
 	var lane := dragon.current_lane
-	if stomach != null:
-		_spit_used_for_pot = true
-		_spit_into_pot(lane)
-	elif get_front(lane) == null:
+	if facing == Facing.RIGHT:
+		if stomach != null:
+			_spit_used_for_pot = true
+			_spit_into_pot(lane)
+		else:
+			spit_missed.emit(lane)
+	elif stomach != null or get_front(lane) == null:
 		spit_missed.emit(lane)
 
 
@@ -165,9 +177,17 @@ func spit_released() -> void:
 	_spit_used_for_pot = false
 
 
-## 正在喊「吐」且胃袋空著（噴火中）。這次按下已經吐進鍋子時回傳 false。
+## 正在喊「吐」、面向左邊且胃袋空著（噴火中）。這次按下已經吐進鍋子時回傳 false。
 func is_breathing_fire() -> bool:
-	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null 			and not is_stunned()
+	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null \
+			and facing == Facing.LEFT and not is_stunned()
+
+
+## 龍頭左右切換（玩家 B 大叫或按 L）。暈眩中不能轉頭。
+func turn_head() -> void:
+	if state != GameState.PLAYING or is_stunned():
+		return
+	_set_facing(Facing.RIGHT if facing == Facing.LEFT else Facing.LEFT)
 
 
 func is_stunned() -> bool:
@@ -238,6 +258,13 @@ func _update_attack(lane: int, delta: float) -> void:
 	ingredient_attacked.emit(lane, ingredient, hit)
 	if hit:
 		_stun_dragon()
+
+
+func _set_facing(value: Facing) -> void:
+	if value == facing:
+		return
+	facing = value
+	facing_changed.emit(facing)
 
 
 func _stun_dragon() -> void:
@@ -321,6 +348,7 @@ func _setup_round() -> void:
 	stun_remaining = 0.0
 	invincible_remaining = 0.0
 	dragon.stunned = false
+	_set_facing(Facing.LEFT)
 	completed_count = 0
 	completed_count_changed.emit(completed_count)
 	cleared_count = 0

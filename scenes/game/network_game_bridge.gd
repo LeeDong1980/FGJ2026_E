@@ -4,9 +4,9 @@ extends Node
 ## 只在 RoomManager 判定「Host 的連線局」時啟用；單機與直接 F6 執行遊戲場景（main.tscn）時什麼都不做。
 ##
 ## 啟用時：
-## - 停用本機鍵盤 J／K 吸吐與語音吸吐（吸吐只來自 Client）；鍵盤 1／2／3 換層保留，當作音高不穩時的保底。
+## - 停用本機鍵盤 J／K／L 吸吐轉頭、語音吸吐與大叫轉頭（都只來自 Client）；鍵盤 1／2／3 換層保留，當作音高不穩時的保底。
 ## - 直接開局，不顯示開始介面（開局時 UIGameBridge 會校正聲音並顯示遊玩介面）。
-## - Client 的 inhale 呼叫 suck()，exhale／none 呼叫 spit_pressed()／spit_released()。
+## - Client 的 inhale 呼叫 suck()，exhale／none 呼叫 spit_pressed()／spit_released()；字音 turn 呼叫 turn_head()。
 ## - 遊戲結束時改顯示「回到房間」，按下後呼叫 RoomManager.finish_match()，Client 會一起回到等候頁。
 ##   等 UI-15（ResultScreen 只發 signal）完成後，這個臨時的結束畫面可以拿掉。
 
@@ -16,6 +16,7 @@ const LANE_ACTIONS: Array[StringName] = [&"lane_1", &"lane_2", &"lane_3"]
 @export var dragon: Dragon
 @export var keyboard_input: KeyboardInput
 @export var voice_action_input: VoiceActionInput
+@export var shout_turn_input: ShoutTurnInput
 @export var ui_root: UIRoot
 ## 【暫時的診斷顯示】在畫面左上角顯示 Client 最後送來的動作，確認封包有沒有收到。語音參數調好後可關閉或移除。
 @export var show_debug: bool = true
@@ -33,6 +34,7 @@ func _ready() -> void:
 	if show_debug:
 		_build_debug_label()
 	NetworkManager.voice_action_received.connect(_on_remote_action)
+	NetworkManager.voice_word_received.connect(_on_remote_word)
 	game_manager.game_won.connect(_show_end.bind(true))
 	game_manager.game_lost.connect(_show_end.bind(false))
 	# 等所有子節點（含 UIGameBridge）都 ready 之後再開局，才收得到 game_started。
@@ -55,6 +57,7 @@ func _disable_local_action_input() -> void:
 	keyboard_input.process_mode = Node.PROCESS_MODE_DISABLED
 	# 語音吸吐是接 MicInput.action_changed signal，停用節點擋不住，要把連線拆掉。
 	voice_action_input.process_mode = Node.PROCESS_MODE_DISABLED
+	shout_turn_input.process_mode = Node.PROCESS_MODE_DISABLED
 	for connection: Dictionary in MicInput.action_changed.get_connections():
 		if (connection["callable"] as Callable).get_object() == voice_action_input:
 			MicInput.action_changed.disconnect(connection["callable"])
@@ -75,6 +78,12 @@ func _on_remote_action(_peer_id: int, action: String) -> void:
 			game_manager.suck()
 		NetworkManager.ACTION_EXHALE:
 			game_manager.spit_pressed()
+
+
+## Client 大叫或按 L：龍頭左右切換。
+func _on_remote_word(_peer_id: int, _seq: int, word: String) -> void:
+	if word == NetworkManager.WORD_TURN:
+		game_manager.turn_head()
 
 
 func _build_debug_label() -> void:

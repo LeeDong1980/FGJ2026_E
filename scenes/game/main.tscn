@@ -16,6 +16,8 @@
 [ext_resource type="Script" path="res://scenes/game/effects_view.gd" id="11_effects_view"]
 [ext_resource type="Script" path="res://scenes/game/network_game_bridge.gd" id="12_net_bridge"]
 [ext_resource type="Script" path="res://scenes/game/stun_banner.gd" id="13_stun_banner"]
+[ext_resource type="Script" path="res://scenes/game/shout_turn_input.gd" id="14_shout_turn"]
+[ext_resource type="Script" path="res://scenes/game/facing_indicator.gd" id="15_facing_indicator"]
 
 [node name="Main" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
 script = ExtResource("4_manager")
@@ -69,6 +71,10 @@ game_manager = NodePath("..")
 script = ExtResource("9_voice_action")
 game_manager = NodePath("..")
 
+[node name="ShoutTurnInput" type="Node" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("14_shout_turn")
+game_manager = NodePath("..")
+
 [node name="VoiceTogglePanel" type="CanvasLayer" parent="."]
 script = ExtResource("10_toggle_panel")
 
@@ -76,14 +82,19 @@ script = ExtResource("10_toggle_panel")
 script = ExtResource("13_stun_banner")
 game_manager = NodePath("..")
 
+[node name="FacingIndicator" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("15_facing_indicator")
+game_manager = NodePath("..")
+
 [node name="PrototypePresentation" parent="." unique_id=1281242266 instance=ExtResource("9_presentation")]
 
 [node name="GameUI" parent="." unique_id=1227268004 instance=ExtResource("8_game_ui")]
 
-[node name="NetworkGameBridge" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "keyboard_input", "voice_action_input", "ui_root")]
+[node name="NetworkGameBridge" type="Node" parent="." node_paths=PackedStringArray("game_manager", "dragon", "keyboard_input", "voice_action_input", "shout_turn_input", "ui_root")]
 script = ExtResource("12_net_bridge")
 game_manager = NodePath("..")
 dragon = NodePath("../Dragon")
 keyboard_input = NodePath("../KeyboardInput")
 voice_action_input = NodePath("../VoiceActionInput")
+shout_turn_input = NodePath("../ShoutTurnInput")
 ui_root = NodePath("../GameUI/UIRoot")
