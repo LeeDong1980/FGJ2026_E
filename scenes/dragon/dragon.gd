@@ -9,6 +9,8 @@ signal current_lane_changed(lane: int)
 
 var target_lane: int = 0
 var current_lane: int = 0
+## 暈眩中停在原地，目標層照常記錄，醒來後才飛過去。由 GameManager 設定。
+var stunned: bool = false
 
 
 func _ready() -> void:
@@ -20,6 +22,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if stunned:
+		return
 	position.y = move_toward(position.y, _lane_y(target_lane), move_speed * delta)
 	var lane := lane_layout.get_lane_at(position.y - lane_layout.position.y)
 	if lane != current_lane:
