@@ -27,6 +27,12 @@ signal baby_left(lane: int, reason: BabyLeaveReason)
 signal baby_arrived(lane: int)
 signal completed_count_changed(count: int)
 signal cleared_count_changed(count: int)
+## 最前端食材蓄滿出手。hit 為 false 表示龍正在暈眩或無敵，這次打空。
+signal ingredient_attacked(lane: int, ingredient: IngredientState, hit: bool)
+## 龍被打中開始暈眩，暈眩中不能換層、吸、吐、噴火。
+signal dragon_stunned
+## 龍暈眩結束，接著進入無敵時間。
+signal dragon_recovered
 signal game_won
 signal game_lost
 
@@ -35,9 +41,17 @@ signal game_lost
 @export var dragon: Dragon
 
 @export_group("食材隊伍")
-@export var ingredient_speed: float = 2.0
+## 從出生點走到最前端的秒數，移動速度由此換算。
+@export var walk_time: float = 4.0
+## 隊伍有空位後，等多少秒才補一個新食材（每層各自計時）。
+## 間隔 = spawn_interval_start - 完成鍋數 × spawn_interval_step，最短 spawn_interval_min。
+@export var spawn_interval_start: float = 8.0
+@export var spawn_interval_step: float = 1.0
+@export var spawn_interval_min: float = 3.0
 @export var ingredient_spacing: float = 0.6
-@export var max_ingredients_per_lane: int = 5
+@export var max_ingredients_per_lane: int = 6
+## 開場每層已經排在最前端的食材數。
+@export var opening_ingredients: int = 1
 ## 開啟時 spawn_x、front_x 改讀最低層房間的 QueueSpawnAnchor、QueueFrontAnchor。
 @export var use_room_anchors: bool = true
 ## 食材出生的 x 座標（LaneLayout 的本地座標）。
@@ -57,6 +71,15 @@ signal game_lost
 ## 持續噴火多少秒才會燒掉一個食材。
 @export var burn_time: float = 1.0
 
+@export_group("食材攻擊")
+## 每次蓄力的秒數在這個範圍內隨機。
+@export var attack_charge_min: float = 10.0
+@export var attack_charge_max: float = 20.0
+## 龍被打中後暈眩的秒數。
+@export var stun_time: float = 1.5
+## 暈眩結束後的無敵秒數，期間攻擊打空。
+@export var invincible_time: float = 2.0
+
 @export_group("勝敗")
 @export var pots_to_win: int = 6
 @export var clears_to_lose: int = 3
@@ -72,6 +95,10 @@ var state: GameState = GameState.WAITING
 var is_spitting: bool = false
 ## 這次按下「吐」已經把食材吐進鍋子，放開前不會接著噴火。
 var _spit_used_for_pot: bool = false
+## 剩餘的暈眩秒數，大於 0 表示暈眩中。
+var stun_remaining: float = 0.0
+## 剩餘的無敵秒數，大於 0 表示無敵中。
+var invincible_remaining: float = 0.0
 ## 每次重置加一，用來忽略上一局還沒觸發的換小龍計時。
 var _round: int = 0
 
@@ -86,9 +113,11 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if state != GameState.PLAYING:
 		return
+	_update_stun(delta)
 	for i in lanes.size():
 		_advance_queue(lanes[i], delta)
-		_try_spawn(i)
+		_try_spawn(i, delta)
+		_update_attack(i, delta)
 	_update_burning(delta)
 
 
@@ -102,7 +131,7 @@ func start_game() -> void:
 
 ## 胃袋空著時，把所在層最前端的食材吞進胃袋。
 func suck() -> void:
-	if state != GameState.PLAYING:
+	if state != GameState.PLAYING or is_stunned():
 		return
 	var lane := dragon.current_lane
 	var ingredient: IngredientState = get_front(lane) if stomach == null else null
@@ -120,6 +149,8 @@ func spit_pressed() -> void:
 	if state != GameState.PLAYING:
 		return
 	is_spitting = true
+	if is_stunned():
+		return
 	var lane := dragon.current_lane
 	if stomach != null:
 		_spit_used_for_pot = true
@@ -136,7 +167,15 @@ func spit_released() -> void:
 
 ## 正在喊「吐」且胃袋空著（噴火中）。這次按下已經吐進鍋子時回傳 false。
 func is_breathing_fire() -> bool:
-	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null
+	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null 			and not is_stunned()
+
+
+func is_stunned() -> bool:
+	return stun_remaining > 0.0
+
+
+func is_invincible() -> bool:
+	return invincible_remaining > 0.0
 
 
 ## 最前端的食材已經走到停止位置才回傳，否則回傳 null。
@@ -151,9 +190,14 @@ func get_pot(lane: int) -> PotState:
 	return pots[lane]
 
 
+## 目前的生成間隔，完成鍋數越多越短。
+func get_spawn_interval() -> float:
+	return maxf(spawn_interval_start - completed_count * spawn_interval_step, spawn_interval_min)
+
+
 ## 持續噴火時，累計所在層最前端食材的燒毀進度。
 func _update_burning(delta: float) -> void:
-	if not is_spitting or _spit_used_for_pot or stomach != null:
+	if not is_breathing_fire():
 		return
 	var lane := dragon.current_lane
 	var ingredient := get_front(lane)
@@ -163,6 +207,43 @@ func _update_burning(delta: float) -> void:
 	if ingredient.burn_progress >= 1.0:
 		_take_front(lane)
 		ingredient_burned.emit(lane, ingredient)
+
+
+## 推進暈眩與無敵的倒數。
+func _update_stun(delta: float) -> void:
+	if is_stunned():
+		stun_remaining -= delta
+		if stun_remaining <= 0.0:
+			stun_remaining = 0.0
+			dragon.stunned = false
+			invincible_remaining = invincible_time
+			dragon_recovered.emit()
+	elif is_invincible():
+		invincible_remaining = maxf(invincible_remaining - delta, 0.0)
+
+
+## 最前端的食材蓄力，蓄滿就攻擊龍並重新蓄力。龍暈眩或無敵時打空。
+func _update_attack(lane: int, delta: float) -> void:
+	var ingredient := get_front(lane)
+	if ingredient == null:
+		return
+	if ingredient.attack_time <= 0.0:
+		ingredient.attack_time = randf_range(attack_charge_min, attack_charge_max)
+	ingredient.attack_progress = minf(ingredient.attack_progress + delta / ingredient.attack_time, 1.0)
+	if ingredient.attack_progress < 1.0:
+		return
+	ingredient.attack_progress = 0.0
+	ingredient.attack_time = 0.0
+	var hit := not is_stunned() and not is_invincible()
+	ingredient_attacked.emit(lane, ingredient, hit)
+	if hit:
+		_stun_dragon()
+
+
+func _stun_dragon() -> void:
+	stun_remaining = stun_time
+	dragon.stunned = true
+	dragon_stunned.emit()
 
 
 func _spit_into_pot(lane: int) -> void:
@@ -223,7 +304,7 @@ func _end_game(won: bool) -> void:
 		game_lost.emit()
 
 
-## 清掉上一局的所有狀態，重新排滿隊伍、換上小龍，龍回到中間層。
+## 清掉上一局的所有狀態，重新排好開場隊伍、換上小龍，龍回到中間層。
 func _setup_round() -> void:
 	_round += 1
 	for i in lanes.size():
@@ -237,6 +318,9 @@ func _setup_round() -> void:
 		stomach_changed.emit(null)
 	is_spitting = false
 	_spit_used_for_pot = false
+	stun_remaining = 0.0
+	invincible_remaining = 0.0
+	dragon.stunned = false
 	completed_count = 0
 	completed_count_changed.emit(completed_count)
 	cleared_count = 0
@@ -245,7 +329,7 @@ func _setup_round() -> void:
 
 	for i in lane_layout.lane_count:
 		lanes.append(LaneState.new())
-		for k in max_ingredients_per_lane:
+		for k in mini(opening_ingredients, max_ingredients_per_lane):
 			_spawn(i, front_x - k * ingredient_spacing)
 		pots.append(PotState.new())
 		_baby_arrive(i, _round)
@@ -259,18 +343,25 @@ func _take_front(lane: int) -> void:
 ## 由前往後推進，每個食材最多走到前一個食材後方一個間隔的位置。
 func _advance_queue(lane: LaneState, delta: float) -> void:
 	var limit := front_x
+	var speed := (front_x - spawn_x) / walk_time
 	for ingredient in lane.queue:
-		ingredient.x = minf(ingredient.x + ingredient_speed * delta, limit)
+		ingredient.x = minf(ingredient.x + speed * delta, limit)
 		limit = ingredient.x - ingredient_spacing
 
 
-## 數量低於上限，且最後一個食材已離開出生點至少一個間隔，才產生新食材。
-func _try_spawn(lane: int) -> void:
-	var queue := lanes[lane].queue
+## 數量低於上限後開始計時，到生成間隔且最後一個食材已離開出生點至少一個間隔，才產生新食材。
+func _try_spawn(lane: int, delta: float) -> void:
+	var lane_state := lanes[lane]
+	var queue := lane_state.queue
 	if queue.size() >= max_ingredients_per_lane:
+		lane_state.spawn_timer = 0.0
+		return
+	lane_state.spawn_timer += delta
+	if lane_state.spawn_timer < get_spawn_interval():
 		return
 	if not queue.is_empty() and queue.back().x < spawn_x + ingredient_spacing:
 		return
+	lane_state.spawn_timer = 0.0
 	_spawn(lane, spawn_x)
 
 

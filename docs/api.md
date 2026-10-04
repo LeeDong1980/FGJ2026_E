@@ -25,6 +25,7 @@
 - 「吐」要回報開始和結束：胃袋有食材時，`spit_pressed()` 一呼叫就吐進鍋子；胃袋空著時是噴火，要持續到 `spit_released()`，累計 `burn_time` 秒（預設 1 秒）才燒掉一個食材。
 - 層數：`game_manager.lane_layout.lane_count`。
 - 樓層位置：`lane_layout.get_lane_position(lane)` 是該層地板頂面的 Y（LaneLayout 本地座標，層距 5）；`lane_layout.get_anchor_position(lane, name)` 取房間定位點（`QueueSpawnAnchor`、`QueueFrontAnchor`、`PotAnchor` 等，名稱見 `docs/prototype_rooms.md`），例如 UI 跟隨鍋子用 `PotAnchor`。
+- 龍暈眩時（`game_manager.is_stunned()`）龍停在原地，`suck()`、`spit_pressed()` 沒有效果，也不會發出 `suck_missed`／`spit_missed`。`set_target_lane()` 照常記錄，醒來後才飛過去；`spit_pressed()` 仍會記錄正在喊「吐」，持續喊到醒來會接著噴火。
 - 鍵盤測試輸入 `scenes/game/keyboard_input.gd` 就是用這些呼叫（按住 K 噴火），可以當作範例。
 
 ## 給 UI：遊戲流程
@@ -33,7 +34,7 @@
 |---|---|
 | `game_manager.start_game()` | 開始遊戲，也用於「重新遊玩」 |
 
-- 開啟場景時是 `WAITING`：隊伍排滿、小龍到位、龍在中間層，但靜止不動，吸吐沒有作用。
+- 開啟場景時是 `WAITING`：每層最前端有 1 個食材、小龍到位、龍在中間層，但靜止不動，吸吐沒有作用。
 - 第一次呼叫 `start_game()` 直接沿用擺好的場景開始；之後再呼叫會原地重置隊伍、鍋子、胃袋、完成鍋數、清空次數與龍的位置，再開始。重置時會發出對應的 signal（`pot_changed`、`stomach_changed`、`completed_count_changed` 等），UI 照常更新即可。
 - 遊戲場景載入後由 `UIGameBridge` 自動呼叫 `start_game()`，第一局開始時呼叫麥克風輸入的校正（主選單是獨立場景，見 design.md 6.1）。
 - 「下一關」要等關卡資料完成後才會提供。
@@ -53,6 +54,11 @@
 | `game_manager.state` | `GameManager.GameState` | `WAITING`（等待開始）、`PLAYING`（遊玩中）、`ENDED`（已分出勝敗） |
 | `game_manager.is_spitting` | `bool` | 玩家 B 正在持續喊「吐」 |
 | `IngredientState.burn_progress` | `float` | 食材被燒的進度，0～1；中途停止噴火不會歸零 |
+| `IngredientState.attack_progress` | `float` | 攻擊蓄力進度，0～1；只有隊伍最前端的食材會蓄力，攻擊後歸零 |
+| `game_manager.get_spawn_interval()` | `float` | 目前的食材生成間隔（秒），隨完成鍋數變短 |
+| `game_manager.get_front(lane)` | `IngredientState` | 某一層已到最前端的食材，沒有則為 `null` |
+| `game_manager.is_stunned()` / `stun_remaining` | `bool` / `float` | 龍是否暈眩 / 剩餘暈眩秒數 |
+| `game_manager.is_invincible()` / `invincible_remaining` | `bool` / `float` | 龍是否在暈眩後的無敵時間 / 剩餘秒數 |
 | `dragon.current_lane` | `int` | 龍目前所在的層 |
 | `IngredientType.NAMES[type]` | `String` | 食材的中文名稱 |
 
@@ -73,6 +79,9 @@
 | `ingredient_swallowed(lane, ingredient)` | 食材被吞進胃袋 |
 | `ingredient_spat(lane, ingredient)` | 胃裡的食材吐進鍋子 |
 | `ingredient_burned(lane, ingredient)` | 食材被噴火燒掉 |
+| `ingredient_attacked(lane, ingredient, hit)` | 最前端食材蓄滿出手。`hit` 為 `false` 表示龍正在暈眩或無敵，這次打空 |
+| `dragon_stunned` | 龍被打中開始暈眩 |
+| `dragon_recovered` | 龍暈眩結束，接著進入無敵時間（`invincible_remaining` 秒） |
 | `suck_missed(lane)` / `spit_missed(lane)` | 喊了吸或吐但沒有效果（可以用來播放空動作）。噴火時只在一開始沒有可燒的食材才會發出 |
 
 `Dragon`：

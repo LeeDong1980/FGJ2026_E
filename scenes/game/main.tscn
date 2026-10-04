@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" path="res://scenes/vfx/dragon_effects.tscn" id="10_effects"]
 [ext_resource type="Script" path="res://scenes/game/effects_view.gd" id="11_effects_view"]
 [ext_resource type="Script" path="res://scenes/game/network_game_bridge.gd" id="12_net_bridge"]
+[ext_resource type="Script" path="res://scenes/game/stun_banner.gd" id="13_stun_banner"]
 
 [node name="Main" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
 script = ExtResource("4_manager")
@@ -70,6 +71,10 @@ game_manager = NodePath("..")
 
 [node name="VoiceTogglePanel" type="CanvasLayer" parent="."]
 script = ExtResource("10_toggle_panel")
+
+[node name="StunBanner" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("13_stun_banner")
+game_manager = NodePath("..")
 
 [node name="PrototypePresentation" parent="." unique_id=1281242266 instance=ExtResource("9_presentation")]
 
