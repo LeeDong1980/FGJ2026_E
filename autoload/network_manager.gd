@@ -23,11 +23,17 @@ signal room_closed_by_host
 ## Client 端：Host 開始或結束連線局。
 signal match_started
 signal match_ended
-## Client 端：等候頁收到房主（玩家 1）目前的音高。level 是 0～1，lane 是對應的層（0 是最低層）。
-signal lobby_pitch_received(level: float, lane: int)
+## 收到對方（坐玩家 1 的那一位）目前的音高。level 是 0～1，lane 是對應的層（0 是最低層，-1 是還沒有）。
+## 等候頁與連線局的 HUD 用來顯示；連線局中 Host 也用 lane 控制龍。Host 與 Client 都會收到。
+signal pitch_received(level: float, lane: int)
+## Client 端：房主決定的座位分配。host_slot 是房主坐的座位（1 或 2），Client 坐另一個。
+signal slot_assignment_received(host_slot: int)
+## Host 端：Client 要求交換座位。
+signal slot_swap_requested
 ## Client 端：房主暫停或繼續遊戲（暫停時 Host 會忽略 Client 的吸／吐）。
 signal host_pause_changed(paused: bool)
-## Host 端：Client 的吸／吐動作改變（ACTION_INHALE、ACTION_EXHALE、ACTION_NONE）。Host 收到後會回覆確認。
+## 收到對方（坐玩家 2 的那一位）的吸／吐動作改變（ACTION_INHALE、ACTION_EXHALE、ACTION_NONE）。
+## Client 送給 Host 的動作，Host 收到後會回覆確認；Host 在等候頁也會傳給 Client 顯示（peer_id 固定 1）。
 signal voice_action_received(peer_id: int, action: String)
 ## Host 端：收到 Client 的語音輸入封包
 signal voice_volume_received(peer_id: int, seq: int, volume: float)
@@ -144,12 +150,31 @@ func start_match() -> void:
 		_rpc_match_started.rpc_id(id)
 
 
-## Host 在等候頁把玩家 1 的音高傳給 Client，讓雙方進遊戲前能一起測試。不可靠傳輸，掉包不補送。
-func send_lobby_pitch(level: float, lane: int) -> void:
+## 坐玩家 1 的人把自己的音高傳給對方（Host 傳給 Client，Client 傳給 Host）。
+## 等候頁讓雙方一起測試，連線局中對方的 lane 會控制龍。不可靠傳輸，掉包不補送，要持續送。
+func send_pitch(level: float, lane: int) -> void:
+	if not is_online():
+		return
+	if is_host():
+		for id: int in _accepted_peers:
+			_rpc_pitch_down.rpc_id(id, level, lane)
+	else:
+		_rpc_pitch_up.rpc_id(1, level, lane)
+
+
+## Host 把座位分配通知 Client（host_slot 是房主坐的座位，1 或 2）。
+func send_slot_assignment(host_slot: int) -> void:
 	if not is_host():
 		return
 	for id: int in _accepted_peers:
-		_rpc_lobby_pitch.rpc_id(id, level, lane)
+		_rpc_slot_assignment.rpc_id(id, host_slot)
+
+
+## Client 要求交換座位，由 Host 決定並回傳新的分配。
+func request_slot_swap() -> void:
+	if not is_online() or is_host():
+		return
+	_rpc_slot_swap_request.rpc_id(1)
 
 
 ## Host 暫停或繼續遊戲時通知 Client，讓對方畫面顯示提示。
@@ -181,9 +206,14 @@ func get_join_remaining_sec() -> float:
 	return join_timeout_sec - (Time.get_ticks_msec() - _join_started_msec) / 1000.0
 
 
-## Client 送出吸／吐動作的開始與結束（ACTION_*）。可靠傳輸，噴火要靠它知道何時放開。
+## 坐玩家 2 的人送出吸／吐動作的開始與結束（ACTION_*）。可靠傳輸，噴火要靠它知道何時放開。
+## Client 送給 Host（有確認）；Host 只在等候頁需要傳給 Client 顯示（沒有確認）。
 func send_voice_action(action: String) -> void:
-	if not is_online() or is_host():
+	if not is_online():
+		return
+	if is_host():
+		for id: int in _accepted_peers:
+			_rpc_voice_action_down.rpc_id(id, action)
 		return
 	var seq: int = _next_seq(KIND_ACTION)
 	_rpc_voice_action.rpc_id(1, seq, action)
@@ -381,8 +411,30 @@ func _rpc_match_ended() -> void:
 
 
 @rpc("authority", "call_remote", "unreliable_ordered")
-func _rpc_lobby_pitch(level: float, lane: int) -> void:
-	lobby_pitch_received.emit(level, lane)
+func _rpc_pitch_down(level: float, lane: int) -> void:
+	pitch_received.emit(level, lane)
+
+
+@rpc("any_peer", "call_remote", "unreliable_ordered")
+func _rpc_pitch_up(level: float, lane: int) -> void:
+	if multiplayer.is_server():
+		pitch_received.emit(level, lane)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _rpc_slot_assignment(host_slot: int) -> void:
+	slot_assignment_received.emit(host_slot)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_slot_swap_request() -> void:
+	if multiplayer.is_server():
+		slot_swap_requested.emit()
+
+
+@rpc("authority", "call_remote", "reliable")
+func _rpc_voice_action_down(action: String) -> void:
+	voice_action_received.emit(1, action)
 
 
 @rpc("authority", "call_remote", "reliable")

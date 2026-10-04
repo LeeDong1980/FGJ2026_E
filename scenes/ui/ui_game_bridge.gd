@@ -15,6 +15,10 @@ const POT_ANCHOR_HEIGHT := 0.6
 @export var game_manager: GameManager
 @export var ui_root: UIRoot
 
+## 玩家 1 的音高在對方電腦上時（連線局，房主坐玩家 2），由 NetworkGameBridge 持續餵進來（0～1）；
+## 負值表示用本機的音高。
+var remote_pitch_level: float = -1.0
+
 var _hud: PlayHud
 var _dragon: Dragon
 var _was_spitting := false
@@ -59,7 +63,7 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if game_manager.state != GameManager.GameState.PLAYING:
 		return
-	_hud.set_volume(MicInput.volume_value / 100.0)
+	_hud.set_volume(remote_pitch_level if remote_pitch_level >= 0.0 else _local_pitch_level())
 	# 噴火沒有開始時的 signal，用 is_spitting 由 false 變 true 的瞬間顯示「吐」。
 	if game_manager.is_spitting and not _was_spitting:
 		_show_spit()
@@ -69,6 +73,14 @@ func _process(_delta: float) -> void:
 func _start_if_waiting() -> void:
 	if game_manager.state == GameManager.GameState.WAITING:
 		game_manager.start_game()
+
+
+## 本機玩家 1 的音高比例（0～1），與換層用的 PitchLaneInput 同一個來源：手機 1 有連上就用手機，否則電腦麥克風。
+func _local_pitch_level() -> float:
+	var voice: Node = MicInput
+	if PhoneMic.is_player_connected(1):
+		voice = PhoneMic.get_source(1)
+	return voice.pitch_value / 100.0
 
 
 func _on_game_started() -> void:

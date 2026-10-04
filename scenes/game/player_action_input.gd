@@ -1,15 +1,15 @@
 class_name PlayerActionInput
 extends Node
 ## 玩家 2（吸／吐）的本機輸入：鍵盤 J（吸）、K（吐，按住），以及語音（電腦麥克風，或連上的手機）。
-## 鍵盤優先於語音，吐優先於吸。動作改變時發出 action_changed，send_to_host 開啟時也把變化傳給 Host。
-## client_play（連線局）與房間等候頁共用。
+## 鍵盤優先於語音，吐優先於吸。動作改變時發出 action_changed，send_to_peer 開啟時也把變化傳給對方
+## （Client 傳給 Host，Host 只在等候頁傳給 Client 顯示）。client_play（連線局）與房間等候頁共用。
 
 signal action_changed(action: String)
 
 ## 關閉時不讀任何輸入，動作視為 ACTION_NONE。
 @export var enabled: bool = true
-## Client 用：動作改變時送給 Host（NetworkManager.send_voice_action）。
-@export var send_to_host: bool = false
+## 動作改變時送給對方（NetworkManager.send_voice_action）。
+@export var send_to_peer: bool = false
 ## 優先讀第幾號玩家的手機（1 或 2）；沒連上就讀電腦麥克風。0 = 只用電腦麥克風。
 @export_range(0, 2) var phone_player: int = 2
 
@@ -26,14 +26,14 @@ func _process(_delta: float) -> void:
 	if next == action:
 		return
 	action = next
-	if send_to_host:
+	if send_to_peer:
 		NetworkManager.send_voice_action(next)
 	action_changed.emit(next)
 
 
 func _exit_tree() -> void:
-	# 離開時還按著的話補送放開，避免 Host 一直在噴火。
-	if send_to_host and action != NetworkManager.ACTION_NONE:
+	# 離開時還按著的話補送放開，避免對方一直在噴火。
+	if send_to_peer and action != NetworkManager.ACTION_NONE:
 		NetworkManager.send_voice_action(NetworkManager.ACTION_NONE)
 
 

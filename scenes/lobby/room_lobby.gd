@@ -3,19 +3,16 @@ extends Control
 ## 房間等候頁：Host 與 Client 共用，依角色顯示按鈕。流程規則見 docs/lobby-flow.md。
 ## 這裡只讀 RoomManager 的狀態、呼叫它的函式；換場景都由 RoomManager 處理，所以單獨按 F6 也能測試。
 ##
+## 座位：點選「玩家 1」「玩家 2」切換自己的角色（RoomManager.claim_slot，不需要對方同意）。
+## 玩家 1 用音高控制龍的高度，玩家 2 負責吸／吐；誰坐哪個座位與誰是房主無關。
+##
 ## 左下玩家 1（音高）、右下玩家 2（吸／吐）的輸入顯示，讓兩位玩家進遊戲前先測試、一起熟悉：
-## - 玩家 1 是 Host：Host 本機量音高，並以 NetworkManager.send_lobby_pitch 傳給 Client 顯示。
-## - 玩家 2 是 Client：Client 本機的鍵盤 J／K 與麥克風送給 Host（PlayerActionInput），Host 收到後顯示。
-## - Host 房內只有自己時（單機），玩家 2 的輸入也由 Host 本機負責。
+## - 坐在某個座位的人，本機量該座位的輸入並傳給對方（PlayerPitchInput／PlayerActionInput）。
+## - 另一個座位顯示對方傳來的輸入。
+## - Host 房內只有自己時（單機），兩個座位的輸入都由本機負責。
 
-const LANE_COUNT: int = 3
-## 與 PitchLaneInput.hysteresis 的預設值相同，等候頁看到的層才會和遊戲內一致。
-const PITCH_HYSTERESIS: float = 3.0
-const PITCH_PHONE_PLAYER: int = 1
-const PITCH_BROADCAST_INTERVAL: float = 1.0 / 15.0
-
-@onready var _slot1_label: Label = %Slot1Label
-@onready var _slot2_label: Label = %Slot2Label
+@onready var _slot1_button: Button = %Slot1Button
+@onready var _slot2_button: Button = %Slot2Button
 @onready var _local_ip_label: Label = %LocalIpLabel
 @onready var _status_label: Label = %StatusLabel
 @onready var _solo_button: Button = %SoloButton
@@ -28,12 +25,13 @@ const PITCH_BROADCAST_INTERVAL: float = 1.0 / 15.0
 
 ## 等候頁自己的提示（例如沒填 IP），下次房間狀態改變時清除。
 var _local_hint: String = ""
+var _pitch_input: PlayerPitchInput
 var _action_input: PlayerActionInput
-var _player1_lane: int = -1
-var _broadcast_timer: float = 0.0
 
 
 func _ready() -> void:
+	_slot1_button.pressed.connect(RoomManager.claim_slot.bind(1))
+	_slot2_button.pressed.connect(RoomManager.claim_slot.bind(2))
 	_solo_button.pressed.connect(RoomManager.start_solo)
 	_join_button.pressed.connect(_on_join_pressed)
 	_ip_input.text_submitted.connect(func(_text: String) -> void: _on_join_pressed())
@@ -41,9 +39,11 @@ func _ready() -> void:
 	_leave_button.pressed.connect(_on_leave_pressed)
 	RoomManager.room_changed.connect(_on_room_changed)
 	NetworkManager.voice_action_received.connect(_on_remote_action)
-	NetworkManager.lobby_pitch_received.connect(_on_lobby_pitch_received)
+	NetworkManager.pitch_received.connect(_on_remote_pitch)
 
-	# 玩家 2 的本機輸入（鍵盤與語音）。是否啟用、要不要送給 Host 依角色在 _refresh() 設定。
+	# 自己座位的本機輸入。是否啟用、要不要傳給對方依座位在 _refresh_player_inputs() 設定。
+	_pitch_input = PlayerPitchInput.new()
+	add_child(_pitch_input)
 	_action_input = PlayerActionInput.new()
 	_action_input.action_changed.connect(_panels.show_action)
 	add_child(_action_input)
@@ -54,11 +54,11 @@ func _ready() -> void:
 	_refresh()
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if RoomManager.phase == RoomManager.Phase.JOINING:
 		_refresh_status()
-	if RoomManager.role == RoomManager.Role.HOST:
-		_update_player1(delta)
+	if _pitch_input.enabled:
+		_panels.set_pitch(_pitch_input.level, _pitch_input.lane)
 
 
 func _exit_tree() -> void:
@@ -85,36 +85,17 @@ func _on_leave_pressed() -> void:
 		RoomManager.leave_room()
 
 
-# ---- 玩家輸入顯示 ----
+# ---- 對方的輸入 ----
 
-## Host：量自己的音高，換算成層顯示，並傳給 Client。
-func _update_player1(delta: float) -> void:
-	var voice: Node = MicInput
-	if PhoneMic.is_player_connected(PITCH_PHONE_PLAYER):
-		voice = PhoneMic.get_source(PITCH_PHONE_PLAYER)
-	var level: float = 0.0
-	if MicInput.pitch_input_enabled:
-		level = voice.pitch_value / 100.0
-		if voice.pitch_active:
-			_player1_lane = PitchLaneInput.pick_lane(voice.pitch_value, LANE_COUNT, _player1_lane, PITCH_HYSTERESIS)
-	else:
-		_player1_lane = -1
-	_panels.set_pitch(level, _player1_lane)
-
-	_broadcast_timer += delta
-	if _broadcast_timer >= PITCH_BROADCAST_INTERVAL:
-		_broadcast_timer = 0.0
-		NetworkManager.send_lobby_pitch(level, _player1_lane)
-
-
-func _on_lobby_pitch_received(level: float, lane: int) -> void:
-	if RoomManager.role == RoomManager.Role.CLIENT:
+## 對方坐玩家 1：顯示對方傳來的音高。
+func _on_remote_pitch(level: float, lane: int) -> void:
+	if not _pitch_input.enabled:
 		_panels.set_pitch(level, lane)
 
 
-## Host 收到 Client 的吸／吐。
+## 對方坐玩家 2：顯示對方傳來的吸／吐。
 func _on_remote_action(_peer_id: int, action: String) -> void:
-	if RoomManager.role == RoomManager.Role.HOST:
+	if not _action_input.enabled:
 		_panels.show_action(action)
 
 
@@ -126,8 +107,7 @@ func _refresh() -> void:
 	var joining: bool = RoomManager.phase == RoomManager.Phase.JOINING
 	var count: int = RoomManager.get_player_count()
 
-	_slot1_label.text = "玩家 1：你（房主）" if is_host else "玩家 1：房主"
-	_slot2_label.text = _slot2_text(is_client, joining, count)
+	_refresh_seats(is_host, is_client, joining, count)
 	_local_ip_label.text = _local_ip_text(is_host)
 
 	# 以單機遊玩、加入別人房間：只有 Host，且房內只有自己時可按。
@@ -142,33 +122,55 @@ func _refresh() -> void:
 	_start_button.disabled = not RoomManager.can_start_match()
 
 	_leave_button.text = "取消連線" if joining else "離開"
-	_refresh_player_inputs(is_host, is_client, joining, count)
+	_refresh_player_inputs(is_host, joining, count)
 	_refresh_status()
 
 
-## 玩家 2 的輸入來源：Client 是自己；Host 單機時也是自己；Host 有 Client 時是對方。
-func _refresh_player_inputs(is_host: bool, is_client: bool, joining: bool, count: int) -> void:
-	var player2_is_mine: bool = is_client or (is_host and count == 1)
-	_action_input.enabled = player2_is_mine and not joining
-	_action_input.send_to_host = is_client
+func _refresh_seats(is_host: bool, is_client: bool, joining: bool, count: int) -> void:
+	var mine: int = RoomManager.get_my_slot()
+	var clickable: bool = RoomManager.phase == RoomManager.Phase.ROOM
+	var buttons: Array[Button] = [_slot1_button, _slot2_button]
+	for i in buttons.size():
+		var slot: int = i + 1
+		buttons[i].text = "玩家 %d｜%s" % [slot, _seat_owner_text(slot == mine, is_host, is_client, joining, count)]
+		buttons[i].theme_type_variation = &"SeatMine" if slot == mine else &"SeatOther"
+		buttons[i].disabled = not clickable
 
-	_panels.set_player1("你的音高：對麥克風發出高低音" if is_host else "房主的音高", is_host)
-	var player2_caption: String = "對方的吸／吐"
+
+func _seat_owner_text(is_mine: bool, is_host: bool, is_client: bool, joining: bool, count: int) -> String:
+	if is_mine:
+		return "你（房主）" if is_host else "你"
 	if is_client:
-		player2_caption = "你的吸／吐：喊「吸」「吐」，或按 J／K"
-	elif player2_is_mine:
-		player2_caption = "單機時由你操作：喊「吸」「吐」，或按 J／K"
-	_panels.set_player2(player2_caption, player2_is_mine)
-
-
-func _slot2_text(is_client: bool, joining: bool, count: int) -> String:
-	if is_client:
-		return "玩家 2：你"
+		return "房主"
 	if joining:
-		return "玩家 2：連線中…"
+		return "連線中…"
 	if count >= 2:
-		return "玩家 2：對方（已加入）"
-	return "玩家 2：等待加入…"
+		return "對方（已加入）"
+	return "等待加入…"
+
+
+## 自己座位的輸入由本機負責並傳給對方；Host 房內只有自己（單機）時兩個座位都由本機負責。
+func _refresh_player_inputs(is_host: bool, joining: bool, count: int) -> void:
+	var alone: bool = is_host and count == 1
+	var has_peer: bool = count == 2
+	var mine: int = RoomManager.get_my_slot()
+	var player1_is_mine: bool = alone or mine == 1
+	var player2_is_mine: bool = alone or mine == 2
+
+	_pitch_input.enabled = player1_is_mine and not joining
+	_pitch_input.send_to_peer = has_peer and mine == 1
+	_action_input.enabled = player2_is_mine and not joining
+	_action_input.send_to_peer = has_peer and mine == 2
+
+	_panels.set_player1("你的音高：對麥克風發出高低音" if player1_is_mine else "對方的音高", player1_is_mine)
+	var player2_caption: String = "對方的吸／吐"
+	if alone:
+		player2_caption = "單機時由你操作：喊「吸」「吐」，或按 J／K"
+	elif player2_is_mine:
+		player2_caption = "你的吸／吐：喊「吸」「吐」，或按 J／K"
+	_panels.set_player2(player2_caption, player2_is_mine)
+	if not player1_is_mine:
+		_panels.set_pitch(0.0, -1)
 
 
 func _local_ip_text(is_host: bool) -> String:

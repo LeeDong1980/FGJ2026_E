@@ -78,17 +78,25 @@ theme_override_font_sizes/font_size = 56
 text = "房間等候"
 horizontal_alignment = 1
 
-[node name="Slot1Label" type="Label" parent="Center/Card/Panel"]
+[node name="Slot1Button" type="Button" parent="Center/Card/Panel"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-horizontal_alignment = 1
+theme_type_variation = &"SeatMine"
+text = "玩家 1"
 
-[node name="Slot2Label" type="Label" parent="Center/Card/Panel"]
+[node name="Slot2Button" type="Button" parent="Center/Card/Panel"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"SeatOther"
+text = "玩家 2"
+
+[node name="SeatHintLabel" type="Label" parent="Center/Card/Panel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_override_font_sizes/font_size = 22
+text = "點選玩家 1／玩家 2 切換角色：玩家 1 用音高控制龍的高度，玩家 2 負責吸／吐"
 horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="LocalIpLabel" type="Label" parent="Center/Card/Panel"]
 unique_name_in_owner = true

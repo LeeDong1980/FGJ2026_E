@@ -117,7 +117,7 @@ theme_override_constants/separation = 16
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
 theme_override_font_sizes/font_size = 36
-text = "玩家 A｜控制高度"
+text = "玩家 1｜控制高度"
 horizontal_alignment = 1
 
 [node name="Separator" type="HSeparator" parent="PlayerACard/Content"]
@@ -128,8 +128,8 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 0.9)
 theme_override_constants/line_spacing = 14
 theme_override_font_sizes/font_size = 28
-text = "用音量控制龍的高度
-大聲飛高、小聲飛低"
+text = "用音高控制龍的高度
+高音飛高、低音飛低"
 horizontal_alignment = 1
 
 [node name="PlayerBCard" type="PanelContainer" parent="."]
@@ -156,7 +156,7 @@ theme_override_constants/separation = 16
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
 theme_override_font_sizes/font_size = 36
-text = "玩家 B｜吸與吐"
+text = "玩家 2｜吸與吐"
 horizontal_alignment = 1
 
 [node name="Separator" type="HSeparator" parent="PlayerBCard/Content"]

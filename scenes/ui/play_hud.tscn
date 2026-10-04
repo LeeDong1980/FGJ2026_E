@@ -134,7 +134,7 @@ theme_override_constants/separation = 20
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
 theme_override_font_sizes/font_size = 30
-text = "玩家 A｜高度"
+text = "玩家 1｜高度"
 horizontal_alignment = 1
 
 [node name="VolumeMeter" type="Control" parent="PlayerAPanel/Content"]
@@ -169,7 +169,7 @@ theme_override_constants/separation = 8
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
 theme_override_font_sizes/font_size = 30
-text = "玩家 B｜吸 / 吐"
+text = "玩家 2｜吸 / 吐"
 horizontal_alignment = 1
 
 [node name="WordLabel" type="Label" parent="PlayerBPanel/Content"]
