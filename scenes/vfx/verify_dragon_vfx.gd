@@ -173,6 +173,8 @@ func _verify() -> void:
 		integrated.stop_effects()
 	_verify_width_controls(scene)
 	_verify_preview_controls()
+	await _verify_fire_density(scene)
+	await _verify_spit(scene)
 	print("VFX_RESULT checks=", _checks, " failures=", _failures)
 	quit(0 if _failures == 0 else 1)
 
@@ -283,3 +285,144 @@ func _verify_preview_controls() -> void:
 	var label: Label = preview.get_node("Instructions/Status") as Label
 	_expect(label.text.contains("吸取寬 4.00") and label.text.contains("噴火寬 3.00"), "preview displays live widths in Traditional Chinese")
 	_expect(label.text.contains("完整直徑") and label.text.contains("胃袋吐食材"), "preview states diameter and fire-only scope")
+	var old_count: int = effects.particle_count
+	for code: int in [KEY_E, KEY_D, KEY_R]:
+		var key: InputEventKey = InputEventKey.new()
+		key.physical_keycode = code
+		key.pressed = true
+		preview.call(&"_unhandled_key_input", key)
+		_expect(effects.particle_count == old_count, "preview fire density key preserves suction setting")
+	_expect(effects.fire_particle_count == 0 and effects.get_fire_particle_count() == old_count, "preview R restores legacy shared count")
+
+
+func _verify_fire_density(scene: PackedScene) -> void:
+	var effects: DragonEffects = scene.instantiate() as DragonEffects
+	var second: DragonEffects = scene.instantiate() as DragonEffects
+	var dragon: TestDragon = TestDragon.new()
+	root.add_child(dragon)
+	root.add_child(effects)
+	root.add_child(second)
+	effects.bind_dragon(dragon)
+	var target: Vector3 = dragon.anchor.global_position + Vector3.LEFT * 4.0
+	var suction: GPUParticles3D = effects.get_node("SuctionEffect/Flow") as GPUParticles3D
+	var fire: GPUParticles3D = effects.get_node("FireBreathEffect/Flow") as GPUParticles3D
+	var sparks: GPUParticles3D = effects.get_node("FireBreathEffect/Sparks") as GPUParticles3D
+	var smoke: GPUParticles3D = effects.get_node("FireBreathEffect/Smoke") as GPUParticles3D
+	_expect(effects.fire_particle_count == 384 and effects.particle_count == 192, "new fire default doubles only main flame")
+	effects.play_suction(target, 2.0)
+	_expect(suction.amount == 192, "suction retains original density")
+	effects.set_fire_particle_count(512)
+	_expect(suction.amount == 192 and effects.get_active_effect() == &"suction", "fire tuning does not alter active suction")
+	effects.play_fire(target, 2.0)
+	var events: Array[StringName] = []
+	effects.effect_started.connect(func(kind: StringName) -> void: events.append(kind))
+	effects.effect_interrupted.connect(func(kind: StringName) -> void: events.append(kind))
+	var remaining: float = effects._remaining
+	for entry: Vector2i in [Vector2i(8, 8), Vector2i(384, 384), Vector2i(512, 512), Vector2i(1, 8), Vector2i(999, 512)]:
+		_expect(effects.set_fire_particle_count(entry.x), "valid or positive clamped density accepted")
+		_expect(fire.amount == entry.y and fire.emitting, "active flame receives selected count")
+	_expect(events.is_empty() and effects._remaining == remaining, "density tuning preserves lifecycle and time")
+	_expect(sparks.amount == 16 and smoke.amount == 12, "sparks and smoke budgets unchanged")
+	_expect(effects.fire_width == 3.0 and effects.suction_width == 4.0 and effects.effect_range == 6.0, "density leaves width and range unchanged")
+	_expect(not effects.set_fire_particle_count(-1) and fire.amount == 512, "negative API input rejected without mutation")
+	effects.fire_particle_count = -4
+	_expect(effects.fire_particle_count == 512, "negative property write ignored")
+	effects.particle_count = 96
+	_expect(effects.set_fire_particle_count(0) and fire.amount == 96, "zero restores legacy shared particle count")
+	effects.stop_effects()
+	effects.play_suction(target)
+	_expect(suction.amount == 96, "legacy particle count remains usable for suction")
+	effects.set_fire_particle_count(384)
+	effects.play_fire(target, 0.01)
+	effects._process(0.02)
+	_expect(effects._draining and not fire.emitting, "finite fire enters drain")
+	effects.fire_particle_count = 512
+	_expect(fire.amount == 384 and not fire.emitting and effects._draining, "tail tuning does not revive or reset fading particles")
+	await create_timer(0.55).timeout
+	_expect(effects.get_active_effect() == &"", "density tuned tail finishes naturally")
+	effects.play_fire(target)
+	_expect(fire.amount == 512, "next playback applies density saved during drain")
+	_expect(second.fire_particle_count == 384, "fire density remains instance local")
+	var packed: PackedScene = PackedScene.new()
+	_expect(packed.pack(effects) == OK, "density configured scene packs")
+	var restored: DragonEffects = packed.instantiate() as DragonEffects
+	_expect(restored.fire_particle_count == 512 and restored.particle_count == 96, "independent density survives scene serialization")
+	restored.free()
+	effects.stop_effects()
+	_expect(not fire.visible and not sparks.visible and not smoke.visible, "new density stops without residual emitters")
+	effects.queue_free()
+	second.queue_free()
+	dragon.queue_free()
+
+
+func _verify_spit(scene: PackedScene) -> void:
+	var effects: DragonEffects = scene.instantiate() as DragonEffects
+	var food: PackedScene = load("res://scenes/ingredient/ingredient_model.tscn")
+	var dragon: TestDragon = TestDragon.new()
+	root.add_child(dragon)
+	root.add_child(effects)
+	effects.bind_dragon(dragon)
+	var source: Vector3 = dragon.anchor.global_position
+	var target: Vector3 = source + Vector3.RIGHT * 12.0
+	var events: Array[String] = []
+	effects.spit_started.connect(func(id: int) -> void: events.append("S:%d" % id))
+	effects.spit_finished.connect(func(id: int) -> void: events.append("F:%d" % id))
+	effects.spit_interrupted.connect(func(id: int) -> void: events.append("I:%d" % id))
+	_expect(effects.play_spit(target, null) == -1, "missing payload rejected")
+	_expect(effects.play_spit(Vector3(INF, 0, 0), food) == -1, "nonfinite spit target rejected")
+	_expect(effects.play_spit(target, food, 0.0) == -1, "zero spit duration rejected")
+	_expect(effects.play_spit(target, food, NAN) == -1, "nonfinite spit duration rejected")
+	_expect(effects.play_spit(target, food, 0.6, -1.0) == -1, "negative arc rejected")
+	_expect(effects.play_spit(target, food, 0.6, INF) == -1, "nonfinite arc rejected")
+	_expect(effects.play_spit(source, food) == -1, "zero length spit rejected")
+	_expect(effects.play_spit(target, food, 0.6, 1.2, 99) == -1, "invalid ingredient type rejected")
+	var bad_root: Node = Node.new()
+	var invalid_scene: PackedScene = PackedScene.new()
+	invalid_scene.pack(bad_root)
+	bad_root.free()
+	_expect(effects.play_spit(target, invalid_scene) == -1, "non3D payload rejected")
+	_expect(events.is_empty() and effects.get_active_spit_count() == 0, "invalid spit calls preserve state and events")
+	var id: int = effects.play_spit(target, food, 0.3, 1.2, IngredientType.Type.SLIME)
+	_expect(id > 0 and effects.get_active_spit_count() == 1, "typed food spit starts")
+	var shot: SpitProjectile = effects._spits[id]
+	_expect(shot.get_position_at(0.0).is_equal_approx(source), "spit starts at captured mouth")
+	_expect(shot.get_position_at(1.0).is_equal_approx(target), "spit reaches full target beyond effect_range")
+	_expect(shot.get_position_at(0.5).is_equal_approx(source.lerp(target, 0.5) + Vector3.UP * 1.2), "arc_height is midpoint lift over line")
+	dragon.position += Vector3.UP * 5.0
+	_expect(shot.get_position_at(0.0).is_equal_approx(source), "inflight shot not dragged by dragon lane changes")
+	_expect(effects.play_fire(source + Vector3.LEFT * 4.0, 2.0), "fire can run alongside food")
+	effects.stop_breath_effects()
+	_expect(effects.get_active_spit_count() == 1 and effects.get_active_effect() == &"", "fire release preserves food already in flight")
+	await create_timer(0.4).timeout
+	_expect(effects.get_active_spit_count() == 0 and events == ["S:%d" % id, "F:%d" % id], "arrival completes once and frees food")
+	events.clear()
+	for type: int in IngredientType.NAMES:
+		_expect(effects.play_spit(target, food, 2.0, 0.0, type) > 0, "all six existing food types accepted")
+	_expect(effects.get_active_spit_count() == 6, "rapid successful spits coexist")
+	effects.play_spit(target, food, 2.0)
+	effects.play_spit(target, food, 2.0)
+	_expect(effects.get_active_spit_count() == 8 and effects.play_spit(target, food) == -1, "concurrency cap rejects excess without replacement")
+	effects.stop_effects()
+	_expect(effects.get_active_spit_count() == 0 and events.size() == 16, "global stop interrupts each active shot once")
+	var stopped: int = events.size()
+	effects.stop_effects()
+	_expect(events.size() == stopped, "idle global stop emits no spit events")
+	var rebound: int = effects.play_spit(target, food, 2.0)
+	effects.bind_dragon(dragon)
+	_expect(effects.get_active_spit_count() == 0 and events.back() == "I:%d" % rebound, "rebind clears food transit")
+	var newer_ids: Array[int] = []
+	var callback: Callable = func(_old_id: int) -> void:
+		newer_ids.append(effects.play_spit(target, food, 1.0))
+	effects.play_spit(target, food, 2.0)
+	effects.spit_interrupted.connect(callback, CONNECT_ONE_SHOT)
+	effects.stop_effects()
+	_expect(newer_ids.size() == 1 and effects._spits.has(newer_ids[0]), "newer cancellation callback shot survives old snapshot")
+	effects.stop_effects()
+	await process_frame
+	var remaining_shots: int = 0
+	for child: Node in effects.get_children():
+		if child is SpitProjectile:
+			remaining_shots += 1
+	_expect(remaining_shots == 0, "global clear frees all shot nodes")
+	effects.queue_free()
+	dragon.queue_free()

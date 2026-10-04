@@ -207,3 +207,61 @@ Forward Plus／D3D12、1600 × 900 真實主鏡頭確認：幼龍、蛋組與鍋
 - 暫存專案 `C:/Users/LeeDong/AppData/Local/Temp/fgj_main_effects_qa`，包含 `capture_width_readability.gd`、`width_review_sheets.py`、`width_source_snapshot.json` 與 `width_capture*.log`。截圖取樣後技美修改的 legacy radius 序列化與獨立預覽操作沒有改變此次主場景效果的寬度／渲染計算；若後續修改幅寬、shader 或主要場景變換，須重新取樣。
 
 本 session 僅更新自己的兩份交付文件，未 commit／push；驗證程序已退出，使用者 Godot 保留。
+
+## 2026-10-04 ART-12／15／17 可逆草案交付
+
+本節是總監授權先做的可檢視草案，**60% 角色比例與接邊方案仍待使用者正式驗收**。此前章節保留首版歷史結果；目前幼龍預設已改為 2.4，樓層在執行時依目前攝影機向外延伸。沒有修改主龍、攝影機、GM 場景、來源模型或 kitkay 配置，不 commit／push。ART-09 既有換層修正維持原狀。
+
+### ART-15 房間向外接邊
+
+修改 `room_module.gd`、`room_ceiling.gd`、`prototype_floor.gd` 及挑戰房的 `outward_direction=-1`。左房向 −X、右房向 +X 增接，原來的 8 × 4 × 8 是固定核心房間尺寸；房間原點、世界內側 X=−4／+4、中央通道、Props 及 Queue／Pot／Nest／Hatchling／Egg／Dragon 定位點均固定。
+
+- `Room.set_outer_extension(distance)`：距離是房間局部單位，有限值限制在 0～40；0 恢復核心外殼。`outward_direction` 指定左／右，`outer_extension` 可在 Inspector 設定。
+- 同步增接 4 單位地板及背牆片，末片僅縮窄建築片的 X 尺寸；延長 foundation、背簷及其碰撞。外牆、外簷、外側前後柱移到新外緣，內側後牆不動，+Z 視線開口保留，沒有拉伸核心道具。左側外牆仍保留既有前半段隊伍入口。
+- `RoomCeiling.set_outer_extension(distance, direction)`：屋頂板、碰撞及下表面地板片同步延伸；仍由原 `set_enabled` 一起控制可見性與碰撞。各實例的 BoxMesh／BoxShape3D 先複製，修改一層不污染另一層。
+- `PrototypeFloor.fit_screen_edges=true`：僅 runtime 生效。尋找祖先內的 `PrototypePresentation`，讀取合成師 `get_visible_horizontal_span(world_y, world_z)`；對地板與牆頂 Y，以及前 Z=4／後 Z=−4，共四組世界座標取樣，再轉回各房間局部 X。
+- 左／右各取最外側值，另加 `edge_overscan=0.1`。三層在 1600 × 900 的延伸距離約 5.221／5.169／5.116；外緣為 ±17.221／±17.169／±17.116，各房寬約 13.221／13.169／13.116。矩形模組會在前緣比画面多延伸，避免深度造成邊緣空隙。
+- `fit_to_presentation_edges() -> bool`：無效／非有限查詢保持既有幾何；相同數值不重建。不修改 `layout_bounds`、不呼叫 reframe；只監聽 `framing_changed` 並延後更新，避免房間延伸與攝影機取景互相擴大。
+- `reset_outer_extensions()`：關閉自動接邊並恢復兩側 8 單位核心。重新設 `fit_screen_edges=true`，再呼叫 `fit_to_presentation_edges()` 即可恢復接邊。單獨 F6 房間沒有 Presentation 時不自動延伸，可直接設 `outer_extension` 預覽。
+
+目前自動接邊適用專案既有 X 水平、Y 樓層、Z 深度的布局；任意旋轉／非等比縮放樓層尚未驗證。合成師的查詢接口仍可回傳世界點，但此整合沒有宣稱支援斜向通道。
+
+### ART-17 幼龍高度與左側食材交接
+
+新增 `baby_dragon.gd` 及 `.uid`，掛到既有 `baby_dragon.tscn`。`display_height` 預設 **2.4**，可調 0.2～3.0，代表包含耳翼的可見模型 AABB 高度；不是骨架高度、Label 高度或角色根倍率。只縮放並校正 Model，BabyDragon 根節點維持原點／scale1，HatchlingAnchor 保持原位置。原貼圖、静態站姿、不帶碰撞的配置維持；沒有代造 idle／走動動畫。
+
+| 草案高度 | 房高占比 | 模型寬 × 高 × 深 | 空間檢查 |
+|---|---:|---|---|
+| 1.15（原首版） | 28.75% | 0.649 × 1.15 × 1.522 | 無鍋／蛋外框交疊 |
+| 2.0 | 50% | 1.128 × 2.0 × 2.647 | 無鍋／蛋外框交疊 |
+| 2.4（目前草案） | 60% | 1.354 × 2.4 × 3.176 | 三層底面誤差 <0.000001，無鍋／蛋／Props 外框交疊；原站位即可保留 |
+| 2.667 | 2/3 | 1.505 × 2.667 × 3.529 | 與第一顆 DragonEgg 的保守 AABB 交疊；不採為目前預設 |
+
+2.4 對來源 GLB 的 Model 倍率約 18.0620202，位置校正 `(0, −0.0013706507, 0.440965809)`。主鏡頭下低層投影約寬 75.5／高 134.6 像素；三層幼龍臉部、鍋子及三種蛋可分別辨識。參數大於 2.4 時仍應重查尾巴與蛋組，合法參數範圍不代表全部值都已保證適合此站位。
+
+**GM-19／程式 owner 的食材待辦（本 session 未修改）**：現有食材是 CapsuleMesh，高 0.8、寬 0.4、底部在 root Y=0，六種真實角色素材仍缺。若採同一 60% 草案：
+
+1. 僅讓身體 Mesh 等比 scale3，身體中心 Y 從 0.4 改 1.2；最後高 2.4、寬 1.2，腳底仍為 0。IngredientModel root、Label3D 與 BurnBar 不整體 scale3。
+2. GameManager `ingredient_spacing` 原 0.6 小於新身寬，應至少 1.2＋間隙，建議首版 1.4；5 人列長（含半徑）約 6.8，可容納在現有 7.4 單位 spawn→front 距離內。保持 QueueSpawn／QueueFront 定位點，不由場景美術改隊列行為。
+3. NameLabel 建議移到約 Y=2.6；字型大小與輪廓另行做主鏡頭核對。BurnBar 建議移到身體頂部附近、Z 向前避免嵌入，保留目前獨立寬度與進度計算。
+4. `EffectsView.target_height` 原 0.4 對應舊身體中段；新高 2.4 建議改 1.2，與技美噴火密度及食材目標回歸一起驗證。真正角色到位時以各自可見 AABB 做縮放與腳底校正，不固定所有源模型都乘3。
+
+### ART-12 洞穴需求與掛載規格
+
+洞穴模型路徑仍未提供，沒有新造／替換模型、沒有放 kitkay，亦未新增假洞穴。預計採場景根下獨立洞穴背景子場景，與 Floors／RedDragon 平行；不能掛在動畫模型或骨架上繼承 fly 位移。主場景掛載由場景美術負責，game.tscn 掛載須交露柑；層數與層距應讀取樓層資料，不能只適合固定三層。
+
+**請提供／核對的模型尺寸清單**：完整变換後外框寬高深、原點相對地面／洞口中心、洞口淨寬淨高、內部可用深度、正面 +Z 及左右側口位置、側口與三層入口高度、前後封閉面、背面材質／法線、材質與貼圖／授權、是否已有可拆屋頂與碰撞。光照及遠裁切在模型到位後由合成師檢視。
+
+中央核心的世界 X=−4～+4，三層樓板 Y=0／5／10、房間頂 Y=4／9／14。這是通道與側向連接的既定布局，**不是整隻龍可以裝入的洞穴內空尺寸**。主龍 scale5、位置 `(0,6.4,−16.018951)` 的 fly 以 8 個時間點實際骨架烘焙量測，合併外框約寬 **26.789**、高 **21.418**、深 **24.017**，min `(-12.996,0.386,-27.688)`；翼展超過 8 寬通道。這是姿勢取樣，不包含所有動作、未來左右擺頭或 game 移動的全程外框。
+
+因此素材需先選擇「中央開放背景」或「包覆完整龍體的洞穴」；前者要保留 +Z 觀看面及左右入口，不可讓岩壁／碰撞侵入公開定位點、嘴部射線或升降路徑；後者必須另按所有動作及 game 範圍量測內空，不能直接以 8 × 14 × 8 封閉。此選擇尚未定案。
+
+若後壁放在本次尾部後方（例如 Z≈−28.688），目前合成師 camera API 回傳 `outside_clip_depth`。ART-13 需依實際洞穴位置核對／調整 far clip，而非讓場景美術私自改鏡頭或主龍。洞口遮擋、側門、尾部與牆的淨距及動畫餘量須等模型到位後驗證，現在不虛報已完成 ART-12。
+
+### 驗證與檢視位置
+
+- `EXTENDED_ROOMS_RESULT checks=109 failures=0`：三層六房的地板碰撞、舊外牆不阻通行、四組前後／頂部邊界覆蓋、屋頂尺寸與顯示／碰撞切換、anchor／主龍保持、幼龍落地及鍋／蛋間距、重複 fit、無效查詢保留、單層 reset 的資源隔離與執行時高度變更。
+- 實際 `LaneLayout` 腳本的獨立 fixture 通過 3→2 層重建、1600 × 900→1280 × 800 resize 後自動接邊，QueueFront 仍為 `(-4.6, layerY, 1.1)`。不是整個 game／UI／語音流程驗收；總監另已 GPU 檢视 main／game，最終畫面交合成師確認。
+- Forward Plus／D3D12、RTX 4070、1600 × 900：[延伸房間＋幼龍 2.4 草案](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/extended_rooms_baby_2_4_draft.png)。Godot 4.7.2，Jolt；截圖保存結果0、程序退出0，無 script／shader 解析錯誤。副本的使用者資料／憑證權限及 UID 快取回退訊息不影響結果，沒有重匯入共享專案。
+- [幼龍四種高度量測](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/role_ratio_measurements.json)、[延伸尺寸與檢查數](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/extended_room_measurements.json)、[鏡頭邊界與主龍 fly 八姿勢外框](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/layout_requirements.json)。
+- 暫存 `C:/Users/LeeDong/AppData/Local/Temp/fgj_main_effects_qa` 保存 `capture_role_ratios.gd`、`measure_layout_requirements.gd`、`verify_extended_rooms.gd`、`verify_generated_rooms.gd` 及 `role_ratio*`／`layout_requirements*`／`extended_rooms*`／`generated_rooms*` 日誌。所有本輪驗證程序已退出。

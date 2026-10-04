@@ -1,7 +1,7 @@
-[gd_resource type="AnimationLibrary" format=3]
+[gd_resource type="AnimationLibrary" format=3 uid="uid://b76fkns8857tg"]
 
 [sub_resource type="Animation" id="Animation_d0tar"]
-length = 1.2083333333333335
+length = 1.2083333333333337
 tracks/0/type = "position_3d"
 tracks/0/imported = false
 tracks/0/enabled = true

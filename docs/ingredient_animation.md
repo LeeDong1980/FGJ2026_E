@@ -1,4 +1,4 @@
-# 食材模型通用動畫規範
+﻿# 食材模型通用動畫規範
 
 所有食材角色（人類、精靈、矮人、史萊姆、獸人、蝙蝠）都使用相同的標準動畫名稱，程式端不需要知道各模型原本的動畫名。
 
@@ -28,6 +28,7 @@
 | 角色 | 場景 | Idle | Walk | Atk |
 |---|---|---|---|---|
 | 人類 | `human_character.tscn` | `Idle_001` | `walk` | `attack` |
+| 精靈 | `elf_character.tscn` | `Idle.fbx` | `Walk.fbx` | `Atk.fbx`（皆為 `mixamo_com`，已移除作用在 metarig 根節點的軌道） |
 | 史萊姆 | `slime_character.tscn` | `Idle` | `Scoot_Move` | `Emote_Anger` |
 | 蝙蝠 | `bat_character.tscn` | `Armature.006` 第 2～36 格 | 同 Idle（第 2～36 格） | `Armature.006` 第 76～105 格 |
 
@@ -44,4 +45,5 @@
 ## 待確認
 
 - 史萊姆 `Atk` 暫用 `Emote_Anger`，可在 `SETS` 改為其他動畫（如 `Emote_Excite`、`Wiggle`）。
-- 精靈、矮人、獸人尚未有模型。
+- 矮人、獸人尚未有模型。
+- 精靈的 `elf.glb`（含貼圖）只有骨架與網格、沒有 AnimationPlayer，`IngredientCharacter` 會自動建立；動畫來自三個獨立 FBX。縮放 0.39（高約 0.8），朝向待在畫面確認。

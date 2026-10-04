@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blp26oxkj1tb8"
-path="res://.godot/imported/ui_result_success.svg-a52a71163afbce50cc1d32d57e420b36.ctex"
+uid="uid://ljipy24cx70t"
+path="res://.godot/imported/density_stopped.png-11ecdd20f3b12e91363ce09d3d6d4b0c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/images/ui_result_success.svg"
-dest_files=["res://.godot/imported/ui_result_success.svg-a52a71163afbce50cc1d32d57e420b36.ctex"]
+source_file="res://scenes/vfx/qa/density_stopped.png"
+dest_files=["res://.godot/imported/density_stopped.png-11ecdd20f3b12e91363ce09d3d6d4b0c.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

@@ -1,4 +1,4 @@
-[gd_resource type="AnimationLibrary" format=3]
+[gd_resource type="AnimationLibrary" format=3 uid="uid://d0m3eaxt5c4dh"]
 
 [sub_resource type="Animation" id="Animation_ifqah"]
 resource_name = "Emote_Anger"

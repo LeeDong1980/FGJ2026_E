@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cfijqaue5000g"
-path="res://.godot/imported/ui_pot_info.svg-8a6b4af52851a91fe997af59b1f17241.ctex"
+uid="uid://dlsqmtiofjl8h"
+path="res://.godot/imported/spit_idle.png-e16ee3cf67f5b122d1abc2c14ac83763.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/images/ui_pot_info.svg"
-dest_files=["res://.godot/imported/ui_pot_info.svg-8a6b4af52851a91fe997af59b1f17241.ctex"]
+source_file="res://scenes/vfx/qa/spit_idle.png"
+dest_files=["res://.godot/imported/spit_idle.png-e16ee3cf67f5b122d1abc2c14ac83763.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

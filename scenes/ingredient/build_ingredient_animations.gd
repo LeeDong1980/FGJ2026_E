@@ -1,4 +1,4 @@
-extends SceneTree
+﻿extends SceneTree
 ## 依「食材模型通用動畫規範」（docs/ingredient_animation.md）為三種食材產生標準名稱動畫庫：Idle、Walk、Atk。
 ##   人類、史萊姆：把模型原有動畫複製並改成標準名稱。
 ##   蝙蝠：從 bat.glb 的 `Armature_006|Take 001|BaseLayer` 以 24 fps 逐格擷取片段（格數 = 時間 × 24）。
@@ -24,9 +24,17 @@ const SETS := [
 		"source": "Armature_006|Take 001|BaseLayer", # Godot 匯入時把 "." 換成 "_"
 		"clips": {&"Idle": [2, 36], &"Walk": [2, 36], &"Atk": [76, 105]},
 	},
+	{
+		"model": "res://Models/heroElf/elf.glb",
+		"output": "res://Models/heroElf/elf_animations.tres",
+		# 動畫在獨立 FBX（Mixamo 風格，動畫名 mixamo_com）；去掉作用在 metarig 根節點上的位移／旋轉軌道，避免改變朝向與位置。
+		"clips": {
+			&"Idle": {"scene": "res://Models/heroElf/Idle.fbx", "anim": "mixamo_com"},
+			&"Walk": {"scene": "res://Models/heroElf/Walk.fbx", "anim": "mixamo_com"},
+			&"Atk": {"scene": "res://Models/heroElf/Atk.fbx", "anim": "mixamo_com"},
+		},
+	},
 ]
-
-
 func _init() -> void:
 	for set_info in SETS:
 		var root := (load(set_info["model"]) as PackedScene).instantiate()
@@ -35,7 +43,9 @@ func _init() -> void:
 		for clip_name in set_info["clips"]:
 			var spec: Variant = set_info["clips"][clip_name]
 			var anim: Animation
-			if spec is Array:
+			if spec is Dictionary:
+				anim = _from_scene(spec["scene"], spec["anim"])
+			elif spec is Array:
 				anim = _extract(player.get_animation(set_info["source"]), spec[0] / FPS, spec[1] / FPS)
 			else:
 				anim = player.get_animation(spec).duplicate()
@@ -69,3 +79,15 @@ func _extract(src: Animation, t0: float, t1: float) -> Animation:
 					value = src.scale_track_interpolate(i, time)
 			out.track_insert_key(t, s / FPS, value)
 	return out
+
+
+## 從另一個 FBX 取動畫，並移除作用在根節點（路徑沒有骨頭名稱）的軌道。
+func _from_scene(scene_path: String, anim_name: String) -> Animation:
+	var root := (load(scene_path) as PackedScene).instantiate()
+	var player := root.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	var anim := player.get_animation(anim_name).duplicate() as Animation
+	for t in range(anim.get_track_count() - 1, -1, -1):
+		if anim.track_get_path(t).get_subname_count() == 0:
+			anim.remove_track(t)
+	root.free()
+	return anim
