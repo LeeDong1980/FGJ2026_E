@@ -83,7 +83,7 @@ func set_completed(completed: int, target: int) -> void:
 
 
 func set_cleared(cleared: int, limit: int) -> void:
-	_cleared_label.text = "✕ 清空 %d / %d" % [cleared, limit]
+	_cleared_label.text = "清空 %d / %d" % [cleared, limit]
 	_cleared_warning = limit - cleared == CLEARED_WARNING_LEFT
 	if not _cleared_warning:
 		_cleared_label.modulate.a = 1.0
