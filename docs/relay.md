@@ -40,6 +40,11 @@ Host ──wss──▶ ┐                              ┌ ◀──wss── 
 - 二進位訊息第一個位元組是類型：`0` 遊戲封包、`1` ping（帶 8 位元組時間）、`2` pong。Host 與 Client 每秒互送 ping 量來回時間與確認對方還在；超過 6 秒沒收到視為斷線。對中繼本身每 4 秒送一次 `ping`，12 秒沒回應視為中繼斷線。
 - 使用 Hibernation API：房間沒有訊息時 Durable Object 不計運算時間。
 
+## 目前部署
+
+- 網址：`https://fgj2026-relay.fgj2026-relay.workers.dev`（Cloudflare 帳號 stc.ntu@gmail.com，Worker 名稱 `fgj2026-relay`），已填入 `NetworkManager.DEFAULT_RELAY_URL`。
+- 更新程式後重新部署：`cd relay_server && npx wrangler deploy`（需要 Node 20 以上；這台 Mac 的預設 node 是 16，用 `PATH=/usr/local/opt/node/bin:$PATH` 指定 brew 裝的新版）。
+
 ## 部署（第一次）
 
 需求：Node 20 以上、Cloudflare 帳號。
@@ -64,7 +69,8 @@ Host ──wss──▶ ┐                              ┌ ◀──wss── 
 
 ## 已知限制與費用
 
-- 每次連線多繞 Cloudflare 一趟，通常增加數十毫秒。
+- **延遲（2026-10-04 實測，台灣）**：這個 workers.dev 網址的請求被導到美國聖荷西（回應標頭 `cf-ray` 結尾 `SJC`，TCP 連線約 138 ms），雖然同一台電腦連 Cloudflare 一般網站是台北（`colo=TPE`）。兩位玩家都在台灣時，玩家對玩家的來回時間約 **290 ms**（單向約 145 ms），診斷的「中繼來回」約 150 ms。可以玩，但吸／吐與音高會有明顯延遲感。
+- 可能的改善：改用綁在自己網域上的 Worker（網域要在 Cloudflare，路由是否改到台北要實測）；或改走 WebRTC 點對點（Cloudflare 提供 STUN／TURN，連得上時延遲只有幾十毫秒，但桌面版要隨遊戲附帶 webrtc-native 的 GDExtension）。
 - Cloudflare 免費額度有限（Workers 每日請求數、Durable Object 每日運算時間，WebSocket 訊息以 20:1 換算請求數）。Jam 規模應該夠用，正式使用前請查 Cloudflare 當前的計費頁面。
 - 目前沒有對房間建立做限流；網址與代碼不要公開張貼。
 - 網頁版（itch.io）：協定只用 WebSocket，原則上可行，但專案目前用 Forward Plus 渲染器與 `TCPServer`（PhoneMic），網頁版匯出前要另外處理（見 tasks.md SET-03）。

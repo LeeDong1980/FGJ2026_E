@@ -60,7 +60,7 @@ signal voice_ack_timeout(kind: String, seq: int)
 
 const DEFAULT_PORT: int = 7777
 ## 中繼伺服器（Cloudflare Worker，見 relay_server/）。命令列加 `-- --relay-url=ws://127.0.0.1:8787` 可改用本機測試。
-const DEFAULT_RELAY_URL: String = "wss://fgj2026-relay.example.workers.dev"
+const DEFAULT_RELAY_URL: String = "wss://fgj2026-relay.fgj2026-relay.workers.dev"
 const RELAY_URL_ARG: String = "--relay-url="
 ## 實際接受的 Client 只有 1 個；多留名額是為了讓多出來的連線收到「房間已滿」的原因，再被中斷。
 const MAX_CONNECTIONS: int = 3
