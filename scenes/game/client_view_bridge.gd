@@ -4,7 +4,7 @@ extends Node
 ## 由 GameStateReceiver 接收 Host 的狀態，畫面元件不用改就顯示一樣的畫面。只在副本模式啟用。
 ##
 ## 啟用時：
-## - 停用本機所有遊戲輸入（鍵盤、音高換層、語音吸吐、大叫換元素）。Client 的輸入由輸入診斷疊層（client_play）依座位送給 Host。
+## - 停用本機所有遊戲輸入（鍵盤、音高換層、語音吸吐、大叫轉頭）。Client 的輸入由輸入診斷疊層（client_play）依座位送給 Host。
 ## - 建立 GameStateReceiver 接收狀態。
 ## - 輸入診斷疊層（client_play.tscn）預設隱藏，按 F3 顯示或隱藏；語音調參數時用得到。
 ## - 房主暫停時凍結遊戲畫面並顯示「房主已暫停」；Client 自己的 Esc 只疊出設定選單，不凍結。
@@ -18,7 +18,7 @@ const TOGGLE_KEY: Key = KEY_F3
 @export var keyboard_input: KeyboardInput
 @export var voice_action_input: VoiceActionInput
 @export var pitch_lane_input: PitchLaneInput
-@export var shout_element_input: ShoutElementInput
+@export var shout_turn_input: ShoutTurnInput
 @export var ui_root: UIRoot
 @export var ui_bridge: UIGameBridge
 
@@ -56,7 +56,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _disable_local_inputs() -> void:
 	keyboard_input.process_mode = Node.PROCESS_MODE_DISABLED
 	voice_action_input.process_mode = Node.PROCESS_MODE_DISABLED
-	shout_element_input.process_mode = Node.PROCESS_MODE_DISABLED
+	shout_turn_input.process_mode = Node.PROCESS_MODE_DISABLED
 	# 音高換層會直接改本機龍的目標層，副本不能自己動
 	pitch_lane_input.queue_free()
 
