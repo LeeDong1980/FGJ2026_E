@@ -27,6 +27,8 @@ var host_slot: int = 1
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	NetworkManager.joined_server.connect(_on_joined_server)
+	NetworkManager.public_room_opened.connect(func(_code: String) -> void: room_changed.emit())
+	NetworkManager.public_room_failed.connect(_on_public_room_failed)
 	NetworkManager.join_failed.connect(func() -> void: _join_failed("連不上對方，請確認 IP、同一個網路與防火牆"))
 	NetworkManager.join_rejected.connect(_join_failed)
 	NetworkManager.join_timed_out.connect(func() -> void: _join_failed("連線逾時（%d 秒）" % int(NetworkManager.join_timeout_sec)))
@@ -80,6 +82,20 @@ func can_join_other() -> bool:
 	return can_start_solo()
 
 
+## 房內只有自己時可以把房間公開（取得房間代碼）或取消公開；公開期間區網的人連不進來。
+func can_toggle_public() -> bool:
+	return can_start_solo()
+
+
+func is_room_public() -> bool:
+	return NetworkManager.is_public_room()
+
+
+## 公開房間的房間代碼；還在向中繼要代碼或不是公開房間時為空字串。
+func get_room_code() -> String:
+	return NetworkManager.get_room_code()
+
+
 func can_start_match() -> bool:
 	return role == Role.HOST and phase == Phase.ROOM and get_player_count() == 2
 
@@ -95,6 +111,29 @@ func enter_room(change_scene: bool = true) -> void:
 	_open_room()
 	if change_scene:
 		_go(LOBBY_SCENE)
+	room_changed.emit()
+
+
+## 公開房間：關掉區網房間，向中繼要房間代碼（拿到後 room_changed，等候頁顯示代碼）。
+## 座位維持不變；失敗時回到區網房間並顯示原因。
+func publish_room() -> void:
+	if not can_toggle_public() or is_room_public():
+		return
+	_clear_notice()
+	var err: Error = NetworkManager.host_public_game()
+	if err != OK:
+		_open_room(false)
+		notice = "無法公開房間（%s）" % error_string(err)
+	room_changed.emit()
+
+
+## 取消公開：關掉中繼房間，回到區網房間。
+func unpublish_room() -> void:
+	if not can_toggle_public() or not is_room_public():
+		return
+	_clear_notice()
+	NetworkManager.leave()
+	_open_room(false)
 	room_changed.emit()
 
 
@@ -120,17 +159,17 @@ func start_solo() -> void:
 	room_changed.emit()
 
 
-## 嘗試連線他人房間。成功才成為 Client；失敗會重新建立自己的房間並回到等候頁。
-## ENet 一次只能是 Server 或 Client，所以嘗試期間會先關掉自己的房間。
-func join_room(ip: String) -> void:
+## 嘗試連線他人房間（target 是區網 IP 或公開房間的房間代碼）。成功才成為 Client；失敗會重新建立自己的房間並回到等候頁。
+## 一次只能是 Server 或 Client，所以嘗試期間會先關掉自己的房間。
+func join_room(target: String) -> void:
 	if not can_join_other():
 		return
 	_clear_notice()
 	NetworkManager.leave()
 	phase = Phase.JOINING
-	var err: Error = NetworkManager.join_game(ip)
+	var err: Error = NetworkManager.join_game(target)
 	if err != OK:
-		_join_failed("無法連線（%s），請檢查 IP" % error_string(err))
+		_join_failed("無法連線（%s），請檢查 IP 或房間代碼" % error_string(err))
 		return
 	room_changed.emit()
 
@@ -194,6 +233,15 @@ func _on_joined_server() -> void:
 	phase = Phase.ROOM
 	notice = ""
 	room_error = ""
+	room_changed.emit()
+
+
+## 公開房間連不上中繼或途中斷線：回到區網房間，並說明原因。
+func _on_public_room_failed(reason: String) -> void:
+	if role != Role.HOST:
+		return
+	_open_room(false)
+	notice = "公開房間已關閉：" + reason
 	room_changed.emit()
 
 
@@ -275,8 +323,9 @@ func _on_match_ended() -> void:
 
 # ---- 內部 ----
 
-func _open_room() -> void:
-	host_slot = 1
+func _open_room(reset_slot: bool = true) -> void:
+	if reset_slot:
+		host_slot = 1
 	var err: Error = NetworkManager.host_game()
 	if err == OK:
 		room_error = ""

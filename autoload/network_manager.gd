@@ -1,9 +1,15 @@
 extends Node
-## 區網雙機連線：Host 建立房間（也是玩家），Client 輸入 IP 加入。
+## 雙機連線：Host 建立房間（也是玩家），Client 輸入 IP 加入。
 ## 目前只支援 2 人（1 個 Host + 1 個 Client）。
+## 兩種連線方式：區網（ENet，Client 輸入 Host 的 IP）與公開房間（經 Cloudflare 中繼，Client 輸入房間代碼，
+## 見 docs/relay.md）。一次只能用一種：Host 公開房間時區網房間會關閉，取消公開再回到區網房間。
 ## 房間流程（單機、加入、開局、斷線後去哪）由 RoomManager 負責，這裡只管連線與封包。
 
 signal hosting_started
+## Host 端：公開房間已在中繼建立好，code 是給對方輸入的房間代碼。
+signal public_room_opened(code: String)
+## Host 端：公開房間連不上中繼，或途中與中繼斷線。reason 是給玩家看的原因，連線已關閉，呼叫端要重新開區網房間。
+signal public_room_failed(reason: String)
 ## Client 端：Host 已接受加入（不是只有 ENet 連上）。
 signal joined_server
 ## Client 端：ENet 連不上 Host。
@@ -53,6 +59,9 @@ signal voice_ack_received(kind: String, seq: int, rtt_msec: int)
 signal voice_ack_timeout(kind: String, seq: int)
 
 const DEFAULT_PORT: int = 7777
+## 中繼伺服器（Cloudflare Worker，見 relay_server/）。命令列加 `-- --relay-url=ws://127.0.0.1:8787` 可改用本機測試。
+const DEFAULT_RELAY_URL: String = "wss://fgj2026-relay.example.workers.dev"
+const RELAY_URL_ARG: String = "--relay-url="
 ## 實際接受的 Client 只有 1 個；多留名額是為了讓多出來的連線收到「房間已滿」的原因，再被中斷。
 const MAX_CONNECTIONS: int = 3
 const ACK_TIMEOUT_MSEC: int = 2000
@@ -67,6 +76,10 @@ const WORD_TURN: String = "turn"
 const WORD_ELEMENT: String = "element"
 const REASON_FULL: String = "房間已滿"
 const REASON_IN_MATCH: String = "對方遊戲中"
+const REASON_ROOM_NOT_FOUND: String = "找不到這個房間代碼，請確認是否輸入正確"
+const REASON_RELAY_UNREACHABLE: String = "連不上中繼伺服器，請檢查網路（可按「連線診斷」）"
+const REASON_RELAY_LOST: String = "與中繼伺服器斷線"
+const REASON_HOST_GONE: String = "房主已離開房間"
 ## 送出拒絕原因或關房通知後，等這麼久再中斷連線，讓可靠封包先送完。
 const FLUSH_DELAY_SEC: float = 0.3
 ## ENet 判定對方斷線的時間（msec）。預設最久要 30 秒，區網太久，縮短成約 6 秒。
@@ -77,6 +90,7 @@ const PEER_TIMEOUT_MAX_MSEC: int = 6000
 @export var join_timeout_sec: float = 20.0
 
 var port: int = DEFAULT_PORT
+var relay_url: String = DEFAULT_RELAY_URL
 ## Host 端：連線局進行中。有人連進來時回覆「對方遊戲中」。由 RoomManager 設定。
 var match_in_progress: bool = false
 
@@ -85,11 +99,16 @@ var _pending: Dictionary = {}  # "kind:seq" -> 送出時間（msec）
 var _last_volume_seq: Dictionary = {}  # peer_id -> 最後收到的音量封包序號
 var _accepted_peers: Array[int] = []
 var _join_started_msec: int = -1
+## 目前使用中的中繼連線；區網（ENet）時為 null。
+var _relay_peer: RelayMultiplayerPeer
 
 
 func _ready() -> void:
 	# 流程與逾時不能因為暫停選單（get_tree().paused）而停住。
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with(RELAY_URL_ARG):
+			relay_url = arg.trim_prefix(RELAY_URL_ARG)
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	multiplayer.connected_to_server.connect(func() -> void: _shorten_timeout(1))
@@ -122,14 +141,47 @@ func host_game() -> Error:
 	return OK
 
 
-func join_game(ip: String) -> Error:
+## target 是 Host 的區網 IP，或公開房間的房間代碼（6 個英數字）。
+func join_game(target: String) -> Error:
+	if RelayMultiplayerPeer.looks_like_code(target):
+		var relay := RelayMultiplayerPeer.new()
+		var relay_err: Error = relay.open_client(relay_url, RelayMultiplayerPeer.normalize_code(target))
+		if relay_err != OK:
+			return relay_err
+		_use_relay(relay)
+		_join_started_msec = Time.get_ticks_msec()
+		return OK
 	var peer := ENetMultiplayerPeer.new()
-	var err: Error = peer.create_client(ip.strip_edges(), port)
+	var err: Error = peer.create_client(target.strip_edges(), port)
 	if err != OK:
 		return err
 	multiplayer.multiplayer_peer = peer
 	_join_started_msec = Time.get_ticks_msec()
 	return OK
+
+
+## Host 公開房間：關掉區網房間，改向中繼要一個房間代碼。結果看 public_room_opened／public_room_failed。
+## 呼叫前房內不能有 Client（區網的 Client 會被中斷）。
+func host_public_game() -> Error:
+	_close_peer()
+	_accepted_peers.clear()
+	_reset_voice_state()
+	var relay := RelayMultiplayerPeer.new()
+	var err: Error = relay.open_host(relay_url)
+	if err != OK:
+		return err
+	_use_relay(relay)
+	return OK
+
+
+## 目前是公開房間（含還在向中繼要代碼的時候）。
+func is_public_room() -> bool:
+	return _relay_peer != null and _relay_peer.is_host()
+
+
+## 公開房間的房間代碼；還沒拿到或不是公開房間時為空字串。
+func get_room_code() -> String:
+	return _relay_peer.get_room_code() if is_public_room() else ""
 
 
 ## 立刻中斷連線（關閉房間或離開房間）。Host 想先通知 Client，改用 close_room()。
@@ -299,6 +351,8 @@ func send_voice_word(word: String) -> void:
 
 ## Client 到 Host 的來回時間（msec）；尚未連上時回傳 -1。
 func get_rtt_msec() -> float:
+	if _relay_peer != null:
+		return _relay_peer.get_rtt_msec()
 	var peer := multiplayer.multiplayer_peer as ENetMultiplayerPeer
 	if peer == null or is_host():
 		return -1.0
@@ -357,6 +411,47 @@ func _close_peer() -> void:
 	if multiplayer.has_multiplayer_peer():
 		multiplayer.multiplayer_peer.close()
 	multiplayer.multiplayer_peer = null
+	_relay_peer = null
+
+
+func _use_relay(relay: RelayMultiplayerPeer) -> void:
+	_relay_peer = relay
+	relay.room_code_received.connect(func(code: String) -> void: public_room_opened.emit(code))
+	relay.relay_closed.connect(_on_relay_closed.bind(relay), CONNECT_DEFERRED)
+	multiplayer.multiplayer_peer = relay
+
+
+## 中繼連線失敗或結束。連線 signal（connection_failed、server_disconnected）在中繼模式下不處理，統一從這裡。
+func _on_relay_closed(reason: String, relay: RelayMultiplayerPeer) -> void:
+	if relay != _relay_peer:
+		return  # 已經被換掉或自己關掉的連線
+	if relay.is_host():
+		_close_peer()
+		_accepted_peers.clear()
+		_reset_voice_state()
+		var never_opened: bool = relay.get_room_code().is_empty()
+		public_room_failed.emit(_relay_reason_text(reason, never_opened))
+		return
+	if _join_started_msec >= 0:
+		_abort_join()
+		join_rejected.emit(_relay_reason_text(reason, true))
+		return
+	_close_peer()
+	_reset_voice_state()
+	disconnected.emit()
+	server_lost.emit()
+
+
+## unreachable 為 true 時，中繼連線問題說成「連不上」（還沒連上過）；否則說成「斷線」。
+func _relay_reason_text(reason: String, unreachable: bool = false) -> String:
+	match reason:
+		RelayMultiplayerPeer.REASON_ROOM_NOT_FOUND:
+			return REASON_ROOM_NOT_FOUND
+		RelayMultiplayerPeer.REASON_ROOM_FULL:
+			return REASON_FULL
+		RelayMultiplayerPeer.REASON_HOST_LEFT:
+			return REASON_HOST_GONE
+	return REASON_RELAY_UNREACHABLE if unreachable else REASON_RELAY_LOST
 
 
 func _shorten_timeout(id: int) -> void:
@@ -400,18 +495,22 @@ func _on_peer_disconnected(id: int) -> void:
 
 func _disconnect_later(id: int) -> void:
 	await get_tree().create_timer(FLUSH_DELAY_SEC).timeout
-	var peer := multiplayer.multiplayer_peer as ENetMultiplayerPeer
+	var peer: MultiplayerPeer = multiplayer.multiplayer_peer
 	if peer != null and multiplayer.is_server():
 		peer.disconnect_peer(id)
 
 
 func _on_connection_failed() -> void:
+	if _relay_peer != null:
+		return  # 中繼模式由 _on_relay_closed 處理
 	_join_started_msec = -1
 	_close_peer()
 	join_failed.emit()
 
 
 func _on_server_disconnected() -> void:
+	if _relay_peer != null:
+		return  # 中繼模式由 _on_relay_closed 處理
 	var was_joined: bool = _join_started_msec < 0
 	_join_started_msec = -1
 	_close_peer()
