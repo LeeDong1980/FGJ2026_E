@@ -113,6 +113,7 @@ func _net_text() -> String:
 		("%d ms" % int(rtt)) if rtt >= 0.0 else "—", _sent_count, _ack_count, _timeout_count]
 
 
+## 【暫時的診斷顯示】語音吸／吐參數調好（MIC-07）後可移除，連同 .tscn 的 DebugLabel 與動作封包統計。
 ## 即時顯示麥克風判定的每一關，語音沒反應時看哪一關沒過：
 ## 音量要超過閥值 → 氣音落在吸區（<= 吸上限）或吐區（>= 吐下限）→ 持續夠久才輸出動作。
 func _debug_text() -> String:

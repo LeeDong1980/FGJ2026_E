@@ -17,7 +17,7 @@ const LANE_ACTIONS: Array[StringName] = [&"lane_1", &"lane_2", &"lane_3"]
 @export var keyboard_input: KeyboardInput
 @export var voice_action_input: VoiceActionInput
 @export var ui_root: UIRoot
-## 在畫面左上角顯示 Client 最後送來的動作，確認封包有沒有收到。
+## 【暫時的診斷顯示】在畫面左上角顯示 Client 最後送來的動作，確認封包有沒有收到。語音參數調好後可關閉或移除。
 @export var show_debug: bool = true
 
 var _remote_action: String = NetworkManager.ACTION_NONE
