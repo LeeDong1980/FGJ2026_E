@@ -76,6 +76,7 @@
 - [x] GM-28 食材正式模型接入遊戲：IngredientModel 依種類換成 ART-20 的人類／史萊姆／蝙蝠角色子場景（精靈、矮人、獸人仍為膠囊），斜 60 度面向龍；走路播 Walk、停下播 Idle、攻擊播 Atk；凍住時動畫停住並蓋冰藍色；史萊姆 0.65 倍、蝙蝠 1.8 倍配合隊伍間隔（比例定案後再調） @露柑
 - [x] GM-29 通關改成完成 3 鍋；新增分數：每鍋 100 分，距上一鍋完成（或開局）60 秒內完成再加 50 分（全場一個計時），`score_changed` signal，main.tscn 的 `ScoreBanner` 在右上角顯示分數、快速加分倒數與加分提示；更新 design.md、api.md @露柑
 - [x] GM-30 轉頭與換元素對調：玩家 1 大叫或按 4 轉頭（`ShoutTurnInput`），玩家 2 按 L 換元素；連線局字音依座位對調；更新 design.md、api.md、voice-input.md @露柑
+- [x] GM-31 食材放大：IngredientModel `body_scale` 2 倍（膠囊與角色模型，名稱與進度條跟著上移、字不放大），隊伍間隔 0.6→1.2，噴吐瞄準高度 0.4→0.8；排滿 6 個仍在出生點內 @露柑
 - [ ] UI-19 遊戲結束介面（ResultScreen）顯示最終分數（`game_manager.score`）
 =======
 - [ ] GM-22 新規則：鍋子收滿需求數量後不自動完成，要在該層對鍋子噴火才完成一鍋（細節見 design.md 未定事項），並提供 UI 用的「已收滿、等噴火」狀態與 signal

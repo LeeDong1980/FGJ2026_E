@@ -78,7 +78,7 @@ signal game_lost
 @export var spawn_interval_start: float = 8.0
 @export var spawn_interval_step: float = 1.0
 @export var spawn_interval_min: float = 3.0
-@export var ingredient_spacing: float = 0.6
+@export var ingredient_spacing: float = 1.2
 @export var max_ingredients_per_lane: int = 6
 ## 開場每層已經排在最前端的食材數。
 @export var opening_ingredients: int = 1

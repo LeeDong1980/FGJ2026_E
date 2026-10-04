@@ -18,6 +18,8 @@ const CHARACTER_SCALES: Dictionary = {
 	IngredientType.Type.BAT: 1.8,
 }
 
+## 食材本體（膠囊或角色模型）的整體放大倍數；名稱標籤與進度條跟著往上移，字不放大。
+@export var body_scale: float = 2.0
 ## 角色模型轉向的角度（度）：模型預設面向 +Z（鏡頭），90 度是完全側面面向 +X（龍）。
 ## 預設 60 度是斜向，看得到臉和蝙蝠的翅膀。
 @export var character_yaw: float = 60.0
@@ -36,14 +38,18 @@ func setup(type: IngredientType.Type) -> void:
 	_color = IngredientType.COLORS[type]
 	_name = IngredientType.NAMES[type]
 	%NameLabel.text = _name
+	for node: Node3D in [%NameLabel, %BurnBar, %AttackBar]:
+		node.position.y *= body_scale
 	if CHARACTER_SCENES.has(type):
 		_character = (CHARACTER_SCENES[type] as PackedScene).instantiate() as IngredientCharacter
 		_character.rotation.y = deg_to_rad(character_yaw)
-		_character.scale = Vector3.ONE * float(CHARACTER_SCALES.get(type, 1.0))
+		_character.scale = Vector3.ONE * float(CHARACTER_SCALES.get(type, 1.0)) * body_scale
 		add_child(_character)
 		_anim_player = _character.find_child("AnimationPlayer", true, false) as AnimationPlayer
 		%Mesh.visible = false
 	else:
+		%Mesh.scale = Vector3.ONE * body_scale
+		%Mesh.position.y *= body_scale
 		_material = StandardMaterial3D.new()
 		_material.albedo_color = _color
 		%Mesh.material_override = _material
