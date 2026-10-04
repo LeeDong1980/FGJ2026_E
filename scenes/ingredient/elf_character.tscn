@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://bhvhiybltjgww"]
+
+[ext_resource type="Script" uid="uid://3qcqjp27unnd" path="res://scenes/ingredient/ingredient_character.gd" id="1_7gm0e"]
+[ext_resource type="AnimationLibrary" uid="uid://dj4u3jkuuf2bj" path="res://Models/heroElf/elf_animations.tres" id="2_i55g1"]
+[ext_resource type="PackedScene" uid="uid://c74j7i82uvfw2" path="res://Models/heroElf/elf.glb" id="3_08b3u"]
+[ext_resource type="PackedScene" uid="uid://c07bh777sbk2q" path="res://Models/heroElf/bow.glb" id="4_8oqiq"]
+[ext_resource type="PackedScene" uid="uid://shiaetxuv8i7" path="res://Models/heroElf/arrow.glb" id="5_qr0jy"]
+
+[node name="ElfCharacter" type="Node3D" unique_id=1048288888]
+script = ExtResource("1_7gm0e")
+extra_library = ExtResource("2_i55g1")
+
+[node name="Model" parent="." unique_id=264995136 instance=ExtResource("3_08b3u")]
+transform = Transform3D(0.39, 0, 0, 0, 0.39, 0, 0, 0, 0.39, 0, 0, 0)
+
+[node name="LeftHandAttachment" type="BoneAttachment3D" parent="." unique_id=2026656871]
+transform = Transform3D(-0.34167063, 0.1834108, -0.041492496, -0.18763046, -0.33822832, 0.049963303, -0.01248749, 0.06373392, 0.3845541, 0.18768454, 0.47271132, -0.00022498753)
+bone_name = "hand.L"
+bone_idx = 11
+use_external_skeleton = true
+external_skeleton = NodePath("../Model/metarig/Skeleton3D")
+
+[node name="Bow" parent="LeftHandAttachment" unique_id=1834870772 instance=ExtResource("4_8oqiq")]
+transform = Transform3D(0.6750293, -0.6922123, -0.2552984, 0.13573076, -0.22361222, 0.9651814, -0.7251983, -0.6861775, -0.056990415, -0.0037465096, 0.019121528, 0.11537439)
+
+[node name="RightHandAttachment" type="BoneAttachment3D" parent="." unique_id=1230852234]
+transform = Transform3D(-0.34167063, -0.1834108, 0.041492496, 0.18763046, -0.33822832, 0.049963303, 0.01248749, 0.06373392, 0.3845541, -0.18768454, 0.47271132, -0.00022498753)
+bone_name = "hand.R"
+bone_idx = 16
+use_external_skeleton = true
+external_skeleton = NodePath("../Model/metarig/Skeleton3D")
+
+[node name="Arrow" parent="RightHandAttachment" unique_id=714667385 instance=ExtResource("5_qr0jy")]
+transform = Transform3D(0.8826528, 0.035384838, -0.46869153, 0.24617928, -0.8842526, 0.39685428, -0.40039867, -0.4656666, -0.7891991, -0.025966644, 0.38441038, 0.15858641)

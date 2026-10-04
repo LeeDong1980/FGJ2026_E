@@ -50,6 +50,13 @@ func begin(source: Vector3, target: Vector3) -> void:
 		emitter.emitting = true
 
 
+func set_particle_count(count: int) -> void:
+	particle_count = clampi(count, 8, 512)
+	for emitter: GPUParticles3D in _emitters:
+		if emitter.name == &"Flow" and emitter.amount != particle_count:
+			emitter.amount = particle_count
+
+
 func set_endpoints(source: Vector3, target: Vector3) -> void:
 	var bounds: AABB = AABB(source, Vector3.ZERO).expand(target).grow(radius + 0.6)
 	if _core != null:

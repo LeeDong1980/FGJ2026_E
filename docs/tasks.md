@@ -1,4 +1,4 @@
-# 任務清單
+﻿# 任務清單
 
 格式：一個任務佔一行，`- [ ] 編號 任務內容 @負責人`。開始做時標上負責人，完成後打勾。
 新任務加到對應區塊的最後面，不要重新排序，以減少 merge conflict。
@@ -75,6 +75,8 @@
 - [x] GM-27 冰的專用特效：新增 `scenes/vfx/ice_breath_effect.tscn`（沿用噴火的 shader，冰藍配色、冰晶與白霧），`DragonEffects.play_ice()`（冰息子場景在腳本建立，不改 dragon_effects.tscn）；flame_core／flow_surface shader 加顏色參數，預設值維持原本火焰顏色；EffectsView 依元素播火或冰 @露柑
 - [x] GM-28 食材正式模型接入遊戲：IngredientModel 依種類換成 ART-20 的人類／史萊姆／蝙蝠角色子場景（精靈、矮人、獸人仍為膠囊），斜 60 度面向龍；走路播 Walk、停下播 Idle、攻擊播 Atk；凍住時動畫停住並蓋冰藍色；史萊姆 0.65 倍、蝙蝠 1.8 倍配合隊伍間隔（比例定案後再調） @露柑
 - [x] GM-29 通關改成完成 3 鍋；新增分數：每鍋 100 分，距上一鍋完成（或開局）60 秒內完成再加 50 分（全場一個計時），`score_changed` signal，main.tscn 的 `ScoreBanner` 在右上角顯示分數、快速加分倒數與加分提示；更新 design.md、api.md @露柑
+- [x] GM-30 轉頭與換元素對調：玩家 1 大叫或按 4 轉頭（`ShoutTurnInput`），玩家 2 按 L 換元素；連線局字音依座位對調；更新 design.md、api.md、voice-input.md @露柑
+- [x] GM-31 食材放大：IngredientModel `body_scale` 2 倍（膠囊與角色模型，名稱與進度條跟著上移、字不放大），隊伍間隔 0.6→1.2，噴吐瞄準高度 0.4→0.8；排滿 6 個仍在出生點內 @露柑
 - [ ] UI-19 遊戲結束介面（ResultScreen）顯示最終分數（`game_manager.score`）
 =======
 - [ ] GM-22 新規則：鍋子收滿需求數量後不自動完成，要在該層對鍋子噴火才完成一鍋（細節見 design.md 未定事項），並提供 UI 用的「已收滿、等噴火」狀態與 signal
@@ -183,7 +185,7 @@
 - [ ] ART-17 放大左右出現的角色，使角色可見高度約佔目前房間高度的 1/2～2/3；房間幼龍由場景美術調整，左側角色交付程式負責人串接規格 @場景美術
 - [ ] ART-18 增加噴火特效發射的粒子數量，調整畫面密度並檢查遮擋及效能 @技術美術與特效
 - [ ] ART-19 評估以單一 0～1 參數控制左右擺頭動畫，確認左右端點、中立值及與 ART-11 的動畫混合接口 @動畫師
-- [x] ART-20 匯入人類（hero.glb）、史萊姆、蝙蝠三種食材模型，建立 `human_character`／`slime_character`／`bat_character` 子場景與共用腳本 `ingredient_character.gd`，設定動畫循環與播放接口，並提供 `ingredient_preview.tscn` 展示；待使用者驗收，尺寸與朝向待確認，GM 串接另行處理 @素材整合
+- [x] ART-20 匯入人類（hero.glb）、史萊姆、蝙蝠三種食材模型，建立 `human_character`／`slime_character`／`bat_character` 子場景與共用腳本 `ingredient_character.gd`，設定動畫循環與播放接口，並提供 `ingredient_preview.tscn` 展示；蝙蝠改用 bat.glb，`fly` 為整段飛行、`attack` 擷取自 Armature.006 第 76～105 格（`scenes/ingredient/build_bat_animations.gd` 產生 `Models/bat/bat_animations.tres`）；待使用者驗收，尺寸與朝向待確認，GM 串接另行處理 @素材整合
 
 2026-10-04：使用者再次授權接續 ART-11～ART-19，上輪因用量中斷，已重新派工。擺頭映射確認為 0＝左、0.5＝前、1＝右，先交接口與展示，玩法自動轉頭另接。吐出軌跡、角色比例與接邊基準討論中；洞穴模型及幼龍動畫素材待提供。本輪成果待使用者驗收後才 commit／push。
 =======

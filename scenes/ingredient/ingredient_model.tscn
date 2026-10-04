@@ -1,6 +1,6 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://byw558tdg7pd0"]
 
-[ext_resource type="Script" path="res://scenes/ingredient/ingredient_model.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://crvnq1nubr4d" path="res://scenes/ingredient/ingredient_model.gd" id="1_script"]
 
 [sub_resource type="CapsuleMesh" id="Mesh_capsule"]
 radius = 0.2
@@ -22,29 +22,29 @@ albedo_color = Color(0.9, 0.1, 0.15, 1)
 material = SubResource("Material_attack")
 size = Vector3(0.6, 0.08, 0.02)
 
-[node name="IngredientModel" type="Node3D"]
+[node name="IngredientModel" type="Node3D" unique_id=2121791503]
 script = ExtResource("1_script")
 
-[node name="Mesh" type="MeshInstance3D" parent="."]
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=523329819]
 unique_name_in_owner = true
-position = Vector3(0, 0.4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+visible = false
 mesh = SubResource("Mesh_capsule")
 
-[node name="NameLabel" type="Label3D" parent="."]
+[node name="NameLabel" type="Label3D" parent="." unique_id=1394186431]
 unique_name_in_owner = true
-position = Vector3(0, 1.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
 billboard = 1
 font_size = 48
-outline_size = 12
 
-[node name="BurnBar" type="MeshInstance3D" parent="."]
+[node name="BurnBar" type="MeshInstance3D" parent="." unique_id=658832620]
 unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0.25)
 visible = false
-position = Vector3(0, 0.88, 0.25)
 mesh = SubResource("Mesh_burn_bar")
 
-[node name="AttackBar" type="MeshInstance3D" parent="."]
+[node name="AttackBar" type="MeshInstance3D" parent="." unique_id=1742636729]
 unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.76, 0.25)
 visible = false
-position = Vector3(0, 0.76, 0.25)
 mesh = SubResource("Mesh_attack_bar")

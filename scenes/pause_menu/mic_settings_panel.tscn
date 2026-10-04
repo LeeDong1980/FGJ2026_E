@@ -202,7 +202,7 @@ text = "0.10 秒"
 [node name="ShoutTitle" type="Label" parent="Margin/Root/Columns/SettingsPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "大叫換元素"
+text = "大叫轉頭"
 
 [node name="ShoutMeter" type="Control" parent="Margin/Root/Columns/SettingsPanel"]
 unique_name_in_owner = true

@@ -62,7 +62,7 @@ const KIND_ACTION: String = "action"
 const ACTION_NONE: String = "none"
 const ACTION_INHALE: String = "inhale"
 const ACTION_EXHALE: String = "exhale"
-## Client 的轉頭（玩家 2 按 L）與換元素（玩家 1 大叫或按 4），用 send_voice_word() 送出，Host 收 voice_word_received。
+## Client 的轉頭（玩家 1 大叫或按 4）與換元素（玩家 2 按 L），用 send_voice_word() 送出，Host 收 voice_word_received。
 const WORD_TURN: String = "turn"
 const WORD_ELEMENT: String = "element"
 const REASON_FULL: String = "房間已滿"

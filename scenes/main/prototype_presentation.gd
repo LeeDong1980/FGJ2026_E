@@ -2,6 +2,9 @@
 extends Node3D
 ## Shared prototype camera and lighting. Bounds use this node's local coordinates.
 
+## Emitted after the camera has been updated. Edge geometry may now be rebuilt.
+signal framing_changed
+
 const SOURCE_CAMERA_POSITION: Vector3 = Vector3(0.0, 40.0, 280.0)
 
 @export_group("Layout Framing")
@@ -99,6 +102,7 @@ func reframe() -> void:
 	# Preserve the converted source Z distance, then translate to the stage center.
 	_source_scale = camera_basis.z.z * distance / SOURCE_CAMERA_POSITION.z
 	_source_offset = _camera.position - SOURCE_CAMERA_POSITION * _source_scale
+	framing_changed.emit()
 
 
 ## Called after a level generator has built a different number of floors.
@@ -116,6 +120,51 @@ func configure_for_layers(layer_count: int, layer_spacing: float = 5.0,
 	layout_bounds = AABB(floor_origin + Vector3(-half_width, -0.25, -half_depth),
 		Vector3(half_width * 2.0, height + 0.55, half_depth * 2.0))
 	reframe()
+
+
+## Read the current full viewport edges at a world-space horizontal line.
+## Does not reframe or include safe_border. Runtime only; invalid rows return a reason.
+func get_visible_horizontal_span(world_y: float, world_z: float) -> Dictionary:
+	if not is_inside_tree() or not is_node_ready() or not is_instance_valid(_camera):
+		return {"valid": false, "reason": "camera_not_ready"}
+	if Engine.is_editor_hint():
+		return {"valid": false, "reason": "runtime_viewport_required"}
+	if not is_finite(world_y) or not is_finite(world_z):
+		return {"valid": false, "reason": "non_finite_coordinates"}
+	var planes: Array[Plane] = _camera.get_frustum()
+	var edges: Array[Vector3] = []
+	for plane_index: int in [2, 4]:
+		var plane: Plane = planes[plane_index]
+		if absf(plane.normal.x) < 0.000001:
+			return {"valid": false, "reason": "parallel_side_plane"}
+		var world_x: float = (plane.d - plane.normal.y * world_y \
+				- plane.normal.z * world_z) / plane.normal.x
+		var point: Vector3 = Vector3(world_x, world_y, world_z)
+		var camera_point: Vector3 = _camera.get_camera_transform().affine_inverse() * point
+		var depth: float = -camera_point.z
+		if depth < _camera.near or depth > _camera.far:
+			return {"valid": false, "reason": "outside_clip_depth"}
+		var screen_point: Vector2 = _camera.unproject_position(point)
+		var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+		if screen_point.y < -0.01 or screen_point.y > viewport_size.y + 0.01:
+			return {"valid": false, "reason": "outside_vertical_frame"}
+		edges.append(point)
+	return {"valid": true, "left": edges[0], "right": edges[1]}
+
+
+## Four world-space floor corners. Query again at ceiling Y for walls/roof.
+func get_visible_floor_edges(floor_y: float, front_z: float, back_z: float) -> Dictionary:
+	var front: Dictionary = get_visible_horizontal_span(floor_y, front_z)
+	var back: Dictionary = get_visible_horizontal_span(floor_y, back_z)
+	if not front["valid"]:
+		return {"valid": false, "reason": front["reason"]}
+	if not back["valid"]:
+		return {"valid": false, "reason": back["reason"]}
+	return {
+		"valid": true,
+		"front_left": front["left"], "front_right": front["right"],
+		"back_left": back["left"], "back_right": back["right"],
+	}
 
 
 func get_framing_settings() -> Dictionary:

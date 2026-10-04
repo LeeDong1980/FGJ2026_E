@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://clwhx8fpiet24"
-path="res://.godot/imported/ui_start_screen.svg-a67a89aca7494605fbb2be908156c194.ctex"
+uid="uid://cxaeswmhbgrkl"
+path="res://.godot/imported/density_fire_512_width8.png-f7713c6ecf2bd4e53acebf339d0bbf7b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/images/ui_start_screen.svg"
-dest_files=["res://.godot/imported/ui_start_screen.svg-a67a89aca7494605fbb2be908156c194.ctex"]
+source_file="res://scenes/vfx/qa/density_fire_512_width8.png"
+dest_files=["res://.godot/imported/density_fire_512_width8.png-f7713c6ecf2bd4e53acebf339d0bbf7b.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

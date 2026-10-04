@@ -1,4 +1,4 @@
-[gd_resource type="AnimationLibrary" format=3]
+[gd_resource type="AnimationLibrary" format=3 uid="uid://cyl5rlmryepy5"]
 
 [sub_resource type="Animation" id="Animation_t1sgo"]
 resource_name = "attack"

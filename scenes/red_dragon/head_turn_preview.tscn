@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/red_dragon/head_turn_preview.gd" id="1_preview"]
+[ext_resource type="PackedScene" path="res://scenes/red_dragon/red_dragon.tscn" id="2_dragon"]
+
+[node name="HeadTurnPreview" type="Node3D"]
+script = ExtResource("1_preview")
+
+[node name="RedDragon" parent="." instance=ExtResource("2_dragon")]
+base_animation = &"fly"

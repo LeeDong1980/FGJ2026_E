@@ -19,6 +19,12 @@ var _player: AnimationPlayer
 
 func _ready() -> void:
 	_player = find_child("AnimationPlayer", true, false) as AnimationPlayer
+	if _player == null and extra_library and get_child_count() > 0:
+		# 純骨架模型（例如精靈的 rig FBX）沒有 AnimationPlayer：建立在模型根節點下，軌道路徑相對於模型根節點。
+		_player = AnimationPlayer.new()
+		_player.name = "AnimationPlayer"
+		_player.add_animation_library(&"", AnimationLibrary.new())
+		get_child(0).add_child(_player)
 	if _player == null:
 		push_warning("%s 找不到 AnimationPlayer" % name)
 		return

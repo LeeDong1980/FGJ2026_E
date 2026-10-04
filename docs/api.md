@@ -20,8 +20,8 @@
 | `game_manager.suck()` | 玩家 B 喊「吸」 |
 | `game_manager.spit_pressed()` | 玩家 B 開始喊「吐」 |
 | `game_manager.spit_released()` | 玩家 B 停止喊「吐」 |
-| `game_manager.turn_head()` | 玩家 2 按 L：龍頭左右切換 |
-| `game_manager.toggle_element()` | 玩家 1 大叫或按 4：火／冰切換 |
+| `game_manager.turn_head()` | 玩家 1 大叫或按 4：龍頭左右切換 |
+| `game_manager.toggle_element()` | 玩家 2 按 L：火／冰切換 |
 
 - 吸和吐一律作用在龍目前位置所在的層（`dragon.current_lane`），不需要傳層的編號。
 - 「吐」要回報開始和結束：胃袋有食材時，`spit_pressed()` 一呼叫就吐進鍋子；胃袋空著時是噴火，要持續到 `spit_released()`，累計 `burn_time` 秒（預設 1 秒）才燒掉一個食材。
@@ -30,9 +30,9 @@
 - 龍暈眩時（`game_manager.is_stunned()`）龍停在原地，`suck()`、`spit_pressed()` 沒有效果，也不會發出 `suck_missed`／`spit_missed`。`set_target_lane()` 照常記錄，醒來後才飛過去；`spit_pressed()` 仍會記錄正在喊「吐」，持續喊到醒來會接著噴火。
 - 朝向：`game_manager.facing` 是 `GameManager.Facing.LEFT`（面向食材）時 `suck()` 與噴火有效；`RIGHT`（面向鍋子）時 `spit_pressed()` 才會吐進鍋子；胃袋空著且鍋子已滿（`PotState.is_full()`）時，持續喊「吐」是對鍋子噴火煮，累計 `cook_time` 秒（預設 1 秒）才完成一鍋。鍋子已滿時吐食材沒有效果。沒有效果時發出 `suck_missed`／`spit_missed`，同時發出 `action_missed(lane, reason)` 附上原因。暈眩中 `turn_head()` 沒有效果，每局開始時面向左。
 - 元素：`game_manager.element` 是 `GameManager.Element.FIRE` 時噴火燒食材，`ICE` 時噴冰凍住最前端食材（`IngredientState.freeze_remaining` 設為 `freeze_time`，預設 1 秒，攻擊蓄力歸零）。煮鍋子時 `PotState.element` 和 `element` 相同才累計，不同則倒退並發出 `action_missed(lane, WRONG_ELEMENT)`。暈眩中 `toggle_element()` 沒有效果，每局開始時是火。
-- 大叫換元素由 `scenes/game/shout_element_input.gd`（`ShoutElementInput`）處理：讀玩家 1 的音量（手機 1 有連上讀手機，否則讀電腦麥克風），`volume_value` 超過 `MicInput.shout_threshold`（預設 50）呼叫一次 `toggle_element()`，降到 `MicInput.shout_release`（預設 35）以下才能再觸發；兩個門檻在麥克風設定面板調整並存進 `user://mic_settings.cfg`。偵測邏輯在 `ShoutDetector`，Client 的 `ClientPlay` 共用。
-- 連線局：Client 坐玩家 2 時按 L 送 `NetworkManager.WORD_TURN`；坐玩家 1 時大叫或按 4 送 `WORD_ELEMENT`，Host 的 `NetworkGameBridge` 依座位接收。
-- 鍵盤測試輸入 `scenes/game/keyboard_input.gd` 就是用這些呼叫（按住 K 噴火、L 轉頭、4 換元素），可以當作範例。
+- 大叫轉頭由 `scenes/game/shout_turn_input.gd`（`ShoutTurnInput`）處理：讀玩家 1 的音量（手機 1 有連上讀手機，否則讀電腦麥克風），`volume_value` 超過 `MicInput.shout_threshold`（預設 50）呼叫一次 `turn_head()`，降到 `MicInput.shout_release`（預設 35）以下才能再觸發；兩個門檻在麥克風設定面板調整並存進 `user://mic_settings.cfg`。偵測邏輯在 `ShoutDetector`，Client 的 `ClientPlay` 共用。
+- 連線局：Client 坐玩家 1 時大叫或按 4 送 `NetworkManager.WORD_TURN`；坐玩家 2 時按 L 送 `WORD_ELEMENT`，Host 的 `NetworkGameBridge` 依座位接收。
+- 鍵盤測試輸入 `scenes/game/keyboard_input.gd` 就是用這些呼叫（按住 K 噴火、4 轉頭、L 換元素），可以當作範例。
 
 ## 給 UI：遊戲流程
 
