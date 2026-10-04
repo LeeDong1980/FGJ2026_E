@@ -170,6 +170,15 @@ func _on_action_changed(action: StringName) -> void:
 預設值是用合成資料調的，還沒用真人聲音長時間實測。
 「tu」開頭的爆音（t）可能被誤判成吸，遇到時優先調 `action_min_seconds` 和 `noisy_zcr`。
 
+### 大叫轉頭
+
+| 參數 | 預設 | 存檔 | 說明 |
+|---|---|---|---|
+| `shout_threshold` | 50 | 是 | 音量（`volume_value`，0~100）往上超過此值算一次大叫，龍頭左右切換（`ShoutTurnInput`） |
+| `shout_release` | 35 | 是 | 音量降到此值以下才能再叫一次 |
+
+設定面板的「大叫轉頭」條：左把手是 `shout_release`，右把手是 `shout_threshold`，白線是目前音量。門檻是音量輸出的百分比，調整「音量」的小聲／大聲區間也會改變實際需要的 dB。
+
 ## 6. 暫停選單與存檔
 
 - **Esc 暫停選單**（autoload `PauseMenu`，`scenes/pause_menu/pause_menu.tscn`）：任何場景按 Esc 都會暫停場景（`get_tree().paused = true`）並顯示設定面板，再按 Esc 或「繼續遊戲」回到遊戲。

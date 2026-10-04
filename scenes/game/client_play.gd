@@ -1,8 +1,9 @@
 class_name ClientPlay
 extends Control
-## Client 的遊玩畫面（玩家 B：吸／吐）。不執行遊戲邏輯，只把吸／吐動作的開始與結束傳給 Host。
+## Client 的遊玩畫面（玩家 B：吸／吐、轉頭）。不執行遊戲邏輯，只把吸／吐動作的開始與結束、轉頭傳給 Host。
 ## 動作來源：麥克風（MicInput.inhale／exhale，受「吸／吐」語音開關控制）與鍵盤 J（吸）、K（吐，按住）。
-## Host 端收 NetworkManager.voice_action_received（ACTION_INHALE／ACTION_EXHALE／ACTION_NONE）。
+## 轉頭：大叫（音量超過 ShoutDetector 門檻）或鍵盤 L，送字音 WORD_TURN。
+## Host 端收 NetworkManager.voice_action_received（ACTION_INHALE／ACTION_EXHALE／ACTION_NONE）與 voice_word_received（WORD_TURN）。
 
 const ACTION_TEXT: Dictionary = {
 	NetworkManager.ACTION_NONE: "—",
@@ -22,6 +23,7 @@ var _sent_action: String = NetworkManager.ACTION_NONE
 var _sent_count: int = 0
 var _ack_count: int = 0
 var _timeout_count: int = 0
+var _shout := ShoutDetector.new()
 
 
 func _ready() -> void:
@@ -35,8 +37,9 @@ func _ready() -> void:
 	NetworkManager.voice_ack_timeout.connect(_on_ack_timeout)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	_update_action()
+	_update_turn(delta)
 	_volume_bar.value = MicInput.volume_value
 	_mic_label.text = _mic_text()
 	_debug_label.text = _debug_text()
@@ -61,6 +64,17 @@ func _update_action() -> void:
 	NetworkManager.send_voice_action(action)
 	_sent_count += 1
 	_show_action(action)
+
+
+## 大叫或按 L 時送出轉頭。
+func _update_turn(delta: float) -> void:
+	_shout.threshold = MicInput.shout_threshold
+	_shout.release = MicInput.shout_release
+	var shouted := _shout.update(MicInput.volume_value, delta)
+	if get_tree().paused:
+		return
+	if shouted or Input.is_action_just_pressed(&"turn_head"):
+		NetworkManager.send_voice_word(NetworkManager.WORD_TURN)
 
 
 func _on_ack_received(kind: String, _seq: int, _rtt_msec: int) -> void:
