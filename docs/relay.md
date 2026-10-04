@@ -67,6 +67,23 @@ Host ──wss──▶ ┐                              ┌ ◀──wss── 
 `scenes/relay/relay_test.tscn`（F6）：一台按「公開房間」，另一台填代碼加入，雙方各送 20 個編號封包，檢查是否都收到且順序正確，並顯示來回時間。
 自動模式（腳本用）：`godot --headless --path . res://scenes/relay/relay_test.tscn -- --auto=host`、`--auto=join --code=XXXXXX`、`--auto=diag`，加 `--relay-url=…` 指定中繼。
 
+## Quick Tunnel 原型（保留，尚未整合進遊戲）
+
+為了降低延遲（見下方「已知限制」）做的原型，程式在 `scenes/tunnel/`，F6 執行 `tunnel_test.tscn`。
+
+做法：Host 在本機用 `WebSocketMultiplayerPeer` 監聽 `127.0.0.1:7780`，`cloudflared` Quick Tunnel 把它公開成 `https://xxx.trycloudflare.com`（`trycloudflare.com` 解析到台北那組 IP），Client 直連這個網址。房間代碼仍由 Worker 當目錄：Host 登記網址（`{"type":"publish","url":…}`），Client 查 `GET /resolve/<代碼>` 取得網址（只接受 `trycloudflare.com`）。Worker 的目錄功能已在本機測試通過，**尚未部署**。
+
+- `cloudflared_tunnel.gd`（`CloudflaredTunnel`）：啟動 cloudflared、讀出網址與機房，離開時關掉。執行檔依序找：命令列 `--cloudflared=`、遊戲旁 `cloudflared/`、專案 `tools/cloudflared/`、系統 PATH。
+- `tunnel_directory.gd`（`TunnelDirectory`）：Host 登記網址取得代碼、Client 用代碼查網址。
+- `tunnel_test.gd`：Host／Client 互連並量來回時間。自動模式 `-- --auto=host`、`--auto=hold`（持續等待，除錯用）、`--auto=join --code=XXXXXX`（或 `--url=` 跳過目錄），加 `--tunnel-debug` 印出 cloudflared 日誌，`--relay-url=` 指定目錄伺服器。
+- 取得 cloudflared：`tools/cloudflared/` 不進 git，各自從 [GitHub releases](https://github.com/cloudflare/cloudflared/releases) 下載對應平台版本（目前用 2026.9.3，macOS arm64 約 20 MB，Windows 約 55 MB）。
+
+實測（2026-10-04，同一台 Mac 開 Host 與 Client 兩個程序）：
+- Godot 對 Godot 經 `WebSocketMultiplayerPeer` 直連，連 `NetworkManager` 原有的加入流程（`joined_server`）也正常，所以現有的 RPC 可以直接搬到這個傳輸上。
+- cloudflared 約 6 秒就緒，連到台北（`tpe01`）或高雄（`khh01`）機房。成功時玩家對玩家來回約 **20～40 ms**（中位數 40、34、20），遠低於中繼的約 290 ms。
+- **問題未解決**：連續 5 輪只有 1 輪成功；失敗時 Client 重試 8 次（約 15 秒）都連不上。tunnel 開了幾分鐘後再連就能立刻成功，懷疑是剛建立的網址 DNS 或邊緣節點尚未生效，但還沒有查證，也不確定是不是 Godot 端 DNS 快取造成。要採用前必須先查清楚，或加上更長的重試與備援（失敗時退回中繼路徑）。
+- 其他風險：cloudflared 需要對外連 7844（UDP 或 TCP），部分網路會擋；Quick Tunnel 官方定位是測試用，沒有可用性保證；要隨遊戲附帶執行檔並處理 Windows 的防毒與視窗。
+
 ## 已知限制與費用
 
 - **延遲（2026-10-04 實測，台灣）**：這個 workers.dev 網址的請求被導到美國聖荷西（回應標頭 `cf-ray` 結尾 `SJC`，TCP 連線約 138 ms），雖然同一台電腦連 Cloudflare 一般網站是台北（`colo=TPE`）。兩位玩家都在台灣時，玩家對玩家的來回時間約 **290 ms**（單向約 145 ms），診斷的「中繼來回」約 150 ms。可以玩，但吸／吐與音高會有明顯延遲感。

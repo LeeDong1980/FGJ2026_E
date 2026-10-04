@@ -138,7 +138,7 @@
 - [x] NET-22 Godot 端中繼連線：`scenes/relay/relay_multiplayer_peer.gd`（`MultiplayerPeerExtension`，兩端都只做出站 wss），`NetworkManager` 支援公開房間與用代碼加入，F6 測試場景 `scenes/relay/relay_test.tscn` @Samuel
 - [x] NET-23 等候頁「公開房間」按鈕、房間代碼顯示與複製、用代碼加入（`RoomManager.publish_room()`／`unpublish_room()`）；更新 docs/lobby-flow.md；2026-10-04 兩台電腦用輸出版實測，透過房間代碼連線並完成遊玩 @Samuel
 - [x] NET-24 連線診斷（HTTPS、WebSocket 握手、echo 來回時間，失敗時顯示白話原因）；兩台電腦實機測試通過（家用、手機熱點、學校網路等其他網路環境有機會再測）@Samuel
-- [ ] NET-25 降低遠端連線延遲（2026-10-04 實測遊玩延遲可接受，暫不處理）：workers.dev 被導到美國，台灣玩家對玩家來回約 290 ms；原因是 workers.dev 子網域的 IP 區段（104.21／172.67）在台灣走美國；同一個 Worker 走台北區段實測約 110 ms。選項：自有網域加 Pro、cloudflared Quick Tunnel 加 Worker 當目錄、WebRTC（Cloudflare STUN／TURN）。見 docs/relay.md @Samuel
+- [ ] NET-25 降低遠端連線延遲（2026-10-04 實測遊玩延遲可接受，暫不處理）：workers.dev 被導到美國，台灣玩家對玩家來回約 290 ms；原因是 workers.dev 子網域的 IP 區段（104.21／172.67）在台灣走美國；同一個 Worker 走台北區段實測約 110 ms。選項：自有網域加 Pro、cloudflared Quick Tunnel 加 Worker 當目錄、WebRTC（Cloudflare STUN／TURN）。Quick Tunnel 原型已保留（`scenes/tunnel/`，成功時來回 20～40 ms，但連線成功率待查），見 docs/relay.md @Samuel
 
 ### 美術與關卡
 
