@@ -56,6 +56,8 @@ signal dragon_recovered
 signal facing_changed(facing: Facing)
 ## 吐出的元素改變。
 signal element_changed(element: Element)
+## 分數改變。fast 為 true 表示這次完成在快速時限內，有額外加分。
+signal score_changed(score: int, gained: int, fast: bool)
 signal game_won
 signal game_lost
 
@@ -110,14 +112,24 @@ signal game_lost
 @export var invincible_time: float = 2.0
 
 @export_group("勝敗")
-@export var pots_to_win: int = 6
+@export var pots_to_win: int = 3
 @export var clears_to_lose: int = 3
+
+@export_group("分數")
+## 每完成一鍋的基本分。
+@export var pot_score: int = 100
+## 距離上一鍋完成（或開局）不到 fast_time 秒就完成，再加這麼多分。全場一個計時，不分層。
+@export var fast_bonus: int = 50
+@export var fast_time: float = 60.0
 
 var lanes: Array[LaneState] = []
 var pots: Array[PotState] = []
 var stomach: IngredientState = null
 var completed_count: int = 0
 var cleared_count: int = 0
+var score: int = 0
+## 距離上一鍋完成（或開局）經過的秒數，用來判斷快速加分。只在遊玩中累計。
+var since_last_pot: float = 0.0
 ## WAITING：場景擺好但靜止，等待 start_game()。PLAYING：遊玩中。ENDED：已分出勝敗。
 var state: GameState = GameState.WAITING
 ## 龍頭朝向：LEFT 面向食材（吸、噴火有效），RIGHT 面向鍋子（吐進鍋子有效）。
@@ -146,6 +158,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if state != GameState.PLAYING:
 		return
+	since_last_pot += delta
 	_update_stun(delta)
 	for i in lanes.size():
 		_advance_queue(lanes[i], delta)
@@ -400,6 +413,11 @@ func _spit_into_pot(lane: int) -> void:
 func _complete_pot(lane: int) -> void:
 	completed_count += 1
 	completed_count_changed.emit(completed_count)
+	var fast := since_last_pot <= fast_time
+	var gained := pot_score + (fast_bonus if fast else 0)
+	score += gained
+	since_last_pot = 0.0
+	score_changed.emit(score, gained, fast)
 	_baby_leave(lane, BabyLeaveReason.COMPLETED)
 	if completed_count >= pots_to_win:
 		_end_game(true)
@@ -457,6 +475,9 @@ func _setup_round() -> void:
 	_set_element(Element.FIRE)
 	completed_count = 0
 	completed_count_changed.emit(completed_count)
+	score = 0
+	since_last_pot = 0.0
+	score_changed.emit(score, 0, false)
 	cleared_count = 0
 	cleared_count_changed.emit(cleared_count)
 	dragon.reset_position()
