@@ -326,6 +326,9 @@ func _on_match_ended() -> void:
 func _open_room(reset_slot: bool = true) -> void:
 	if reset_slot:
 		host_slot = 1
+	if OS.has_feature("web"):
+		room_error = ""  # 瀏覽器不能開區網（ENet）房間，只能單機或公開房間
+		return
 	var err: Error = NetworkManager.host_game()
 	if err == OK:
 		room_error = ""

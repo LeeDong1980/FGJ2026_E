@@ -50,6 +50,8 @@ func _ready() -> void:
 	_join_button.pressed.connect(_on_join_pressed)
 	_ip_input.text_submitted.connect(func(_text: String) -> void: _on_join_pressed())
 	_start_button.pressed.connect(RoomManager.start_match)
+	if OS.has_feature("web"):
+		_ip_input.placeholder_text = "對方的房間代碼"
 	_leave_button.pressed.connect(_on_leave_pressed)
 	RoomManager.room_changed.connect(_on_room_changed)
 	NetworkManager.voice_action_received.connect(_on_remote_action)
@@ -268,6 +270,8 @@ func _status_text() -> String:
 		lines.append("對方已加入，可以開始遊戲")
 	elif RoomManager.is_room_public():
 		lines.append("公開房間中，請把房間代碼告訴對方，等待加入")
+	elif OS.has_feature("web"):
+		lines.append("選擇單機、公開房間（把代碼告訴對方），或輸入對方的房間代碼加入")
 	else:
 		lines.append("等待對方輸入你的 IP 加入，或選擇單機、公開房間、加入別人的房間")
 	return "\n".join(lines)
