@@ -209,4 +209,4 @@ func _on_action_changed(action: StringName) -> void:
 - 開局音量校正（design.md 3.1：以遊戲開始時測到的音量作為基準）。
 - 雙麥克風（玩家 A、玩家 B）的裝置選擇與收音干擾處理（MIC-03）。
 - 用真人聲音實測並調整吸／吐的預設參數。
-- 單機保底版已接進 game.tscn：`scenes/game/pitch_lane_input.gd` 用音高切三段控制龍的層（鍵盤 1／2／3 保留備援），吸／吐用鍵盤 J／K。`VoiceActionInput` 接語音吸／吐，左下角 `VoiceTogglePanel` 可分別開關音高與語音吸吐（`MicInput.pitch_input_enabled`／`action_input_enabled`）。音量換層尚未接。
+- 單機保底版已接進遊戲場景 `scenes/game/main.tscn`：`scenes/game/pitch_lane_input.gd` 用音高切三段控制龍的層（鍵盤 1／2／3 保留備援），吸／吐用鍵盤 J／K。`VoiceActionInput` 接語音吸／吐，左下角 `VoiceTogglePanel` 可分別開關音高與語音吸吐（`MicInput.pitch_input_enabled`／`action_input_enabled`）。音量換層尚未接。

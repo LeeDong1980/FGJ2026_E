@@ -5,7 +5,7 @@
 
 ## 取得節點
 
-`scenes/game/game.tscn` 的根節點是 `GameManager`，龍是 `Dragon` 節點：
+`scenes/game/main.tscn`（遊戲場景）的根節點是 `GameManager`，龍是 `Dragon` 節點：
 
 ```gdscript
 @export var game_manager: GameManager
@@ -35,7 +35,7 @@
 
 - 開啟場景時是 `WAITING`：隊伍排滿、小龍到位、龍在中間層，但靜止不動，吸吐沒有作用。
 - 第一次呼叫 `start_game()` 直接沿用擺好的場景開始；之後再呼叫會原地重置隊伍、鍋子、胃袋、完成鍋數、清空次數與龍的位置，再開始。重置時會發出對應的 signal（`pot_changed`、`stomach_changed`、`completed_count_changed` 等），UI 照常更新即可。
-- 「開始遊戲」按鍵的流程建議由 UI 串起來：先呼叫麥克風輸入的校正，再呼叫 `start_game()`。
+- 遊戲場景載入後由 `UIGameBridge` 自動呼叫 `start_game()`，第一局開始時呼叫麥克風輸入的校正（主選單是獨立場景，見 design.md 6.1）。
 - 「下一關」要等關卡資料完成後才會提供。
 
 ## 給 UI：查詢資料
@@ -83,5 +83,5 @@
 
 ## 注意
 
-- 開場的 `baby_arrived`、`pot_changed` 在 `GameManager._ready()` 發出。UI 如果是 `game.tscn` 的子節點，在自己的 `_ready()` 連接就不會漏接；如果放在別的場景，連接後請先主動用 `get_pot()` 等查詢讀一次目前狀態。
+- 開場的 `baby_arrived`、`pot_changed` 在 `GameManager._ready()` 發出。UI 如果是遊戲場景 `scenes/game/main.tscn` 的子節點，在自己的 `_ready()` 連接就不會漏接；如果放在別的場景，連接後請先主動用 `get_pot()` 等查詢讀一次目前狀態。
 - 不要直接修改 `GameManager` 或 `PotState` 的資料，只讀取。

@@ -4,19 +4,20 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 
 ## 環境
 - Godot 4.7，Forward Plus 渲染器，3D 物理用 Jolt
-- 執行：用 Godot 編輯器開啟 `project.godot`，按 F5 執行主場景，按 F6 執行目前開啟的場景。
+- 執行：用 Godot 編輯器開啟 `project.godot`，按 F5 執行主場景（主選單 `scenes/main_menu/main_menu.tscn`），按 F6 執行目前開啟的場景。
 
 ## 資料夾結構
-- `scenes/main/`：主場景。
+- `scenes/main/`：美術展示場景 `art_prev.tscn`（原 main.tscn，三層樓層＋紅龍＋特效的整體構圖預覽）與展示用子場景。
 - `scenes/dungeon_room/`：地牢房間，包含 dungeon 模型實例、材質、碰撞、燈光與攝影機。
-- `scenes/game/`：遊戲場景，含 GameManager（遊戲狀態）、樓層產生（LaneLayout）、食材畫面、吸吐特效串接（EffectsView）與鍵盤測試輸入。
+- `scenes/game/`：遊戲場景 `main.tscn`（原 game.tscn），含 GameManager（遊戲狀態）、樓層產生（LaneLayout）、食材畫面、吸吐特效串接（EffectsView）與鍵盤測試輸入。
 - `scenes/dragon/`：可操控的龍（移動腳本＋紅龍模型）。
 - `scenes/ingredient/`：食材種類、食材資料與暫時食材模型。
 - `scenes/red_dragon/`：紅龍模型子場景。
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
 - `scenes/lobby/`：區網連線大廳（建立房間／輸入 IP 加入）。
 - `scenes/network_test/`：雙機語音封包傳輸測試場景（內含大廳）。
-- `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線與語音封包收發，autoload 名稱 `NetworkManager`）。 `mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。
+- `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線與語音封包收發，autoload 名稱 `NetworkManager`）。 `scene_flow.gd` 是暫時的場景流程（autoload 名稱 `SceneFlow`，主選單 ↔ 遊戲，之後併入 Samuel 的流程控制器）。`mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。
+- `scenes/main_menu/`：主選單（從 UIRoot 的 StartScreen 拆出的獨立場景，只發 signal）。
 - `scenes/pause_menu/`：暫停選單（autoload `PauseMenu`，Esc 開關）、麥克風設定面板 `mic_settings_panel.tscn`、可拖曳區間的觀察條 `range_meter.gd`。
 - `scenes/mic_test/`：麥克風輸入實驗場景，只實例化設定面板，F6 單獨執行用。
 - `scenes/rooms/`：prototype 勇者挑戰房、幼龍哺育房、通用天花板與垂直樓層子場景。

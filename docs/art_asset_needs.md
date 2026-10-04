@@ -25,7 +25,7 @@
 
 | Session | 可編輯範圍與工作 | 狀態 |
 |---|---|---|
-| 場景美術 | `scenes/rooms/`、`scenes/main/main.tscn`：房間／樓層、龍蛋、幼龍與特效接入；`docs/prototype_rooms.md`、`docs/kitkay_dungeon_inventory.md` | 185 件盤點交付及 18 張三層特效比較完成；人物／巢穴／鋪墊仍待素材，地牢物件分配待定 |
+| 場景美術 | `scenes/rooms/`、`scenes/main/art_prev.tscn`：房間／樓層、龍蛋、幼龍與特效接入；`docs/prototype_rooms.md`、`docs/kitkay_dungeon_inventory.md` | 185 件盤點交付及 18 張三層特效比較完成；人物／巢穴／鋪墊仍待素材，地牢物件分配待定 |
 | 動畫師 | `scenes/red_dragon/`：既有動畫接口及嘴部掛點；`docs/dragon_animation_api.md` | ART-09 已由使用者解決並撤回；停止診斷／修正，僅保存已取得的參考紀錄，未修改動畫程式或場景 |
 | 合成師 | `scenes/main/prototype_presentation.tscn` 及專用腳本：攝影機、燈光、環境；`docs/prototype_camera.md` | 加寬幾何檢視完成，61 個 fly 姿勢、寬度投影與射程限制已記錄，不修改使用者構圖 |
 | 技術美術與特效 | `scenes/vfx/`：shader／粒子可重用子場景、控制接口與獨立展示；`docs/dragon_vfx_api.md` | ART-07 完成，122 項檢查、11 張 GPU 圖與匯入檔、繁中預覽和接口文件齊全；使用者已驗收，授權提交 PR |
