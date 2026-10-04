@@ -114,6 +114,7 @@
 - [x] UI-30 連線等候頁改版：`lobby_theme.tres` 改用 UI 素材包（一般按鍵木框、主要按鍵金框、座位灰／橘金石框、輸入框石條、Changa＋中文字型與描邊）；`room_lobby.tscn` 卡片改石框並加寬、`player_input_panels.tscn` 面板改石框。場景與主題是 Samuel 的，經使用者同意由 GMF 直接修改，節點與腳本接口不變 @GMF
 - [x] UI-31 Esc 暫停選單改版：`pause_menu.tscn` 外層加金角石框與「遊戲暫停」木製橫幅、背景加深，麥克風設定面板套用新的小字主題 `scenes/ui/panel_theme.tres`（mic_settings_panel.tscn 本身沒改）。場景是山雷的，經使用者同意由 GMF 直接修改，節點與腳本接口不變 @GMF
 - [x] UI-32 連線等候頁隱藏玩家音高／吸吐側邊面板（`room_lobby.tscn` 的 PlayerPanels 設為不顯示，腳本照常運作）；九宮格面板與按鍵的最小高度不小於圖片上下邊框，延展時邊角不變形；主選單與 design.md 改為「音高控制高度（高音飛高、低音飛低）」；遊戲背景換成新版圖 FGJ2026TeamE_GameBg2 @GMF
+- [x] UI-36 關閉遊戲畫面上的測試用元件：`game_ui.tscn` 的 DebugHotkeys 關閉（Hotkeys Enabled、Show Indicator 取消勾選）；`main.tscn` 左下角語音開關面板 VoiceTogglePanel 設為不顯示（開關狀態仍照 MicInput 存檔生效）。main.tscn 是露柑的場景，經使用者同意由 GMF 直接修改 @GMF
 - [ ] UI-34 （原 GM 區塊的 UI-19，與既有 UI-19 重號而改號）遊戲結束介面（ResultScreen）顯示最終分數（`game_manager.score`）
 - [ ] UI-35 主選單「雙人合作」卡寫「完成 6 鍋料理就成功」，與 GM-29 的通關 3 鍋不一致，需改成 3 鍋（main_menu.tscn 與 design.md 6.4 一起改）
 

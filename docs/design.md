@@ -417,7 +417,7 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 
 玩家 B 的「吸」「吐」以遊戲收到的指令為準，所以鍵盤測試（J 吸、按住 K 吐）與麥克風都會顯示。
 
-測試用：`game_ui.tscn` 的 DebugHotkeys 節點提供 Ctrl+Shift 測試快捷鍵（按鍵同 `ui_test.tscn`，說明在 `scenes/ui/game_debug_hotkeys.gd` 開頭），只在編輯器執行的單機局有效，匯出的正式版本與連線局自動停用。
+測試用：`game_ui.tscn` 的 DebugHotkeys 節點提供 Ctrl+Shift 測試快捷鍵（按鍵同 `ui_test.tscn`，說明在 `scenes/ui/game_debug_hotkeys.gd` 開頭），只在編輯器執行的單機局有效，匯出的正式版本與連線局自動停用。目前預設關閉：要測試時，在遊戲場景選 `GameUI/DebugHotkeys`，勾選 Hotkeys Enabled（需要畫面提示再勾 Show Indicator）。
 
 ### 6.9 介面美術風格
 

@@ -15,3 +15,5 @@ ui_root = NodePath("UIRoot")
 
 [node name="DebugHotkeys" type="Node" parent="."]
 script = ExtResource("4_hotkeys")
+hotkeys_enabled = false
+show_indicator = false
