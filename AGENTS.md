@@ -16,6 +16,8 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
 - `scenes/lobby/`：區網連線大廳 `lobby.tscn`（舊版）、房間等候頁 `room_lobby.tscn`（流程見 docs/lobby-flow.md）、玩家 1／2 輸入顯示 `player_input_panels.tscn`、等候頁主題 `lobby_theme.tres`。
 - `scenes/network_test/`：雙機語音封包傳輸測試場景（內含大廳）。
+- `scenes/relay/`：遠端連線（公開房間）的 Godot 端：`relay_multiplayer_peer.gd`（經 Cloudflare 中繼的 MultiplayerPeer）、`relay_diagnostics.gd`（連線診斷）、`relay_test.tscn`（F6 測試）。
+- `relay_server/`：Cloudflare Worker 中繼伺服器（JavaScript，不是 Godot 內容，已用 `.gdignore` 排除），部署方式見 docs/relay.md。
 - `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線與語音封包收發，autoload 名稱 `NetworkManager`）。`room_manager.gd` 是房間流程與換場景（autoload 名稱 `RoomManager`）。`mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。`phone_mic_server.gd` 是手機網頁麥克風的 server（autoload 名稱 `PhoneMic`，見 docs/voice-input.md 9.1）。`audio_settings.gd` 是總音量／音樂／音效設定（autoload 名稱 `AudioSettings`，bus 為 Master、Music、SFX，設定存在 `user://audio_settings.cfg`）。`sound.gd` 播放 BGM 與 UI／遊戲音效（autoload 名稱 `Sound`，`Sound.play(&"notify")`，音效種類見檔案開頭的 SOUNDS）。
 - `scenes/main_menu/`：主選單（從 UIRoot 的 StartScreen 拆出的獨立場景；「進入遊戲」呼叫 `RoomManager.enter_room()`）。
 - `scenes/pause_menu/`：暫停選單（autoload `PauseMenu`，Esc 開關）、麥克風設定面板 `mic_settings_panel.tscn`、音量設定面板 `audio_settings_panel.tscn`（暫停選單與主選單共用）、可拖曳區間的觀察條 `range_meter.gd`。
@@ -35,6 +37,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `docs/tasks.md`：任務清單。**每次開始任務前都要讀**。
 - `docs/design.md`：玩法、操作、勝敗條件、範圍。實作遊戲功能前先讀。
 - `docs/conventions.md`：命名、資料夾、場景歸屬規則。新增或修改檔案、場景前先讀。
+- `docs/relay.md`：遠端連線（公開房間、房間代碼、Cloudflare 中繼）的運作方式、部署與測試。改連線層或中繼伺服器前先讀。
 - `docs/voice-input.md`：聲音輸入系統（`MicInput`）的使用方法與串接方式。接聲音輸入前先讀。
 - `docs/api.md`：遊戲機制對外的函式與 signal（給 UI 與麥克風輸入）。
 - `docs/ui_art_prompts.md`：UI 與背景美術的生圖提示詞，以及替換暫時美術的方法。

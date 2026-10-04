@@ -6,6 +6,9 @@ extends Control
 ## 座位：點選「玩家 1」「玩家 2」切換自己的角色（RoomManager.claim_slot，不需要對方同意）。
 ## 玩家 1 用音高控制龍的高度，玩家 2 負責吸／吐；誰坐哪個座位與誰是房主無關。
 ##
+## 公開房間：Host 房內只有自己時可按「公開房間」，向中繼伺服器取得房間代碼，對方在「加入別人房間」輸入代碼即可（不同網路也行）。
+## 公開期間區網的人連不進來，按「取消公開」回到區網房間。「連線診斷」檢查這台電腦連不連得到中繼。
+##
 ## 左下玩家 1（音高）、右下玩家 2（吸／吐）的輸入顯示，讓兩位玩家進遊戲前先測試、一起熟悉：
 ## - 坐在某個座位的人，本機量該座位的輸入並傳給對方（PlayerPitchInput／PlayerActionInput）。
 ## - 另一個座位顯示對方傳來的輸入。
@@ -16,6 +19,11 @@ extends Control
 @onready var _local_ip_label: Label = %LocalIpLabel
 @onready var _status_label: Label = %StatusLabel
 @onready var _solo_button: Button = %SoloButton
+@onready var _publish_button: Button = %PublishButton
+@onready var _diagnostics_button: Button = %DiagnosticsButton
+@onready var _room_code_box: Control = %RoomCodeBox
+@onready var _room_code_label: Label = %RoomCodeLabel
+@onready var _copy_code_button: Button = %CopyCodeButton
 @onready var _join_box: Control = %JoinBox
 @onready var _ip_input: LineEdit = %IpInput
 @onready var _join_button: Button = %JoinButton
@@ -29,12 +37,16 @@ var _pitch_input: PlayerPitchInput
 var _action_input: PlayerActionInput
 ## 目前畫面上顯示的是哪個座位的狀態，換座位時用來清掉舊畫面。
 var _shown_slot: int = 0
+var _diagnosing: bool = false
 
 
 func _ready() -> void:
 	_slot1_button.pressed.connect(RoomManager.claim_slot.bind(1))
 	_slot2_button.pressed.connect(RoomManager.claim_slot.bind(2))
 	_solo_button.pressed.connect(RoomManager.start_solo)
+	_publish_button.pressed.connect(_on_publish_pressed)
+	_diagnostics_button.pressed.connect(_on_diagnostics_pressed)
+	_copy_code_button.pressed.connect(_on_copy_code_pressed)
 	_join_button.pressed.connect(_on_join_pressed)
 	_ip_input.text_submitted.connect(func(_text: String) -> void: _on_join_pressed())
 	_start_button.pressed.connect(RoomManager.start_match)
@@ -75,10 +87,40 @@ func _on_room_changed() -> void:
 
 func _on_join_pressed() -> void:
 	if _ip_input.text.strip_edges().is_empty():
-		_local_hint = "請先輸入對方的 IP"
+		_local_hint = "請先輸入對方的房間代碼或 IP"
 		_refresh_status()
 		return
 	RoomManager.join_room(_ip_input.text)
+
+
+func _on_publish_pressed() -> void:
+	if RoomManager.is_room_public():
+		RoomManager.unpublish_room()
+	else:
+		RoomManager.publish_room()
+
+
+func _on_copy_code_pressed() -> void:
+	DisplayServer.clipboard_set(RoomManager.get_room_code())
+	_local_hint = "已複製房間代碼 %s" % RoomManager.get_room_code()
+	_refresh_status()
+
+
+## 連線診斷：結果顯示在狀態文字，下次房間狀態改變時清除。
+func _on_diagnostics_pressed() -> void:
+	if _diagnosing:
+		return
+	_diagnosing = true
+	_diagnostics_button.disabled = true
+	var diagnostics := RelayDiagnostics.new()
+	add_child(diagnostics)
+	diagnostics.progress.connect(func(report: String) -> void:
+		_local_hint = report
+		_refresh_status())
+	await diagnostics.run(NetworkManager.relay_url)
+	diagnostics.queue_free()
+	_diagnosing = false
+	_diagnostics_button.disabled = false
 
 
 func _on_leave_pressed() -> void:
@@ -119,6 +161,7 @@ func _refresh() -> void:
 	_join_box.visible = is_host or joining
 	_join_button.disabled = not RoomManager.can_join_other()
 	_ip_input.editable = RoomManager.can_join_other()
+	_refresh_public_room(is_host)
 
 	# 開始遊戲：Host 滿 2 人才可按；Client 只顯示「等待房主開始」。
 	_start_button.text = "開始遊戲" if is_host or joining else "等待房主開始"
@@ -127,6 +170,18 @@ func _refresh() -> void:
 	_leave_button.text = "取消連線" if joining else "離開"
 	_refresh_player_inputs(joining, count)
 	_refresh_status()
+
+
+## 公開房間：顯示房間代碼與按鈕文字。還在向中繼要代碼時按鈕暫時不能按。
+func _refresh_public_room(is_host: bool) -> void:
+	var is_public: bool = is_host and RoomManager.is_room_public()
+	var code: String = RoomManager.get_room_code()
+	_publish_button.visible = is_host
+	_publish_button.text = "取消公開" if is_public else "公開房間"
+	_publish_button.disabled = not RoomManager.can_toggle_public()
+	_room_code_box.visible = is_public
+	_room_code_label.text = "房間代碼：%s" % code if not code.is_empty() else "取得房間代碼中…"
+	_copy_code_button.disabled = code.is_empty()
 
 
 func _refresh_seats(is_host: bool, is_client: bool, joining: bool, count: int) -> void:
@@ -188,7 +243,7 @@ func _refresh_player_inputs(joining: bool, count: int) -> void:
 
 
 func _local_ip_text(is_host: bool) -> String:
-	if not is_host or not NetworkManager.is_host():
+	if not is_host or not NetworkManager.is_host() or RoomManager.is_room_public():
 		return ""
 	return "本機 IP：%s　Port：%d" % [", ".join(NetworkManager.get_local_ips()), NetworkManager.port]
 
@@ -211,6 +266,8 @@ func _status_text() -> String:
 		lines.append("已加入房間，等待房主開始遊戲")
 	elif RoomManager.get_player_count() >= 2:
 		lines.append("對方已加入，可以開始遊戲")
+	elif RoomManager.is_room_public():
+		lines.append("公開房間中，請把房間代碼告訴對方，等待加入")
 	else:
-		lines.append("等待對方輸入你的 IP 加入，或選擇單機、加入別人的房間")
+		lines.append("等待對方輸入你的 IP 加入，或選擇單機、公開房間、加入別人的房間")
 	return "\n".join(lines)

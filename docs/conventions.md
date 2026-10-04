@@ -52,6 +52,7 @@ autoload/          全域單例
 - `res://scenes/lobby/player_input_panels.tscn` @Samuel
 - `res://scenes/game/client_play.tscn` @Samuel
 - `res://scenes/network_test/network_test.tscn` @Samuel
+- `res://scenes/relay/relay_test.tscn` @Samuel
 - `res://scenes/mic_test/mic_test.tscn` @山雷
 - `res://scenes/pause_menu/pause_menu.tscn` @山雷
 - `res://scenes/pause_menu/mic_settings_panel.tscn` @山雷

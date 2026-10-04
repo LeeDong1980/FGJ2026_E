@@ -114,6 +114,7 @@
 - [x] UI-30 連線等候頁改版：`lobby_theme.tres` 改用 UI 素材包（一般按鍵木框、主要按鍵金框、座位灰／橘金石框、輸入框石條、Changa＋中文字型與描邊）；`room_lobby.tscn` 卡片改石框並加寬、`player_input_panels.tscn` 面板改石框。場景與主題是 Samuel 的，經使用者同意由 GMF 直接修改，節點與腳本接口不變 @GMF
 - [x] UI-31 Esc 暫停選單改版：`pause_menu.tscn` 外層加金角石框與「遊戲暫停」木製橫幅、背景加深，麥克風設定面板套用新的小字主題 `scenes/ui/panel_theme.tres`（mic_settings_panel.tscn 本身沒改）。場景是山雷的，經使用者同意由 GMF 直接修改，節點與腳本接口不變 @GMF
 - [x] UI-32 連線等候頁隱藏玩家音高／吸吐側邊面板（`room_lobby.tscn` 的 PlayerPanels 設為不顯示，腳本照常運作）；九宮格面板與按鍵的最小高度不小於圖片上下邊框，延展時邊角不變形；主選單與 design.md 改為「音高控制高度（高音飛高、低音飛低）」；遊戲背景換成新版圖 FGJ2026TeamE_GameBg2 @GMF
+- [x] UI-36 關閉遊戲畫面上的測試用元件：`game_ui.tscn` 的 DebugHotkeys 關閉（Hotkeys Enabled、Show Indicator 取消勾選）；`main.tscn` 左下角語音開關面板 VoiceTogglePanel 設為不顯示（開關狀態仍照 MicInput 存檔生效）。main.tscn 是露柑的場景，經使用者同意由 GMF 直接修改 @GMF
 - [ ] UI-34 （原 GM 區塊的 UI-19，與既有 UI-19 重號而改號）遊戲結束介面（ResultScreen）顯示最終分數（`game_manager.score`）
 - [ ] UI-35 主選單「雙人合作」卡寫「完成 6 鍋料理就成功」，與 GM-29 的通關 3 鍋不一致，需改成 3 鍋（main_menu.tscn 與 design.md 6.4 一起改）
 
@@ -133,6 +134,10 @@
 - [x] NET-18 房間等候頁介面優化：沿用主選單視覺（logo 背景、深色卡片、橘色按鈕，主題 `lobby_theme.tres`）；顯示玩家 1／2 欄位；左下玩家 1 音高條、右下玩家 2 吸／吐（沿用遊玩介面樣式），讓兩位玩家進遊戲前先測試；Host 的音高經 `send_lobby_pitch` 同步給 Client；吸／吐本機輸入抽成 `PlayerActionInput`（client_play 共用） @Samuel
 - [x] NET-19 Client 畫面同步顯示遊戲：連線局 Client 載入同一個遊戲場景，GameManager 為副本，由 Host 的事件、快照與完整狀態填入，畫面元件不用改（做法見 docs/lobby-flow.md「畫面同步」）。已完成四階段：①龍、計數、勝敗 ②鍋子、小龍、胃袋、噴吐狀態 ③食材與特效事件 ④HUD 音高、掉包與斷線測試 @Samuel
 - [x] NET-20 等候頁自選座位：點選「玩家 1」「玩家 2」切換角色（不需對方同意、不需準備）；`RoomManager.host_slot`；音高與吸／吐改為雙向傳輸；`NetworkGameBridge` 與 `client_play` 依座位切換（Client 可坐玩家 1 以音高換層）；遊玩 HUD 的音高條改讀音高並可讀對方傳來的音高；介面「玩家 A／B」統一改為「玩家 1／2」 @Samuel
+- [ ] NET-21 遠端連線中繼伺服器：`relay_server/`（Cloudflare Worker + Durable Object，WebSocket 轉送，房間代碼配對），部署到 workers.dev，附 `/health`、`/echo` @Samuel
+- [ ] NET-22 Godot 端中繼連線：`scenes/relay/relay_multiplayer_peer.gd`（`MultiplayerPeerExtension`，兩端都只做出站 wss），`NetworkManager` 支援公開房間與用代碼加入，F6 測試場景 `scenes/relay/relay_test.tscn` @Samuel
+- [ ] NET-23 等候頁「公開房間」按鈕、房間代碼顯示與複製、用代碼加入（`RoomManager.publish_room()`／`unpublish_room()`）；更新 docs/lobby-flow.md @Samuel
+- [ ] NET-24 連線診斷（HTTPS、WebSocket 握手、echo 來回時間，失敗時顯示白話原因）與跨網路實測 @Samuel
 
 ### 美術與關卡
 
