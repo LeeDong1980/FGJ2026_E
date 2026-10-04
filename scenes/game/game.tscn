@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://llovwt808xad"]
+[gd_scene format=3 uid="uid://c5us1c24iq0sx"]
 
 [ext_resource type="Script" uid="uid://c47hsqb0ccaeq" path="res://scenes/game/lane_layout.gd" id="1_lanes"]
 [ext_resource type="PackedScene" uid="uid://c5ry0dajlv2f1" path="res://scenes/dragon/dragon.tscn" id="2_dragon"]
@@ -26,7 +26,7 @@ script = ExtResource("1_lanes")
 presentation = NodePath("../PrototypePresentation")
 
 [node name="Dragon" parent="." unique_id=1188782568 node_paths=PackedStringArray("lane_layout") instance=ExtResource("2_dragon")]
-transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, -4.252825, -11.913324)
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, -4.253, -25)
 lane_layout = NodePath("../LaneLayout")
 
 [node name="IngredientsView" type="Node3D" parent="." unique_id=351790369 node_paths=PackedStringArray("game_manager", "lane_layout")]
@@ -72,6 +72,7 @@ game_manager = NodePath("..")
 script = ExtResource("10_toggle_panel")
 
 [node name="PrototypePresentation" parent="." unique_id=1281242266 instance=ExtResource("9_presentation")]
+far_padding = 40.0
 
 [node name="GameUI" parent="." unique_id=1227268004 instance=ExtResource("8_game_ui")]
 
