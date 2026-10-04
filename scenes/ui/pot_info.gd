@@ -31,12 +31,16 @@ func _ready() -> void:
 
 
 func set_forbidden(types: Array) -> void:
+	# 先移出再釋放：queue_free 要等到這一幀結束，舊圖示留著會把面板撐寬。
 	for child in _icons.get_children():
+		_icons.remove_child(child)
 		child.queue_free()
 	for type: IngredientType.Type in types:
 		var icon := ForbiddenIcon.new()
 		icon.type = type
 		_icons.add_child(icon)
+	# PanelContainer 只會長大不會自己縮，圖示變少時縮回最小尺寸。
+	reset_size()
 
 
 func set_progress(have: int, need: int) -> void:
