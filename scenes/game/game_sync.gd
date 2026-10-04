@@ -44,5 +44,6 @@ const EV_FROZEN: String = "frozen"  # lane、id
 const EV_SUCK_MISSED: String = "suck_missed"  # lane
 const EV_SPIT_MISSED: String = "spit_missed"  # lane
 const EV_ACTION_MISSED: String = "action_missed"  # lane、v: GameManager.MissReason（畫面上方的提示）
+const EV_SCORE: String = "score"  # v: 分數、gained: 這次得分、fast: 是否有快速加分
 const EV_WON: String = "won"
 const EV_LOST: String = "lost"

@@ -73,6 +73,8 @@
 - [x] GM-26 火與冰：玩家 1 大叫（`ShoutElementInput`，原大叫轉頭改用）或按 4 切換火／冰；轉頭改成只有玩家 2 按 L；冰凍住最前端食材 1 秒並歸零攻擊蓄力；鍋子食譜隨機要火或冰，用錯元素煮會倒退進度並提示；FacingIndicator 顯示元素；鍋子底下 `PotElementView` 發光圈顯示食譜（橘火、藍冰）；連線局依座位傳 `turn`／`element` 字音；更新 design.md、api.md、voice-input.md @露柑
 - [x] GM-27 冰的專用特效：新增 `scenes/vfx/ice_breath_effect.tscn`（沿用噴火的 shader，冰藍配色、冰晶與白霧），`DragonEffects.play_ice()`（冰息子場景在腳本建立，不改 dragon_effects.tscn）；flame_core／flow_surface shader 加顏色參數，預設值維持原本火焰顏色；EffectsView 依元素播火或冰 @露柑
 - [x] GM-28 食材正式模型接入遊戲：IngredientModel 依種類換成 ART-20 的人類／史萊姆／蝙蝠角色子場景（精靈、矮人、獸人仍為膠囊），斜 60 度面向龍；走路播 Walk、停下播 Idle、攻擊播 Atk；凍住時動畫停住並蓋冰藍色；史萊姆 0.65 倍、蝙蝠 1.8 倍配合隊伍間隔（比例定案後再調） @露柑
+- [x] GM-29 通關改成完成 3 鍋；新增分數：每鍋 100 分，距上一鍋完成（或開局）60 秒內完成再加 50 分（全場一個計時），`score_changed` signal，main.tscn 的 `ScoreBanner` 在右上角顯示分數、快速加分倒數與加分提示；更新 design.md、api.md @露柑
+- [ ] UI-19 遊戲結束介面（ResultScreen）顯示最終分數（`game_manager.score`）
 
 #### UI（GMF）
 - [x] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF

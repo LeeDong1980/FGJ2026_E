@@ -38,6 +38,10 @@ func apply_full(state: Dictionary) -> void:
 	game_manager.pots_to_win = int(state.get("pots_to_win", game_manager.pots_to_win))
 	game_manager.clears_to_lose = int(state.get("clears_to_lose", game_manager.clears_to_lose))
 	game_manager.state = int(state.get("state", game_manager.state)) as GameManager.GameState
+	var score: int = int(state.get("score", game_manager.score))
+	if score != game_manager.score:
+		game_manager.score = score
+		game_manager.score_changed.emit(score, 0, false)
 	_set_completed(int(state.get("completed", game_manager.completed_count)))
 	_set_cleared(int(state.get("cleared", game_manager.cleared_count)))
 	_set_facing(int(state.get("facing", game_manager.facing)) as GameManager.Facing)
@@ -65,6 +69,10 @@ func apply_event(event: Dictionary) -> void:
 			_emit_started()
 		GameSync.EV_COMPLETED:
 			_set_completed(int(value))
+		GameSync.EV_SCORE:
+			game_manager.score = int(value)
+			game_manager.since_last_pot = 0.0
+			game_manager.score_changed.emit(int(value), int(event.get("gained", 0)), bool(event.get("fast", false)))
 		GameSync.EV_CLEARED:
 			_set_cleared(int(value))
 		GameSync.EV_FACING:
@@ -136,6 +144,8 @@ func apply_snapshot(snapshot: Dictionary, force_position: bool = false) -> void:
 	game_manager.invincible_remaining = float(snapshot.get("inv", 0.0))
 	dragon.stunned = game_manager.stun_remaining > 0.0
 	_apply_queue_snapshot(snapshot.get("q", []))
+	# 快速加分的計時（連續值，本機也在預測，這裡校正）
+	game_manager.since_last_pot = float(snapshot.get("since", game_manager.since_last_pot))
 	# 鍋子煮的進度（連續值）
 	var cook: Array = snapshot.get("cook", [])
 	for lane in mini(cook.size(), game_manager.pots.size()):

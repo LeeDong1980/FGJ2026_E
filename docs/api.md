@@ -61,6 +61,8 @@
 | `game_manager.stomach` | `IngredientState` | 胃袋裡的食材，胃空時為 `null`；種類是 `.type` |
 | `game_manager.completed_count` / `pots_to_win` | `int` | 完成鍋數 / 成功需要的鍋數 |
 | `game_manager.cleared_count` / `clears_to_lose` | `int` | 清空次數 / 失敗需要的次數 |
+| `game_manager.score` | `int` | 目前分數 |
+| `game_manager.since_last_pot` / `fast_time` | `float` | 距離上一鍋完成（或開局）的秒數 / 快速加分時限（預設 60 秒） |
 | `game_manager.state` | `GameManager.GameState` | `WAITING`（等待開始）、`PLAYING`（遊玩中）、`ENDED`（已分出勝敗） |
 | `game_manager.is_spitting` | `bool` | 玩家 B 正在持續喊「吐」 |
 | `game_manager.is_breathing_fire()` / `is_cooking()` | `bool` | 正在噴火燒食材 / 正在對已滿的鍋子噴火煮 |
@@ -86,6 +88,7 @@
 | `baby_arrived(lane)` | 新的小龍到位，禁止清單已更新。遊戲開始時每一層也會發一次 |
 | `stomach_changed(ingredient)` | 胃袋內容改變，胃空時為 `null` |
 | `completed_count_changed(count)` | 完成鍋數改變 |
+| `score_changed(score, gained, fast)` | 分數改變。`gained` 是這次加的分（重置時為 0），`fast` 表示有快速加分 |
 | `cleared_count_changed(count)` | 清空次數改變 |
 | `game_started` | `start_game()` 完成重置並開始遊玩 |
 | `game_won` / `game_lost` | 遊戲成功 / 失敗，之後不再接受吸吐，`state` 變為 `ENDED` |

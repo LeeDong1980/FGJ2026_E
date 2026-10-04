@@ -49,6 +49,7 @@ func _ready() -> void:
 	game_manager.suck_missed.connect(func(lane: int) -> void: _event_with(GameSync.EV_SUCK_MISSED, {"lane": lane}))
 	game_manager.spit_missed.connect(func(lane: int) -> void: _event_with(GameSync.EV_SPIT_MISSED, {"lane": lane}))
 	game_manager.action_missed.connect(func(lane: int, reason: GameManager.MissReason) -> void: _event_with(GameSync.EV_ACTION_MISSED, {"lane": lane, "v": reason}))
+	game_manager.score_changed.connect(func(score: int, gained: int, fast: bool) -> void: _event_with(GameSync.EV_SCORE, {"v": score, "gained": gained, "fast": fast}))
 	game_manager.game_won.connect(func() -> void: _event(GameSync.EV_WON))
 	game_manager.game_lost.connect(func() -> void: _event(GameSync.EV_LOST))
 
@@ -79,6 +80,7 @@ func build_full() -> Dictionary:
 		"pots_to_win": game_manager.pots_to_win,
 		"clears_to_lose": game_manager.clears_to_lose,
 		"state": game_manager.state,
+		"score": game_manager.score,
 		"completed": game_manager.completed_count,
 		"cleared": game_manager.cleared_count,
 		"facing": game_manager.facing,
@@ -98,6 +100,7 @@ func build_snapshot() -> Dictionary:
 		"y": dragon.position.y,
 		"stun": game_manager.stun_remaining,
 		"inv": game_manager.invincible_remaining,
+		"since": game_manager.since_last_pot,
 		"cook": game_manager.pots.map(func(pot: PotState) -> float: return pot.cook_progress),
 		"q": game_manager.lanes.map(func(lane: LaneState) -> Array: return lane.queue.map(ingredient_to_array)),
 	}
