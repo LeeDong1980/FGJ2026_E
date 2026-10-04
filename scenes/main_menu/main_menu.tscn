@@ -2,6 +2,9 @@
 
 [ext_resource type="Script" path="res://scenes/main_menu/main_menu.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://scenes/ui/game_logo.png" id="2_logo"]
+[ext_resource type="Theme" path="res://scenes/ui/ui_theme.tres" id="3_theme"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Bg.Png" id="4_card"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Button/Button_Square02_n_Icon.png" id="5_play"]
 
 [sub_resource type="Gradient" id="Gradient_bottom"]
 colors = PackedColorArray(0.043, 0.035, 0.07, 0, 0.043, 0.035, 0.07, 0.85)
@@ -11,58 +14,16 @@ gradient = SubResource("Gradient_bottom")
 fill_from = Vector2(0, 0)
 fill_to = Vector2(0, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
-content_margin_left = 28.0
-content_margin_top = 22.0
-content_margin_right = 28.0
-content_margin_bottom = 26.0
-bg_color = Color(0.08, 0.067, 0.125, 0.82)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 1, 1, 0.2)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
-bg_color = Color(0.94, 0.66, 0.19, 1)
-corner_radius_top_left = 55
-corner_radius_top_right = 55
-corner_radius_bottom_right = 55
-corner_radius_bottom_left = 55
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
-bg_color = Color(1, 0.75, 0.3, 1)
-corner_radius_top_left = 55
-corner_radius_top_right = 55
-corner_radius_bottom_right = 55
-corner_radius_bottom_left = 55
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
-bg_color = Color(0.8, 0.55, 0.14, 1)
-corner_radius_top_left = 55
-corner_radius_top_right = 55
-corner_radius_bottom_right = 55
-corner_radius_bottom_left = 55
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_focus"]
-draw_center = false
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(1, 1, 1, 0.85)
-corner_radius_top_left = 55
-corner_radius_top_right = 55
-corner_radius_bottom_right = 55
-corner_radius_bottom_left = 55
-expand_margin_left = 6.0
-expand_margin_top = 6.0
-expand_margin_right = 6.0
-expand_margin_bottom = 6.0
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_card"]
+content_margin_left = 40.0
+content_margin_top = 30.0
+content_margin_right = 40.0
+content_margin_bottom = 36.0
+texture = ExtResource("4_card")
+texture_margin_left = 56.0
+texture_margin_top = 56.0
+texture_margin_right = 56.0
+texture_margin_bottom = 56.0
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -71,6 +32,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("3_theme")
 script = ExtResource("1_script")
 
 [node name="Background" type="TextureRect" parent="."]
@@ -90,83 +52,135 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -320.0
+offset_top = -340.0
 grow_horizontal = 2
 grow_vertical = 0
 texture = SubResource("GradientTexture2D_bottom")
 expand_mode = 1
 
+[node name="GameplayCard" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 0
+offset_left = 36.0
+offset_top = 40.0
+offset_right = 556.0
+offset_bottom = 300.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_card")
+
+[node name="Content" type="VBoxContainer" parent="GameplayCard"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="GameplayCard/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.45, 1)
+theme_override_font_sizes/font_size = 36
+text = "遊玩方式"
+horizontal_alignment = 1
+
+[node name="BodyLabel" type="Label" parent="GameplayCard/Content"]
+layout_mode = 2
+theme_override_constants/line_spacing = 8
+theme_override_font_sizes/font_size = 26
+text = "① 吸取左邊排隊走來的食材
+② 飛到右邊，把食材吐進鍋裡
+③ 鍋子收集滿後，對鍋子吐火完成料理"
+
+[node name="TeamCard" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -556.0
+offset_top = 40.0
+offset_right = -36.0
+offset_bottom = 300.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxTexture_card")
+
+[node name="Content" type="VBoxContainer" parent="TeamCard"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="TeamCard/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.45, 1)
+theme_override_font_sizes/font_size = 36
+text = "雙人合作"
+horizontal_alignment = 1
+
+[node name="BodyLabel" type="Label" parent="TeamCard/Content"]
+layout_mode = 2
+theme_override_constants/line_spacing = 8
+theme_override_font_sizes/font_size = 26
+text = "兩位玩家合作操控中間的大龍
+完成 6 鍋料理就成功
+吐錯食材會打翻鍋子，打翻 3 次就失敗"
+
 [node name="PlayerACard" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(440, 0)
+custom_minimum_size = Vector2(520, 0)
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = 60.0
+offset_left = 36.0
 offset_top = -60.0
-offset_right = 500.0
+offset_right = 556.0
 offset_bottom = 150.0
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+theme_override_styles/panel = SubResource("StyleBoxTexture_card")
 
 [node name="Content" type="VBoxContainer" parent="PlayerACard"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="PlayerACard/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_colors/font_color = Color(1, 0.84, 0.45, 1)
 theme_override_font_sizes/font_size = 36
 text = "玩家 A｜控制高度"
 horizontal_alignment = 1
 
-[node name="Separator" type="HSeparator" parent="PlayerACard/Content"]
-layout_mode = 2
-
 [node name="BodyLabel" type="Label" parent="PlayerACard/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.9)
-theme_override_constants/line_spacing = 14
-theme_override_font_sizes/font_size = 28
-text = "用音量控制龍的高度
+theme_override_constants/line_spacing = 8
+theme_override_font_sizes/font_size = 26
+text = "對麥克風發聲，音量大小決定龍的高度
 大聲飛高、小聲飛低"
 horizontal_alignment = 1
 
 [node name="PlayerBCard" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(440, 0)
+custom_minimum_size = Vector2(520, 0)
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -500.0
+offset_left = -556.0
 offset_top = -60.0
-offset_right = -60.0
+offset_right = -36.0
 offset_bottom = 150.0
 grow_horizontal = 0
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+theme_override_styles/panel = SubResource("StyleBoxTexture_card")
 
 [node name="Content" type="VBoxContainer" parent="PlayerBCard"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="PlayerBCard/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.54, 1)
+theme_override_colors/font_color = Color(1, 0.84, 0.45, 1)
 theme_override_font_sizes/font_size = 36
 text = "玩家 B｜吸與吐"
 horizontal_alignment = 1
 
-[node name="Separator" type="HSeparator" parent="PlayerBCard/Content"]
-layout_mode = 2
-
 [node name="BodyLabel" type="Label" parent="PlayerBCard/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.9)
-theme_override_constants/line_spacing = 14
-theme_override_font_sizes/font_size = 28
+theme_override_constants/line_spacing = 8
+theme_override_font_sizes/font_size = 26
 text = "喊「吸」把食材吞進胃袋
 喊「吐」吐進鍋子，胃空時噴火"
 horizontal_alignment = 1
@@ -179,64 +193,43 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -500.0
-offset_top = -200.0
+offset_top = -230.0
 offset_right = 500.0
-offset_bottom = -36.0
+offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 18
+theme_override_constants/separation = 12
 alignment = 2
 
 [node name="ButtonRow" type="HBoxContainer" parent="Footer"]
 layout_mode = 2
-theme_override_constants/separation = 32
+theme_override_constants/separation = 28
 alignment = 1
 
 [node name="StartButton" type="Button" parent="Footer/ButtonRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 100)
+custom_minimum_size = Vector2(440, 130)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_colors/font_hover_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_colors/font_pressed_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_colors/font_focus_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_font_sizes/font_size = 44
-theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
-theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
 text = "進入遊戲"
+icon = ExtResource("5_play")
 
 [node name="QuitButton" type="Button" parent="Footer/ButtonRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 80)
+custom_minimum_size = Vector2(240, 100)
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_colors/font_hover_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_colors/font_pressed_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_colors/font_focus_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_font_sizes/font_size = 32
-theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
-theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
+theme_override_font_sizes/font_size = 34
 text = "離開"
 
 [node name="NoticeLabel" type="Label" parent="Footer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.75, 0.3, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
-theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 
 [node name="CalibrationHint" type="Label" parent="Footer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.85)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
-theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 26
 text = "開始遊戲時請保持安靜，遊戲會以當下的聲音校正麥克風"
 horizontal_alignment = 1

@@ -64,6 +64,7 @@
 - [x] GM-19 食材攻擊：每層最前端食材蓄力（每次隨機 10～20 秒），蓄滿攻擊龍（任何層都打得到），攻擊後重新蓄力；龍暈眩 1.5 秒（不能換層、吸、吐、噴火），醒來後無敵 2 秒，暈眩或無敵時攻擊打空；新增 signal 並更新 api.md @露柑
 - [x] GM-20 攻擊測試畫面：食材上顯示蓄力條；main.tscn 的 `StunBanner` 在螢幕上方（上方資訊列下面）顯示暈眩／無敵倒數，暈眩時文字晃動、被打中時放大彈出 @露柑
 - [x] GM-21 難度：開場每層 1 個食材、上限改 6 個；生成間隔隨完成鍋數變短（8 秒起每鍋 -1 秒，最短 3 秒，`@export`），蓄力與走路時間不變 @露柑
+- [ ] GM-22 新規則：鍋子收滿需求數量後不自動完成，要在該層對鍋子噴火才完成一鍋（細節見 design.md 未定事項），並提供 UI 用的「已收滿、等噴火」狀態與 signal
 
 #### UI（GMF）
 - [x] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF
@@ -89,7 +90,12 @@
 - [x] UI-21 依 Logo 風格製作暫時美術：開始介面（現為主選單）改用 Logo 當背景；遊戲結束背景（Logo 加工）、資訊面板（九宮格石板火焰框）、龍洞穴 2D 背景（`scenes/backdrop/`，已換成正式美術 FGJ2026TeamE_GameSceneBG），並寫生圖提示詞 `docs/ui_art_prompts.md` @GMF
 - [ ] UI-22 用 `docs/ui_art_prompts.md` 生成遊戲結束背景的正式美術，覆蓋 `result_background.png`（龍洞穴背景已完成；資訊面板改用 UI 素材包，不再需要）
 - [x] UI-23 介面改版：遊玩狀態介面、鍋子資訊、音量條、禁止圖示、遊戲結束介面改用 UI 素材包 `scenes/ui/UI/`（石框、金框按鍵、圖示、VICTORY／DEFEAT 橫幅），說明見 design.md 6.9；修正龍洞穴背景在新鏡頭下擋住 3D 場景 @GMF
-- [ ] UI-24 請露柑讓主選單 `main_menu.tscn` 套用 `scenes/ui/ui_theme.tres` 與相同的石框卡片、金框按鍵（設計見 design.md 6.9）
+- [x] UI-24 請露柑讓主選單 `main_menu.tscn` 套用 `scenes/ui/ui_theme.tres` 與相同的石框卡片、金框按鍵（設計見 design.md 6.9）（經使用者同意由 GMF 直接修改，見 UI-27） @GMF
+- [x] UI-25 真正遊戲裡的 Ctrl+Shift 測試快捷鍵：`scenes/ui/game_debug_hotkeys.gd`（`game_ui.tscn` 的 DebugHotkeys 節點），按鍵同 ui_test；只在除錯版本、單機局、遊玩中有效 @GMF
+- [ ] UI-26 請露柑在 GameManager 提供測試用接口（設定完成鍋數／清空次數、強制勝敗、換某層禁止清單），讓 UI-25 不必直接改 GameManager 的資料
+- [x] UI-27 主選單：玩家 A 說明改為「對麥克風發聲，音量大小決定龍的高度」；新增「遊玩方式」「雙人合作」說明卡；套用 ui_theme 與石框卡片、金框按鍵。主選單是露柑的場景，經使用者同意由 GMF 直接修改，節點名稱與腳本接口不變 @GMF
+- [x] UI-28 修正龍洞穴背景遮住龍模型：背景改用深度一律寫成最遠的著色器（`cave_backdrop.gdshader`），所有 3D 物件都畫在背景前面 @GMF
+- [ ] UI-29 鍋子資訊顯示「已收滿，對鍋子吐火」的提示（等 GM-22 提供狀態與 signal）
 
 #### 區網連線（Samuel）
 - [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel

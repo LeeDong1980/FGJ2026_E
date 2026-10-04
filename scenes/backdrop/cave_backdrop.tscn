@@ -3,7 +3,6 @@
 [ext_resource type="Script" path="res://scenes/backdrop/cave_backdrop.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://scenes/backdrop/cave_backdrop.png" id="2_texture"]
 
-[node name="CaveBackdrop" type="Sprite3D"]
-texture = ExtResource("2_texture")
-double_sided = false
+[node name="CaveBackdrop" type="MeshInstance3D"]
 script = ExtResource("1_script")
+texture = ExtResource("2_texture")
