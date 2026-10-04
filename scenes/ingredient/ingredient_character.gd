@@ -26,7 +26,9 @@ func _ready() -> void:
 		_player.add_animation_library(&"", AnimationLibrary.new())
 		get_child(0).add_child(_player)
 	if _player == null:
-		push_warning("%s 找不到 AnimationPlayer" % name)
+		# 沒有動畫的靜態模型（例如矮人、獸人）不需要 AnimationPlayer；有指定動畫庫卻找不到才警告。
+		if extra_library:
+			push_warning("%s 找不到 AnimationPlayer" % name)
 		return
 	if extra_library:
 		var lib := _player.get_animation_library(&"")

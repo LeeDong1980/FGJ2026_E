@@ -31,6 +31,8 @@
 | 精靈 | `elf_character.tscn` | `Idle.fbx` | `Walk.fbx` | `Atk.fbx`（皆為 `mixamo_com`，已移除作用在 metarig 根節點的軌道） |
 | 史萊姆 | `slime_character.tscn` | `Idle` | `Scoot_Move` | `Emote_Anger` |
 | 蝙蝠 | `bat_character.tscn` | `Armature.006` 第 2～36 格 | 同 Idle（第 2～36 格） | `Armature.006` 第 76～105 格 |
+| 矮人 | `dwarf_character.tscn` | 無（模型沒有動畫） | 無 | 無 |
+| 獸人 | `orc_character.tscn` | 無（模型沒有動畫） | 無 | 無 |
 
 蝙蝠的格數以 24 fps 換算（時間 = 格數 ÷ 24），擷取後從 0 秒開始。
 
@@ -45,5 +47,5 @@
 ## 待確認
 
 - 史萊姆 `Atk` 暫用 `Emote_Anger`，可在 `SETS` 改為其他動畫（如 `Emote_Excite`、`Wiggle`）。
-- 矮人、獸人尚未有模型。
-- 精靈的 `elf.glb`（含貼圖）只有骨架與網格、沒有 AnimationPlayer，`IngredientCharacter` 會自動建立；動畫來自三個獨立 FBX。縮放 0.39（高約 0.8），朝向待在畫面確認。
+- 矮人（`dawrf.glb`）、獸人（`orc.glb`）只有網格、沒有動畫，遊戲中顯示靜態模型；有動畫檔後依上方流程補 `extra_library`。
+- 精靈的 `elf.glb`（含貼圖）只有骨架與網格、沒有 AnimationPlayer，`IngredientCharacter` 會自動建立；動畫來自三個獨立 FBX。縮放 0.39（高約 0.8），預設面向 +Z，已接入遊戲（GM-33）。

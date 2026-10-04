@@ -66,7 +66,6 @@
 - [x] GM-19 食材攻擊：每層最前端食材蓄力（每次隨機 10～20 秒），蓄滿攻擊龍（任何層都打得到），攻擊後重新蓄力；龍暈眩 1.5 秒（不能換層、吸、吐、噴火），醒來後無敵 2 秒，暈眩或無敵時攻擊打空；新增 signal 並更新 api.md @露柑
 - [x] GM-20 攻擊測試畫面：食材上顯示蓄力條；main.tscn 的 `StunBanner` 在螢幕上方（上方資訊列下面）顯示暈眩／無敵倒數，暈眩時文字晃動、被打中時放大彈出 @露柑
 - [x] GM-21 難度：開場每層 1 個食材、上限改 6 個；生成間隔隨完成鍋數變短（8 秒起每鍋 -1 秒，最短 3 秒，`@export`），蓄力與走路時間不變 @露柑
-<<<<<<< HEAD
 - [x] GM-22 轉頭：龍頭分左（食材）右（鍋子），玩家 B 大叫（音量 > 50%，`ShoutTurnInput`）或按 L 切換，門檻在麥克風設定面板調整並存檔；面向左才能吸、噴火，面向右才能吐進鍋子；暈眩不能轉頭；畫面下方 `FacingIndicator` 框框顯示目前朝向（模型暫不轉）；連線局 Client 用字音 `turn` 傳給 Host；更新 design.md、api.md @露柑
 - [ ] GM-23 轉頭動畫：龍的模型依 `game_manager.facing`（`facing_changed`）轉向左／右，完成後可移除或保留 `FacingIndicator` 框框
 - [x] GM-24 煮鍋子：鍋子加滿後不直接完成，面向右、胃空時對鍋子持續噴火累計 1 秒（`cook_time`，中斷保留進度）才完成；滿鍋時再吐食材沒有效果；噴火特效改朝鍋子；PotsDebugView 顯示煮的進度；更新 design.md、api.md @露柑
@@ -77,10 +76,9 @@
 - [x] GM-29 通關改成完成 3 鍋；新增分數：每鍋 100 分，距上一鍋完成（或開局）60 秒內完成再加 50 分（全場一個計時），`score_changed` signal，main.tscn 的 `ScoreBanner` 在右上角顯示分數、快速加分倒數與加分提示；更新 design.md、api.md @露柑
 - [x] GM-30 轉頭與換元素對調：玩家 1 大叫或按 4 轉頭（`ShoutTurnInput`），玩家 2 按 L 換元素；連線局字音依座位對調；更新 design.md、api.md、voice-input.md @露柑
 - [x] GM-31 食材放大：IngredientModel `body_scale` 2 倍（膠囊與角色模型，名稱與進度條跟著上移、字不放大），隊伍間隔 0.6→1.2，噴吐瞄準高度 0.4→0.8；排滿 6 個仍在出生點內 @露柑
-- [ ] UI-19 遊戲結束介面（ResultScreen）顯示最終分數（`game_manager.score`）
-=======
-- [ ] GM-22 新規則：鍋子收滿需求數量後不自動完成，要在該層對鍋子噴火才完成一鍋（細節見 design.md 未定事項），並提供 UI 用的「已收滿、等噴火」狀態與 signal
->>>>>>> 修改備份_20261004_1321
+- [x] GM-32 矮人、獸人模型接入遊戲：IngredientModel 的 CHARACTER_SCENES 加入 ART-20 的 `dwarf_character`／`orc_character`（兩者都沒有動畫，只顯示靜態模型，凍住時同樣蓋冰藍色）；沒有動畫的角色不再跳「找不到 AnimationPlayer」警告 @露柑
+- [x] GM-33 精靈模型接入遊戲：IngredientModel 的 CHARACTER_SCENES 加入 `elf_character.tscn`（弓箭掛在手上，走路／待機／攻擊動畫），修正精靈原本在遊戲中完全看不到（膠囊預設隱藏） @露柑
+- [x] GM-34 食材再放大：IngredientModel `body_scale` 2→2.4，隊伍間隔 1.2→1.4（排滿 6 個仍在出生點內），噴吐瞄準高度 0.8→1.0 @露柑
 
 #### UI（GMF）
 - [x] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF
@@ -100,9 +98,7 @@
 - [x] UI-15 ResultScreen 不再 `quit()`：最後一關成功改顯示「回主選單」，UIRoot 發 `back_requested`，由 UIGameBridge 呼叫 `RoomManager.return_to_menu()` @露柑
 - [x] UI-16 專案主場景改成主選單 main_menu.tscn；遊戲場景 game.tscn 改名為 `scenes/game/main.tscn`（根節點 Main），原美術展示 `scenes/main/main.tscn` 改名為 `art_prev.tscn`（根節點 ArtPrev，F6 預覽） @露柑
 - [ ] UI-17 連線局結束改用正式的 ResultScreen（目前是 NetworkGameBridge 的臨時「回到房間」畫面，需與 Samuel 協調）
-<<<<<<< HEAD
 - [x] UI-18 修正 PotInfo 換小龍後面板永久變寬：`set_forbidden()` 舊圖示先移出再釋放（同一幀 `pot_changed`＋`baby_arrived` 呼叫兩次時會疊在一起），並在更新後 `reset_size()` 縮回 @露柑
-=======
 - [x] UI-33 （原 UI-18，與 PotInfo 修正的 UI-18 重號而改號）UI 對接遊戲機制：`UIGameBridge`（`scenes/ui/game_ui.tscn`）依 docs/api.md 接上完成鍋數、清空次數、各層鍋子、龍所在層、音量、吸吐、開始／結束／重新遊玩 @GMF
 - [x] UI-19 把 `scenes/ui/game_ui.tscn` 實例化進 game.tscn（GameManager 的子節點 `GameUI`），（之後 UI-14 已把開始介面改成獨立主選單，game.tscn 也改名為 scenes/game/main.tscn）。經使用者同意由 GMF 直接修改，已通知露柑：GM-16 改 game.tscn 時請保留 `GameUI` 節點 @GMF
 - [ ] UI-20 遊玩狀態介面顯示胃袋裡的食材（`stomach_changed`）與換小龍中的狀態（`PotState.has_baby`），設計確定後再做
@@ -114,11 +110,12 @@
 - [ ] UI-26 請露柑在 GameManager 提供測試用接口（設定完成鍋數／清空次數、強制勝敗、換某層禁止清單），讓 UI-25 不必直接改 GameManager 的資料
 - [x] UI-27 主選單：玩家 A 說明改為「對麥克風發聲，音量大小決定龍的高度」；新增「遊玩方式」「雙人合作」說明卡；套用 ui_theme 與石框卡片、金框按鍵。主選單是露柑的場景，經使用者同意由 GMF 直接修改，節點名稱與腳本接口不變 @GMF
 - [x] UI-28 修正龍洞穴背景遮住龍模型：背景改用深度一律寫成最遠的著色器（`cave_backdrop.gdshader`），所有 3D 物件都畫在背景前面 @GMF
-- [ ] UI-29 鍋子資訊顯示「已收滿，對鍋子吐火」的提示（等 GM-22 提供狀態與 signal）
+- [ ] UI-29 鍋子資訊顯示「已收滿，對鍋子吐火」的提示（煮鍋子已由 GM-24 實作，確認 GameManager 提供的狀態與 signal 後再做）
 - [x] UI-30 連線等候頁改版：`lobby_theme.tres` 改用 UI 素材包（一般按鍵木框、主要按鍵金框、座位灰／橘金石框、輸入框石條、Changa＋中文字型與描邊）；`room_lobby.tscn` 卡片改石框並加寬、`player_input_panels.tscn` 面板改石框。場景與主題是 Samuel 的，經使用者同意由 GMF 直接修改，節點與腳本接口不變 @GMF
 - [x] UI-31 Esc 暫停選單改版：`pause_menu.tscn` 外層加金角石框與「遊戲暫停」木製橫幅、背景加深，麥克風設定面板套用新的小字主題 `scenes/ui/panel_theme.tres`（mic_settings_panel.tscn 本身沒改）。場景是山雷的，經使用者同意由 GMF 直接修改，節點與腳本接口不變 @GMF
 - [x] UI-32 連線等候頁隱藏玩家音高／吸吐側邊面板（`room_lobby.tscn` 的 PlayerPanels 設為不顯示，腳本照常運作）；九宮格面板與按鍵的最小高度不小於圖片上下邊框，延展時邊角不變形；主選單與 design.md 改為「音高控制高度（高音飛高、低音飛低）」；遊戲背景換成新版圖 FGJ2026TeamE_GameBg2 @GMF
->>>>>>> 修改備份_20261004_1321
+- [ ] UI-34 （原 GM 區塊的 UI-19，與既有 UI-19 重號而改號）遊戲結束介面（ResultScreen）顯示最終分數（`game_manager.score`）
+- [ ] UI-35 主選單「雙人合作」卡寫「完成 6 鍋料理就成功」，與 GM-29 的通關 3 鍋不一致，需改成 3 鍋（main_menu.tscn 與 design.md 6.4 一起改）
 
 #### 區網連線（Samuel）
 - [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel
@@ -175,7 +172,6 @@
 - [x] ART-08 驗證加寬特效的最小／預設／最大表現、即時調整、停止清場與三層遮擋，統整設定方式供使用者驗收（使用者已驗收，授權提交 PR） @美術總監
 - [x] ART-09 [緊急] game.tscn 按 1／2／3 換層後紅龍模型不對齊目標（使用者表示已解決並撤回修正；本輪未改動畫，診斷資料保留供參考） @動畫師
 - [x] ART-10 統整兩項緊急任務進度與確認方式（使用者撤回 ART-09，沒有本輪動畫修正須交叉回歸；特效檢查已完成於 ART-08） @美術總監
-<<<<<<< HEAD
 - [ ] ART-11 套用紅龍龍頭左右轉動動畫，評估 Godot AnimationTree 的加法動畫混合（additive）與骨骼過濾可行性，確認既有動畫及嘴部掛點的相容方式 @動畫師
 - [ ] ART-12 為中央紅龍所在區域配置洞穴背景；使用者計畫提供洞穴模型，先確認所需尺寸、開口與掛載位置，模型到位後配置 @場景美術
 - [ ] ART-13 左右樓層拼接完成後對齊 Camera3D 的可見畫面邊界，確認拼接範圍與攝影機構圖的配合方式 @合成師
@@ -186,12 +182,10 @@
 - [ ] ART-18 增加噴火特效發射的粒子數量，調整畫面密度並檢查遮擋及效能 @技術美術與特效
 - [ ] ART-19 評估以單一 0～1 參數控制左右擺頭動畫，確認左右端點、中立值及與 ART-11 的動畫混合接口 @動畫師
 - [x] ART-20 匯入人類（hero.glb）、史萊姆、蝙蝠三種食材模型，建立 `human_character`／`slime_character`／`bat_character` 子場景與共用腳本 `ingredient_character.gd`，設定動畫循環與播放接口，並提供 `ingredient_preview.tscn` 展示；蝙蝠改用 bat.glb，`fly` 為整段飛行、`attack` 擷取自 Armature.006 第 76～105 格（`scenes/ingredient/build_bat_animations.gd` 產生 `Models/bat/bat_animations.tres`）；待使用者驗收，尺寸與朝向待確認，GM 串接另行處理 @素材整合
-
-2026-10-04：使用者再次授權接續 ART-11～ART-19，上輪因用量中斷，已重新派工。擺頭映射確認為 0＝左、0.5＝前、1＝右，先交接口與展示，玩法自動轉頭另接。吐出軌跡、角色比例與接邊基準討論中；洞穴模型及幼龍動畫素材待提供。本輪成果待使用者驗收後才 commit／push。
-=======
 - [x] ART-21 勇者挑戰房往左加長到超出畫面左緣（實作 ART-15 的左側延伸，整體布局待場景美術與 ART-12／ART-13 一起定案）：`hero_challenge_room.tscn` 複製地板、背牆模組到 x = -16（新增 3 段 4 單位），地基與上方飾帶加長，左端外牆、柱子、飾帶移到新左端，加 2 支壁掛火把；隊伍定位點不變。房間是場景美術的場景，經使用者同意由 GMF 直接修改 @GMF
 - [x] ART-22 幼龍哺育房往右加長到超出畫面右緣（實作 ART-15 的右側延伸，做法同 ART-21）：`dragon_nursery_room.tscn` 複製地板、背牆模組到 x = 16（新增 3 段 4 單位），地基與上方飾帶加長，右端外牆（前後兩段）、柱子、飾帶移到新右端，加 2 支壁掛火把；鍋子、小龍、龍蛋等定位點不變。房間是場景美術的場景，經使用者同意由 GMF 直接修改 @GMF
->>>>>>> 修改備份_20261004_1321
+
+2026-10-04：使用者再次授權接續 ART-11～ART-19，上輪因用量中斷，已重新派工。擺頭映射確認為 0＝左、0.5＝前、1＝右，先交接口與展示，玩法自動轉頭另接。吐出軌跡、角色比例與接邊基準討論中；洞穴模型及幼龍動畫素材待提供。本輪成果待使用者驗收後才 commit／push。
 
 ### 音效與 UI
 - [x] SND-01 音量設定：新增 `default_bus_layout.tres`（Master、Music、SFX，Music／SFX 送到 Master）與 autoload `AudioSettings`（`autoload/audio_settings.gd`，0～1 音量、存 `user://audio_settings.cfg`）；共用面板 `scenes/pause_menu/audio_settings_panel.tscn` 放進暫停選單（麥克風設定下方）與主選單（「音量」按鈕開視窗）；之後加音樂、音效的 AudioStreamPlayer 要把 bus 設成 `Music`／`SFX`。改動 `pause_menu.tscn` 需告知 @山雷 @露柑

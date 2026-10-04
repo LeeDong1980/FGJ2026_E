@@ -1,14 +1,17 @@
 class_name IngredientModel
 extends Node3D
 ## 食材在遊戲中的外觀：有正式角色模型的種類（CHARACTER_SCENES）換成角色並播放動畫，
-## 其他種類先用依種類上色的膠囊。名稱標籤、噴火進度條與攻擊蓄力條共用；凍住時變冰藍色、動畫停住。
+## 其他種類先用依種類上色的膠囊。矮人、獸人的模型沒有動畫，只顯示靜態模型。名稱標籤、噴火進度條與攻擊蓄力條共用；凍住時變冰藍色、動畫停住。
 
 const BURN_BAR_WIDTH := 0.6
 const ICE_COLOR := Color(0.6, 0.85, 1.0)
 ## 有正式模型的食材種類 → 角色子場景（ART-20）。沒有列出的種類用膠囊。
 const CHARACTER_SCENES: Dictionary = {
 	IngredientType.Type.HUMAN: preload("res://scenes/ingredient/human_character.tscn"),
+	IngredientType.Type.ELF: preload("res://scenes/ingredient/elf_character.tscn"),
+	IngredientType.Type.DWARF: preload("res://scenes/ingredient/dwarf_character.tscn"),
 	IngredientType.Type.SLIME: preload("res://scenes/ingredient/slime_character.tscn"),
+	IngredientType.Type.ORC: preload("res://scenes/ingredient/orc_character.tscn"),
 	IngredientType.Type.BAT: preload("res://scenes/ingredient/bat_character.tscn"),
 }
 
@@ -19,7 +22,7 @@ const CHARACTER_SCALES: Dictionary = {
 }
 
 ## 食材本體（膠囊或角色模型）的整體放大倍數；名稱標籤與進度條跟著往上移，字不放大。
-@export var body_scale: float = 2.0
+@export var body_scale: float = 2.4
 ## 角色模型轉向的角度（度）：模型預設面向 +Z（鏡頭），90 度是完全側面面向 +X（龍）。
 ## 預設 60 度是斜向，看得到臉和蝙蝠的翅膀。
 @export var character_yaw: float = 60.0

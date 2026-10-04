@@ -14,7 +14,7 @@ const FIRE_HOLD_DURATION := 3600.0
 @export var effects: DragonEffects
 @export var suction_duration: float = 0.6
 ## 目標點在隊伍定位點上方的高度（食材模型的中段）。
-@export var target_height: float = 0.8
+@export var target_height: float = 1.0
 
 
 func _ready() -> void:
