@@ -114,3 +114,11 @@
 
 - 開場的 `baby_arrived`、`pot_changed` 在 `GameManager._ready()` 發出。UI 如果是遊戲場景 `scenes/game/main.tscn` 的子節點，在自己的 `_ready()` 連接就不會漏接；如果放在別的場景，連接後請先主動用 `get_pot()` 等查詢讀一次目前狀態。
 - 不要直接修改 `GameManager` 或 `PotState` 的資料，只讀取。
+
+## 副本模式（連線畫面同步）
+
+連線局的 Client 載入同一個遊戲場景，但 `GameManager.replica` 為 `true`：不模擬、輸入函式（`start_game()`、`suck()`、`spit_pressed()`、`spit_released()`、`toggle_element()`、`turn_head()`）都沒有作用，狀態由 `GameStateReceiver` 依 Host 的封包填入並發出和 Host 相同的 signal。畫面元件照常讀 `GameManager` 的資料與 signal，不需要判斷是不是副本。
+
+- 新增的畫面元件如果要同步到 Client，請確認它讀的狀態都在同步範圍內（見 docs/lobby-flow.md「畫面同步」）；新增的 `GameManager` 狀態或 signal 要在 `GameStateSender`／`GameStateReceiver` 與 `game_sync.gd` 補上。
+- `IngredientState.id` 是這一局的唯一編號，同步用，不要自己改。
+

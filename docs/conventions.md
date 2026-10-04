@@ -55,6 +55,13 @@ autoload/          全域單例
 - `res://scenes/mic_test/mic_test.tscn` @山雷
 - `res://scenes/pause_menu/pause_menu.tscn` @山雷
 - `res://scenes/pause_menu/mic_settings_panel.tscn` @山雷
+- `res://scenes/ui/ui_root.tscn` @GMF
+- `res://scenes/ui/play_hud.tscn` @GMF
+- `res://scenes/ui/pot_info.tscn` @GMF
+- `res://scenes/ui/result_screen.tscn` @GMF
+- `res://scenes/ui/ui_test.tscn` @GMF
+- `res://scenes/ui/game_ui.tscn` @GMF
+- `res://scenes/backdrop/cave_backdrop.tscn` @GMF
 - `res://scenes/phone_mic/phone_mic_test.tscn` @露柑
 - `res://scenes/main_menu/main_menu.tscn` @露柑
 

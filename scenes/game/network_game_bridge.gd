@@ -16,6 +16,8 @@ extends Node
 ##   等 UI-15（ResultScreen 只發 signal）完成後，這個臨時的結束畫面可以拿掉。
 
 const LANE_ACTIONS: Array[StringName] = [&"lane_1", &"lane_2", &"lane_3"]
+## 開局前最久等 Client 的畫面載入完成（它載入完會要求完整狀態）多少秒，超過就直接開始。
+const CLIENT_READY_TIMEOUT: float = 8.0
 
 @export var game_manager: GameManager
 @export var dragon: Dragon
@@ -33,6 +35,7 @@ var _remote_action: String = NetworkManager.ACTION_NONE
 var _received_count: int = 0
 var _debug_label: Label
 var _was_paused: bool = false
+var _client_ready: bool = false
 
 
 func _ready() -> void:
@@ -53,8 +56,18 @@ func _ready() -> void:
 		_build_debug_label()
 	game_manager.game_won.connect(_show_end.bind(true))
 	game_manager.game_lost.connect(_show_end.bind(false))
-	# 等所有子節點（含 UIGameBridge）都 ready 之後再開局，才收得到 game_started。
-	game_manager.start_game.call_deferred()
+	NetworkManager.state_requested.connect(func() -> void: _client_ready = true)
+	_start_when_client_ready()
+
+
+## 等所有子節點（含 UIGameBridge）都 ready，也等 Client 的畫面載入完成，再開局，兩邊才從同一個時間點開始。
+func _start_when_client_ready() -> void:
+	await get_tree().process_frame
+	var waited: float = 0.0
+	while not _client_ready and waited < CLIENT_READY_TIMEOUT:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+	game_manager.start_game()
 
 
 func _process(_delta: float) -> void:

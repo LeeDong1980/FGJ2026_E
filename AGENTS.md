@@ -9,7 +9,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 ## 資料夾結構
 - `scenes/main/`：美術展示場景 `art_prev.tscn`（原 main.tscn，三層樓層＋紅龍＋特效的整體構圖預覽）與展示用子場景。
 - `scenes/dungeon_room/`：地牢房間，包含 dungeon 模型實例、材質、碰撞、燈光與攝影機。
-- `scenes/game/`：遊戲場景 `main.tscn`（原 game.tscn），含 GameManager（遊戲狀態）、樓層產生（LaneLayout）、食材畫面、吸吐特效串接（EffectsView）、鍵盤測試輸入與 Client 遊玩畫面 `client_play.tscn`。
+- `scenes/game/`：遊戲場景 `main.tscn`（原 game.tscn），含 GameManager（遊戲狀態）、樓層產生（LaneLayout）、食材畫面、吸吐特效串接（EffectsView）、鍵盤測試輸入與 Client 輸入診斷疊層 `client_play.tscn`（按 F3）；連線畫面同步見 `game_state_sender.gd`（Host）、`game_state_receiver.gd`（Client）、`client_view_bridge.gd`、`game_sync.gd`（封包格式）。
 - `scenes/dragon/`：可操控的龍（移動腳本＋紅龍模型）。
 - `scenes/ingredient/`：食材種類、食材資料、遊戲中的食材外觀（`ingredient_model.tscn`，有正式模型的種類換成角色子場景，其他用暫時膠囊）與角色子場景（人類、史萊姆、蝙蝠）。
 - `scenes/red_dragon/`：紅龍模型子場景。
@@ -23,8 +23,10 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `scenes/phone_mic/`：手機網頁麥克風（MIC-11）：手機網頁 `phone_mic.html`、每位玩家的聲音換算 `PhoneVoiceSource`、連線測試場景。
 - `scenes/rooms/`：prototype 勇者挑戰房、幼龍哺育房、通用天花板與垂直樓層子場景。
 - `scenes/vfx/`：吸取、噴火的程序材質、粒子子場景、控制接口與獨立展示。
+- `scenes/ui/`：UI 根場景與三個介面（遊戲開始、遊玩狀態、遊戲結束）。`game_ui.tscn` 是接上遊戲機制的完整 UI，已實例化在 game.tscn；`ui_test.tscn` 只測介面流程（假資料與測試快捷鍵）。
+- `scenes/backdrop/`：遊戲中 3D 場景最後面的 2D 龍洞穴背景圖（`cave_backdrop.tscn`，由 `game_ui.tscn` 實例化，自動對齊攝影機）。
 - `Models/`：模型與貼圖素材。
-- `docs/`：設計、開發慣例與任務清單。
+- `docs/`：設計、開發慣例與任務清單；`docs/images/` 放企劃書用的示意圖。
 
 新資料夾依 docs/conventions.md 的規則建立，建好後更新這一節。
 
@@ -34,6 +36,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `docs/conventions.md`：命名、資料夾、場景歸屬規則。新增或修改檔案、場景前先讀。
 - `docs/voice-input.md`：聲音輸入系統（`MicInput`）的使用方法與串接方式。接聲音輸入前先讀。
 - `docs/api.md`：遊戲機制對外的函式與 signal（給 UI 與麥克風輸入）。
+- `docs/ui_art_prompts.md`：UI 與背景美術的生圖提示詞，以及替換暫時美術的方法。
 - `docs/art_asset_needs.md`：prototype 缺素材表、派工進度與模組接口。美術總監在素材到位、交付及進度回報時更新。
 - `docs/asset_credits.md`：第三方資源清單。記錄模型、素材的來源連結與授權。
 
