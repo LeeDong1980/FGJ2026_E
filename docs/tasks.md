@@ -192,5 +192,11 @@
 - [x] SND-02 套用音樂與音效：autoload `Sound`（`autoload/sound.gd`）循環播放 `SFX/BGM.mp3`（全程同一首，換場景、暫停不中斷）；所有按鈕自動加滑過與按下音效（依節點名稱分確認／取消／點擊，可用 metadata `ui_sound` 指定）；暫停選單與主選單音量視窗開關音效；main.tscn 新增 `GameSounds` 播遊戲事件音效（開局、完成一鍋、打翻、無效指令、轉頭、換元素、快速加分、勝敗） @露柑
 - [ ] SND-03 遊戲動作專用音效（吸、噴火、冰息、吐進鍋子、食材攻擊、龍暈眩）：目前音效庫只有 UI 音效，需要素材
 - [ ] SND-04 `SFX/` 的音效與 BGM 來源與授權補進 docs/asset_credits.md
+- [x] SND-05 龍吸取音效：Freesound #315930（CC0）剪成 1.2 秒 `SFX/Dragon/dragon_suck.wav`；`Sound` 支援只有一個版本的音效（SOUNDS 不寫 %d），新增 `suck`；`GameSounds` 在吞下食材（`ingredient_swallowed`）時播放（SND-03 的「吸」） @露柑
+- [x] SND-06 噴火音效：Freesound #467228（CC0）龍吼剪成兩段 `SFX/Dragon/dragon_roar_1.wav`／`_2.wav`；`GameSounds` 在噴火或冰息開始時（`is_breathing_fire()` 或 `is_cooking()` 變成 true）隨機播一段，停止噴吐時 0.25 秒淡出（SND-03 的「噴火」；冰息改用 SND-07，噴火聲之後由 SND-09 換掉） @露柑
+- [x] SND-07 冰息音效：Freesound #841268 暴風雪（CC BY 4.0，作者 klankbeeld）做成 6 秒無縫循環 `SFX/Dragon/ice_breath_loop.wav`（匯入設定循環 Forward）；`GameSounds` 冰息期間循環播放，噴吐途中換元素會淡出舊聲音、改播另一種 @露柑
+- [ ] SND-08 遊戲加入製作名單或致謝畫面，標註 CC BY 素材作者（目前有 klankbeeld 的暴風雪音效、OGsoundFX 的噴火音效，見 docs/asset_credits.md）
+- [x] SND-09 噴火音效換成 Freesound #423009「Dragon Spit Fire 1」（CC BY 4.0，作者 OGsoundFX），剪成 6 秒 `SFX/Dragon/dragon_fire.wav`，噴火開始時播一次、停止噴吐時淡出；移除龍吼 `dragon_roar_1／2.wav` @露柑
+- [x] SND-10 暈眩音效：Freesound #455262「Cartoon, Stunned 05」（CC0）複製為 `SFX/Dragon/dragon_stunned.wav`，`Sound` 新增 `stunned`，`GameSounds` 在龍被食材打暈（`dragon_stunned`）時播放 @露柑
 
 ## 有時間再做

@@ -5,7 +5,7 @@ extends Node
 ## 其他腳本用 Sound.play(&"notify") 播指定音效。每種音效有 4 個版本，每次隨機挑一個並微調音高。
 
 const BGM_PATH := "res://SFX/BGM.mp3"
-## 音效種類 → 檔名樣式（%d 換成 1～4）。換音效只要改這裡。
+## 音效種類 → 檔名樣式（%d 換成 1～4）。只有一個版本的音效直接寫檔名，不放 %d。換音效只要改這裡。
 const SOUNDS: Dictionary[StringName, String] = {
 	&"hover": "res://SFX/Hover/subtle_UI_hover_soun_#%d.wav",
 	&"click": "res://SFX/Click_Select/soft_UI_button_click_#%d.wav",
@@ -17,6 +17,8 @@ const SOUNDS: Dictionary[StringName, String] = {
 	&"error": "res://SFX/Cancel_Back/firm_UI_cancel_sound_#%d.wav",
 	&"toggle": "res://SFX/Click_Select/sharp_UI_selection_c_#%d.wav",
 	&"popup": "res://SFX/Open_Close/small_popup_appearin_#%d.wav",
+	&"suck": "res://SFX/Dragon/dragon_suck.wav",
+	&"stunned": "res://SFX/Dragon/dragon_stunned.wav",
 }
 const VARIANTS := 4
 ## 按鈕節點名稱 → 按下時的音效。沒列到的按鈕播 click。
@@ -76,8 +78,15 @@ func _setup_bgm() -> void:
 func _create_player(kind: StringName) -> AudioStreamPlayer:
 	var randomizer := AudioStreamRandomizer.new()
 	randomizer.random_pitch = 1.05
-	for i in range(1, VARIANTS + 1):
-		var stream := load(SOUNDS[kind] % i) as AudioStream
+	var pattern := SOUNDS[kind]
+	var paths: Array[String] = []
+	if pattern.contains("%d"):
+		for i in range(1, VARIANTS + 1):
+			paths.append(pattern % i)
+	else:
+		paths.append(pattern)
+	for path in paths:
+		var stream := load(path) as AudioStream
 		if stream != null:
 			randomizer.add_stream(-1, stream)
 	var player := AudioStreamPlayer.new()

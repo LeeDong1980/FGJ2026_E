@@ -26,7 +26,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `scenes/ui/`：UI 根場景與三個介面（遊戲開始、遊玩狀態、遊戲結束）。`game_ui.tscn` 是接上遊戲機制的完整 UI，已實例化在 game.tscn；`ui_test.tscn` 只測介面流程（假資料與測試快捷鍵）。
 - `scenes/backdrop/`：遊戲中 3D 場景最後面的 2D 龍洞穴背景圖（`cave_backdrop.tscn`，由 `game_ui.tscn` 實例化，自動對齊攝影機）。
 - `Models/`：模型與貼圖素材。
-- `SFX/`：音樂 `BGM.mp3` 與 UI 音效（依用途分資料夾，每種 4 個版本）。
+- `SFX/`：音樂 `BGM.mp3` 與 UI 音效（依用途分資料夾，每種 4 個版本）；`SFX/Dragon/` 放龍的動作音效（單一版本）。
 - `docs/`：設計、開發慣例與任務清單；`docs/images/` 放企劃書用的示意圖。
 
 新資料夾依 docs/conventions.md 的規則建立，建好後更新這一節。

@@ -24,4 +24,7 @@
 
 | 資源名稱 | 檔案路徑 | 來源連結 | 授權 / 作者 / 備註 |
 | :--- | :--- | :--- | :--- |
-| (待補) | | | |
+| 龍吸取音效（sucked into classroom） | `SFX/Dragon/dragon_suck.wav` | [Freesound #315930](https://freesound.org/s/315930/) | CC0（公眾領域）／ bevibeldesign ／ 原檔 7 秒 AIFF，取開頭 1.2 秒、最後 0.4 秒淡出並轉成 WAV |
+| 噴火音效（Dragon Spit Fire 1 WAV） | `SFX/Dragon/dragon_fire.wav` | [Freesound #423009](https://freesound.org/s/423009/) | **CC BY 4.0，需標註作者**：OGsoundFX ／ 原檔 8.6 秒 24-bit WAV，取 0.1～6.1 秒、最後 1 秒淡出，去掉內嵌封面圖並轉成 16-bit |
+| 暈眩音效（Cartoon, Stunned 05） | `SFX/Dragon/dragon_stunned.wav` | [Freesound #455262](https://freesound.org/s/455262/) | CC0（公眾領域）／ LilMati ／ 原檔直接使用（2.3 秒） |
+| 冰息音效（snow-storm garden De Vers Overloon） | `SFX/Dragon/ice_breath_loop.wav` | [Freesound #841268](https://freesound.org/s/841268/) | **CC BY 4.0，需標註作者**：klankbeeld ／ 原檔 50 秒 32-bit WAV，取 10～16.5 秒做成 6 秒無縫循環（頭尾交叉混合），轉成 16-bit |
