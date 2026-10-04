@@ -23,7 +23,7 @@ signal room_closed_by_host
 ## Client 端：Host 開始或結束連線局。
 signal match_started
 signal match_ended
-## Host 端：Client 的吸／吐動作改變（ACTION_INHALE、ACTION_EXHALE、ACTION_NONE）。
+## Host 端：Client 的吸／吐動作改變（ACTION_INHALE、ACTION_EXHALE、ACTION_NONE）。Host 收到後會回覆確認。
 signal voice_action_received(peer_id: int, action: String)
 ## Host 端：收到 Client 的語音輸入封包
 signal voice_volume_received(peer_id: int, seq: int, volume: float)
@@ -41,6 +41,7 @@ const MAX_CONNECTIONS: int = 3
 const ACK_TIMEOUT_MSEC: int = 2000
 const KIND_VOLUME: String = "volume"
 const KIND_WORD: String = "word"
+const KIND_ACTION: String = "action"
 const ACTION_NONE: String = "none"
 const ACTION_INHALE: String = "inhale"
 const ACTION_EXHALE: String = "exhale"
@@ -59,7 +60,7 @@ var port: int = DEFAULT_PORT
 ## Host 端：連線局進行中。有人連進來時回覆「對方遊戲中」。由 RoomManager 設定。
 var match_in_progress: bool = false
 
-var _seq: Dictionary = {KIND_VOLUME: 0, KIND_WORD: 0}
+var _seq: Dictionary = {KIND_VOLUME: 0, KIND_WORD: 0, KIND_ACTION: 0}
 var _pending: Dictionary = {}  # "kind:seq" -> 送出時間（msec）
 var _last_volume_seq: Dictionary = {}  # peer_id -> 最後收到的音量封包序號
 var _accepted_peers: Array[int] = []
@@ -164,7 +165,8 @@ func get_join_remaining_sec() -> float:
 func send_voice_action(action: String) -> void:
 	if not is_online() or is_host():
 		return
-	_rpc_voice_action.rpc_id(1, action)
+	var seq: int = _next_seq(KIND_ACTION)
+	_rpc_voice_action.rpc_id(1, seq, action)
 
 
 func is_host() -> bool:
@@ -223,7 +225,7 @@ func _next_seq(kind: String) -> int:
 
 
 func _reset_voice_state() -> void:
-	_seq = {KIND_VOLUME: 0, KIND_WORD: 0}
+	_seq = {KIND_VOLUME: 0, KIND_WORD: 0, KIND_ACTION: 0}
 	_pending.clear()
 	_last_volume_seq.clear()
 
@@ -359,7 +361,9 @@ func _rpc_match_ended() -> void:
 
 
 @rpc("any_peer", "call_remote", "reliable")
-func _rpc_voice_action(action: String) -> void:
+func _rpc_voice_action(seq: int, action: String) -> void:
 	if not multiplayer.is_server():
 		return
-	voice_action_received.emit(multiplayer.get_remote_sender_id(), action)
+	var id: int = multiplayer.get_remote_sender_id()
+	voice_action_received.emit(id, action)
+	_rpc_voice_ack.rpc_id(id, KIND_ACTION, seq)

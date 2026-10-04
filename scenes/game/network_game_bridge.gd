@@ -17,8 +17,12 @@ const LANE_ACTIONS: Array[StringName] = [&"lane_1", &"lane_2", &"lane_3"]
 @export var keyboard_input: KeyboardInput
 @export var voice_action_input: VoiceActionInput
 @export var ui_root: UIRoot
+## 在畫面左上角顯示 Client 最後送來的動作，確認封包有沒有收到。
+@export var show_debug: bool = true
 
 var _remote_action: String = NetworkManager.ACTION_NONE
+var _received_count: int = 0
+var _debug_label: Label
 
 
 func _ready() -> void:
@@ -26,6 +30,8 @@ func _ready() -> void:
 		set_process_unhandled_input(false)
 		return
 	_disable_local_action_input()
+	if show_debug:
+		_build_debug_label()
 	NetworkManager.voice_action_received.connect(_on_remote_action)
 	game_manager.game_won.connect(_show_end.bind(true))
 	game_manager.game_lost.connect(_show_end.bind(false))
@@ -56,6 +62,9 @@ func _disable_local_action_input() -> void:
 
 ## Client 的動作改變：inhale 吸一次；exhale 開始吐或噴火，直到換成別的動作才放開。
 func _on_remote_action(_peer_id: int, action: String) -> void:
+	_received_count += 1
+	if _debug_label != null:
+		_debug_label.text = "Client 動作：%s（已收到 %d 個封包）" % [action, _received_count]
 	if action == _remote_action:
 		return
 	if _remote_action == NetworkManager.ACTION_EXHALE:
@@ -66,6 +75,15 @@ func _on_remote_action(_peer_id: int, action: String) -> void:
 			game_manager.suck()
 		NetworkManager.ACTION_EXHALE:
 			game_manager.spit_pressed()
+
+
+func _build_debug_label() -> void:
+	var layer := CanvasLayer.new()
+	_debug_label = Label.new()
+	_debug_label.position = Vector2(12, 40)
+	_debug_label.text = "Client 動作：尚未收到封包"
+	layer.add_child(_debug_label)
+	add_child(layer)
 
 
 func _show_end(won: bool) -> void:
