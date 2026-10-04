@@ -4,13 +4,15 @@ extends Node3D
 ## 各角色場景只需設定 Inspector 的動畫名稱，其餘共用。
 
 ## 待機動畫名稱（循環播放，場景載入後自動播放）。
-@export var idle_animation: StringName = &""
+@export var idle_animation: StringName = &"Idle"
 ## 移動動畫名稱（循環播放），留空表示沒有。
-@export var move_animation: StringName = &""
+@export var move_animation: StringName = &"Walk"
 ## 一次性動作動畫名稱（播完回到待機），留空表示沒有。
-@export var action_animation: StringName = &""
+@export var action_animation: StringName = &"Atk"
 ## 動畫混合時間（秒）。
 @export var blend_time: float = 0.2
+## 額外動畫庫（例如從模型擷取的片段），載入時併入模型的 AnimationPlayer，名稱可直接填入上面的欄位。
+@export var extra_library: AnimationLibrary
 
 var _player: AnimationPlayer
 
@@ -20,6 +22,12 @@ func _ready() -> void:
 	if _player == null:
 		push_warning("%s 找不到 AnimationPlayer" % name)
 		return
+	if extra_library:
+		var lib := _player.get_animation_library(&"")
+		for anim_name in extra_library.get_animation_list():
+			if lib.has_animation(anim_name):
+				lib.remove_animation(anim_name)
+			lib.add_animation(anim_name, extra_library.get_animation(anim_name))
 	_player.playback_default_blend_time = blend_time
 	_set_loop(idle_animation, true)
 	_set_loop(move_animation, true)

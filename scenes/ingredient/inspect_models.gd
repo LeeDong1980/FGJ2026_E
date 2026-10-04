@@ -1,11 +1,11 @@
-extends SceneTree
-## 檢查食材模型匯入結果：列印節點、AnimationPlayer 動畫、材質與世界座標高度。用法：
+﻿extends SceneTree
+## 瑼Ｘ憌?璅∪??臬蝯?嚗??啁?暺nimationPlayer ???鞈芾?銝?摨扳?擃漲?瘜?
 ## Godot --headless --path . -s res://scenes/ingredient/inspect_models.gd
 
 const PATHS := [
 	"res://Models/heroHuman/hero.glb",
 	"res://Models/slime/Slime_glb.glb",
-	"res://Models/bat/Bat_Level_1.fbx",
+	"res://Models/bat/bat.glb",
 ]
 
 
@@ -39,3 +39,4 @@ func _dump(n: Node, d: int) -> void:
 	if d < 5:
 		for c in n.get_children():
 			_dump(c, d + 1)
+
