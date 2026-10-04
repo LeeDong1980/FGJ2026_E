@@ -20,6 +20,7 @@
 [ext_resource type="Script" path="res://scenes/game/facing_indicator.gd" id="15_facing_indicator"]
 [ext_resource type="Script" path="res://scenes/game/action_hint_banner.gd" id="16_action_hint"]
 [ext_resource type="Script" path="res://scenes/game/pot_element_view.gd" id="17_pot_element"]
+[ext_resource type="Script" path="res://scenes/game/score_banner.gd" id="18_score_banner"]
 
 [node name="Main" type="Node3D" unique_id=1674477969 node_paths=PackedStringArray("lane_layout", "dragon")]
 script = ExtResource("4_manager")
@@ -91,6 +92,10 @@ game_manager = NodePath("..")
 
 [node name="ActionHintBanner" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]
 script = ExtResource("16_action_hint")
+game_manager = NodePath("..")
+
+[node name="ScoreBanner" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]
+script = ExtResource("18_score_banner")
 game_manager = NodePath("..")
 
 [node name="FacingIndicator" type="CanvasLayer" parent="." node_paths=PackedStringArray("game_manager")]
