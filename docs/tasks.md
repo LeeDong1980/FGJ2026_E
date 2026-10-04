@@ -136,9 +136,9 @@
 - [x] NET-20 等候頁自選座位：點選「玩家 1」「玩家 2」切換角色（不需對方同意、不需準備）；`RoomManager.host_slot`；音高與吸／吐改為雙向傳輸；`NetworkGameBridge` 與 `client_play` 依座位切換（Client 可坐玩家 1 以音高換層）；遊玩 HUD 的音高條改讀音高並可讀對方傳來的音高；介面「玩家 A／B」統一改為「玩家 1／2」 @Samuel
 - [x] NET-21 遠端連線中繼伺服器：`relay_server/`（Cloudflare Worker + Durable Object，WebSocket 轉送，房間代碼配對），部署到 workers.dev，附 `/health`、`/echo`；已部署 `https://fgj2026-relay.fgj2026-relay.workers.dev`，本機與雲端都用 headless 雙程序測試通過 @Samuel
 - [x] NET-22 Godot 端中繼連線：`scenes/relay/relay_multiplayer_peer.gd`（`MultiplayerPeerExtension`，兩端都只做出站 wss），`NetworkManager` 支援公開房間與用代碼加入，F6 測試場景 `scenes/relay/relay_test.tscn` @Samuel
-- [ ] NET-23 等候頁「公開房間」按鈕、房間代碼顯示與複製、用代碼加入（`RoomManager.publish_room()`／`unpublish_room()`）；更新 docs/lobby-flow.md @Samuel
-- [ ] NET-24 連線診斷（HTTPS、WebSocket 握手、echo 來回時間，失敗時顯示白話原因）已完成；待兩台不同網路的電腦實機跨網路測試（家用、手機熱點、學校網路）@Samuel
-- [ ] NET-25 降低遠端連線延遲：workers.dev 被導到美國，台灣玩家對玩家來回約 290 ms；評估自有網域 Worker 是否改走台北，或改 WebRTC（Cloudflare STUN／TURN） @Samuel
+- [x] NET-23 等候頁「公開房間」按鈕、房間代碼顯示與複製、用代碼加入（`RoomManager.publish_room()`／`unpublish_room()`）；更新 docs/lobby-flow.md；2026-10-04 兩台電腦用輸出版實測，透過房間代碼連線並完成遊玩 @Samuel
+- [x] NET-24 連線診斷（HTTPS、WebSocket 握手、echo 來回時間，失敗時顯示白話原因）；兩台電腦實機測試通過（家用、手機熱點、學校網路等其他網路環境有機會再測）@Samuel
+- [ ] NET-25 降低遠端連線延遲（2026-10-04 實測遊玩延遲可接受，暫不處理）：workers.dev 被導到美國，台灣玩家對玩家來回約 290 ms；原因是 workers.dev 子網域的 IP 區段（104.21／172.67）在台灣走美國；同一個 Worker 走台北區段實測約 110 ms。選項：自有網域加 Pro、cloudflared Quick Tunnel 加 Worker 當目錄、WebRTC（Cloudflare STUN／TURN）。見 docs/relay.md @Samuel
 
 ### 美術與關卡
 

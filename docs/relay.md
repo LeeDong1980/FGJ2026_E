@@ -70,7 +70,9 @@ Host ──wss──▶ ┐                              ┌ ◀──wss── 
 ## 已知限制與費用
 
 - **延遲（2026-10-04 實測，台灣）**：這個 workers.dev 網址的請求被導到美國聖荷西（回應標頭 `cf-ray` 結尾 `SJC`，TCP 連線約 138 ms），雖然同一台電腦連 Cloudflare 一般網站是台北（`colo=TPE`）。兩位玩家都在台灣時，玩家對玩家的來回時間約 **290 ms**（單向約 145 ms），診斷的「中繼來回」約 150 ms。可以玩，但吸／吐與音高會有明顯延遲感。
-- 可能的改善：改用綁在自己網域上的 Worker（網域要在 Cloudflare，路由是否改到台北要實測）；或改走 WebRTC 點對點（Cloudflare 提供 STUN／TURN，連得上時延遲只有幾十毫秒，但桌面版要隨遊戲附帶 webrtc-native 的 GDExtension）。
+- **原因（2026-10-04 實驗）**：不是程式或 Worker 設定，而是 Cloudflare 依 IP 區段決定走哪個機房。`*.workers.dev` 的帳號子網域網址，DNS 給的是 `104.21.x`／`172.67.x` 這一組，在台灣會被導到美國 SJC（TCP 連線 138～210 ms）；同一個 Worker 改連 `104.16`～`104.20`、`162.159` 那幾組 IP（用 `curl --resolve` 或 Node 指定），則落在台北／高雄（連線約 10～20 ms），玩家對玩家來回從約 **296 ms 降到約 110 ms**。社群的說法是免費方案在亞洲的路由較差（非官方文件，我沒有找到免費方案能切換的設定）。
+- 其他參考：`trycloudflare.com` 解析到 `104.16.x`（台北），與 MIC-11 實測單程約 17 ms 一致；`stun.cloudflare.com`、`turn.cloudflare.com` ping 約 8 ms。
+- 可能的改善（細節見 tasks.md NET-25）：(1) 自己的網域加 Pro 方案，讓 Worker 拿到較近的 IP 區段（未驗證）；(2) Host 用 cloudflared Quick Tunnel 對外，Worker 只當「房間代碼→網址」的目錄，遊戲封包走台北；(3) WebRTC 點對點，Cloudflare 提供 STUN／TURN，桌面版要隨遊戲附帶 webrtc-native 的 GDExtension。
 - Cloudflare 免費額度有限（Workers 每日請求數、Durable Object 每日運算時間，WebSocket 訊息以 20:1 換算請求數）。Jam 規模應該夠用，正式使用前請查 Cloudflare 當前的計費頁面。
 - 目前沒有對房間建立做限流；網址與代碼不要公開張貼。
 - 網頁版（itch.io）：協定只用 WebSocket，原則上可行，但專案目前用 Forward Plus 渲染器與 `TCPServer`（PhoneMic），網頁版匯出前要另外處理（見 tasks.md SET-03）。
