@@ -79,6 +79,15 @@ func show_action(action: String) -> void:
 			_fade()
 
 
+## 清掉玩家 2 的動作顯示（換座位或不屬於自己時）。
+func reset_action() -> void:
+	if _word_tween:
+		_word_tween.kill()
+	_word_label.text = "—"
+	_word_label.scale = Vector2.ONE
+	_word_label.modulate.a = 0.45
+
+
 func _pop(word: String) -> void:
 	_word_label.text = word
 	_word_label.pivot_offset = _word_label.size / 2.0

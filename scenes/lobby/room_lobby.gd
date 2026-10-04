@@ -9,7 +9,7 @@ extends Control
 ## 左下玩家 1（音高）、右下玩家 2（吸／吐）的輸入顯示，讓兩位玩家進遊戲前先測試、一起熟悉：
 ## - 坐在某個座位的人，本機量該座位的輸入並傳給對方（PlayerPitchInput／PlayerActionInput）。
 ## - 另一個座位顯示對方傳來的輸入。
-## - Host 房內只有自己時（單機），兩個座位的輸入都由本機負責。
+## - 嚴格依座位：房內只有自己時也一樣，只偵測自己座位的輸入，另一個座位等對方加入。
 
 @onready var _slot1_button: Button = %Slot1Button
 @onready var _slot2_button: Button = %Slot2Button
@@ -27,6 +27,8 @@ extends Control
 var _local_hint: String = ""
 var _pitch_input: PlayerPitchInput
 var _action_input: PlayerActionInput
+## 目前畫面上顯示的是哪個座位的狀態，換座位時用來清掉舊畫面。
+var _shown_slot: int = 0
 
 
 func _ready() -> void:
@@ -123,7 +125,7 @@ func _refresh() -> void:
 	_start_button.disabled = not RoomManager.can_start_match()
 
 	_leave_button.text = "取消連線" if joining else "離開"
-	_refresh_player_inputs(is_host, joining, count)
+	_refresh_player_inputs(joining, count)
 	_refresh_status()
 
 
@@ -150,29 +152,39 @@ func _seat_owner_text(is_mine: bool, is_host: bool, is_client: bool, joining: bo
 	return "等待加入…"
 
 
-## 自己座位的輸入由本機負責並傳給對方；Host 房內只有自己（單機）時兩個座位都由本機負責。
-func _refresh_player_inputs(is_host: bool, joining: bool, count: int) -> void:
-	var alone: bool = is_host and count == 1
+## 嚴格依座位：只偵測、顯示自己座位的輸入（坐玩家 1 只處理音高，坐玩家 2 只處理吸／吐），
+## 並傳給對方；另一個座位只顯示對方傳來的輸入，房內只有自己時就是空的。
+## 單機遊戲開始後兩種輸入都由自己操作，可以在 Esc 選單與遊戲畫面確認。
+func _refresh_player_inputs(joining: bool, count: int) -> void:
 	var has_peer: bool = count == 2
 	var mine: int = RoomManager.get_my_slot()
-	var player1_is_mine: bool = alone or mine == 1
-	var player2_is_mine: bool = alone or mine == 2
+	var player1_is_mine: bool = mine == 1
+	var player2_is_mine: bool = mine == 2
 
 	_pitch_input.enabled = player1_is_mine and not joining
-	_pitch_input.send_to_peer = has_peer and mine == 1
+	_pitch_input.send_to_peer = has_peer and player1_is_mine
 	_action_input.enabled = player2_is_mine and not joining
-	_action_input.send_to_peer = has_peer and mine == 2
+	_action_input.send_to_peer = has_peer and player2_is_mine
 
-	_panels.set_player1("你的音高：對麥克風發出高低音" if player1_is_mine else "對方的音高", player1_is_mine)
-	var player2_caption: String = "對方的吸／吐"
-	if alone:
-		player2_caption = "單機時由你操作：喊「吸」「吐」，或按 J／K"
-	elif player2_is_mine:
-		player2_caption = "你的吸／吐：喊「吸」「吐」，或按 J／K"
-	_panels.set_player2(player2_caption, player2_is_mine)
-	if not player1_is_mine:
+	var waiting_text: String = "對方加入後顯示"
+	_panels.set_player1(
+		"你的音高：對麥克風發出高低音" if player1_is_mine else ("對方的音高" if has_peer else waiting_text),
+		player1_is_mine)
+	_panels.set_player2(
+		"你的吸／吐：喊「吸」「吐」，或按 J／K" if player2_is_mine else ("對方的吸／吐" if has_peer else waiting_text),
+		player2_is_mine)
+
+	# 換座位時，另一邊留下的舊畫面要清掉；房內只有自己時，不屬於自己的座位保持空白。
+	if mine != _shown_slot:
+		_shown_slot = mine
 		_panels.set_pitch(0.0, -1)
+		_panels.reset_action()
+	if not player1_is_mine:
 		_panels.set_pitch_input_off(false)
+		if not has_peer:
+			_panels.set_pitch(0.0, -1)
+	if player1_is_mine and not has_peer:
+		_panels.reset_action()
 
 
 func _local_ip_text(is_host: bool) -> String:

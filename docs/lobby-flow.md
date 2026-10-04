@@ -81,7 +81,7 @@ flowchart TD
 - 「嘗試連線」期間會先關掉自己的房間（ENet 一次只能是 Server 或 Client），失敗後重新建立，效果等同流程圖的「保留自己的房間」。
 - 遊戲端要回到房間時呼叫 `RoomManager.finish_match()`（Host）；單機結束呼叫 `RoomManager.return_to_menu()`。
 - 暫停（`PauseMenu`，Esc）：Host 在遊戲中會凍結遊戲並以 `NetworkManager.send_pause_state()` 通知 Client（Client 顯示「房主已暫停」）；暫停中 `NetworkGameBridge` 只記下 Client 的動作，繼續時再接上噴火。Client、等候頁、連線中的 Esc 只疊出麥克風設定，不凍結（`RoomManager.pause_freezes_game()`）。`RoomManager` 換場景前一律解除暫停。
-- 等候頁的玩家輸入顯示（`player_input_panels.tscn`，樣式沿用遊玩介面）：左下玩家 1（音高條，低／中／高）、右下玩家 2（吸／吐大字）。坐在某個座位的人，本機量該座位的輸入並傳給對方：玩家 1 用 `PlayerPitchInput` 以 `NetworkManager.send_pitch()` 傳音高與層（層改變時立刻送，平時每秒約 15 次），玩家 2 用 `PlayerActionInput` 以 `send_voice_action()` 傳吸／吐；另一個座位顯示對方傳來的輸入。Host 房內只有自己（單機）時，兩個座位的輸入都由本機負責。「我負責的」那一塊多一個語音開關。層的換算與遊戲內相同（`PitchLaneInput.pick_lane`）。
+- 等候頁的玩家輸入顯示（`player_input_panels.tscn`，樣式沿用遊玩介面）：左下玩家 1（音高條，低／中／高）、右下玩家 2（吸／吐大字）。坐在某個座位的人，本機量該座位的輸入並傳給對方：玩家 1 用 `PlayerPitchInput` 以 `NetworkManager.send_pitch()` 傳音高與層（層改變時立刻送，平時每秒約 15 次），玩家 2 用 `PlayerActionInput` 以 `send_voice_action()` 傳吸／吐；另一個座位顯示對方傳來的輸入。等候頁嚴格依座位偵測：坐玩家 1 只處理並顯示音高，坐玩家 2 只處理並顯示吸／吐，房內只有自己時也一樣，另一個座位等對方加入。單機遊戲開始後兩種輸入都由自己操作，可以在 Esc 選單與遊戲畫面確認。「我負責的」那一塊多一個語音開關。層的換算與遊戲內相同（`PitchLaneInput.pick_lane`）。
 
 ## 座位（玩家 1／玩家 2）
 
