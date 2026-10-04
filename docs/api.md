@@ -27,7 +27,7 @@
 - 層數：`game_manager.lane_layout.lane_count`。
 - 樓層位置：`lane_layout.get_lane_position(lane)` 是該層地板頂面的 Y（LaneLayout 本地座標，層距 5）；`lane_layout.get_anchor_position(lane, name)` 取房間定位點（`QueueSpawnAnchor`、`QueueFrontAnchor`、`PotAnchor` 等，名稱見 `docs/prototype_rooms.md`），例如 UI 跟隨鍋子用 `PotAnchor`。
 - 龍暈眩時（`game_manager.is_stunned()`）龍停在原地，`suck()`、`spit_pressed()` 沒有效果，也不會發出 `suck_missed`／`spit_missed`。`set_target_lane()` 照常記錄，醒來後才飛過去；`spit_pressed()` 仍會記錄正在喊「吐」，持續喊到醒來會接著噴火。
-- 朝向：`game_manager.facing` 是 `GameManager.Facing.LEFT`（面向食材）時 `suck()` 與噴火有效；`RIGHT`（面向鍋子）時 `spit_pressed()` 才會吐進鍋子。朝向不對時發出 `suck_missed`／`spit_missed`。暈眩中 `turn_head()` 沒有效果，每局開始時面向左。
+- 朝向：`game_manager.facing` 是 `GameManager.Facing.LEFT`（面向食材）時 `suck()` 與噴火有效；`RIGHT`（面向鍋子）時 `spit_pressed()` 才會吐進鍋子；胃袋空著且鍋子已滿（`PotState.is_full()`）時，持續喊「吐」是對鍋子噴火煮，累計 `cook_time` 秒（預設 1 秒）才完成一鍋。鍋子已滿時吐食材沒有效果。朝向不對時發出 `suck_missed`／`spit_missed`。暈眩中 `turn_head()` 沒有效果，每局開始時面向左。
 - 大叫轉頭由 `scenes/game/shout_turn_input.gd`（`ShoutTurnInput`）處理：讀玩家 B 的音量（手機 2 有連上讀手機，否則讀電腦麥克風），`volume_value` 超過 `MicInput.shout_threshold`（預設 50）呼叫一次 `turn_head()`，降到 `MicInput.shout_release`（預設 35）以下才能再觸發；兩個門檻在麥克風設定面板調整並存進 `user://mic_settings.cfg`。偵測邏輯在 `ShoutDetector`，Client 的 `ClientPlay` 共用，連線局用 `NetworkManager.send_voice_word(WORD_TURN)` 傳給 Host。
 - 鍵盤測試輸入 `scenes/game/keyboard_input.gd` 就是用這些呼叫（按住 K 噴火、L 轉頭），可以當作範例。
 
@@ -50,12 +50,15 @@
 | `PotState.forbidden` | `Array[IngredientType.Type]` | 禁止食材（1～3 種） |
 | `PotState.required` | `int` | 需求數量 |
 | `PotState.count` | `int` | 目前數量 |
+| `PotState.is_full()` | `bool` | 數量已達需求，等待噴火煮好（還沒完成） |
+| `PotState.cook_progress` | `float` | 對已滿鍋子噴火煮的進度，0～1；每幀變動，不會發 `pot_changed`，要自己每幀讀 |
 | `PotState.has_baby` | `bool` | 小龍是否到位；`false` 表示正在換小龍，這時不能吐入 |
 | `game_manager.stomach` | `IngredientState` | 胃袋裡的食材，胃空時為 `null`；種類是 `.type` |
 | `game_manager.completed_count` / `pots_to_win` | `int` | 完成鍋數 / 成功需要的鍋數 |
 | `game_manager.cleared_count` / `clears_to_lose` | `int` | 清空次數 / 失敗需要的次數 |
 | `game_manager.state` | `GameManager.GameState` | `WAITING`（等待開始）、`PLAYING`（遊玩中）、`ENDED`（已分出勝敗） |
 | `game_manager.is_spitting` | `bool` | 玩家 B 正在持續喊「吐」 |
+| `game_manager.is_breathing_fire()` / `is_cooking()` | `bool` | 正在噴火燒食材 / 正在對已滿的鍋子噴火煮 |
 | `IngredientState.burn_progress` | `float` | 食材被燒的進度，0～1；中途停止噴火不會歸零 |
 | `IngredientState.attack_progress` | `float` | 攻擊蓄力進度，0～1；只有隊伍最前端的食材會蓄力，攻擊後歸零 |
 | `game_manager.get_spawn_interval()` | `float` | 目前的食材生成間隔（秒），隨完成鍋數變短 |

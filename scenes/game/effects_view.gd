@@ -1,7 +1,7 @@
 class_name EffectsView
 extends Node
 ## 依 GameManager 的事件播放龍的吸取與噴火特效（scenes/vfx/dragon_effects.tscn）。
-## 吸：吞下食材或吸空時，從所在層隊伍最前端吸向嘴部。吐：噴火期間持續朝隊伍最前端噴，停止喊「吐」就停。
+## 吸：吞下食材或吸空時，從所在層隊伍最前端吸向嘴部。吐：噴火期間持續朝隊伍最前端噴（對已滿的鍋子煮時改朝鍋子），停止喊「吐」就停。
 
 ## 噴火一次播放的秒數，設得很長，實際長度由喊「吐」的時間決定。
 const FIRE_HOLD_DURATION := 3600.0
@@ -26,8 +26,15 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	var firing := effects.get_active_effect() == &"fire"
+	var target: Vector3
+	var breathing := true
 	if game_manager.is_breathing_fire():
-		var target := _target_position(dragon.current_lane)
+		target = _target_position(dragon.current_lane)
+	elif game_manager.is_cooking():
+		target = _anchor_position(dragon.current_lane, &"PotAnchor")
+	else:
+		breathing = false
+	if breathing:
 		if firing:
 			effects.set_target_global_position(target)
 		else:
@@ -41,5 +48,9 @@ func _play_suction(lane: int) -> void:
 
 
 func _target_position(lane: int) -> Vector3:
-	var local := lane_layout.get_anchor_position(lane, &"QueueFrontAnchor") + Vector3.UP * target_height
+	return _anchor_position(lane, &"QueueFrontAnchor")
+
+
+func _anchor_position(lane: int, anchor: StringName) -> Vector3:
+	var local := lane_layout.get_anchor_position(lane, anchor) + Vector3.UP * target_height
 	return lane_layout.to_global(local)
