@@ -109,6 +109,7 @@ size = Vector3(0.8, 0.800283452, 0.797311356)
 
 [node name="HeroChallengeRoom" type="Node3D"]
 script = ExtResource("Ext2")
+outward_direction = -1
 
 [node name="Architecture" type="Node3D" parent="."]
 

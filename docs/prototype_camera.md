@@ -151,3 +151,55 @@ Headless 驗證沒有評估 GPU 畫面、實際亮度、陰影品質或幀率。
 檢查含四種寬度、兩種射程、61 個 fly 姿勢，每個姿勢以 11 個截面、各 32 個圓周點量測。幾何採嘴端 8%～外端完整半徑的包絡，供吸取／噴火共同比較；沒有執行正在修改的加寬 shader，因此不是其實際粒子輪廓、密度或 GPU 效能驗證。並已查看首版已提交的 `scenes/vfx/qa/vfx_fire.png` 與 `vfx_fire_range12.png`，確認原先窄效果與截短／延長表現。
 
 目前 `game.tscn` 仍有自己的 Camera3D 及原 LaneLayout，GM-16 的美術接入由 @露柑 負責。本節只對現有 Main 展示構圖成立；遊戲接入不同層距、角色包裝變換或目標定位點後需重做投影與遮擋確認，合成師不在本次改動遊戲場景。
+
+## ART-13：依現有鏡頭查詢通道外緣（2026-10-04）
+
+本輪先交可測接口，供 ART-15 場景美術拼接外側通道。16:9 現有構圖是可檢視草案，最終接邊布局仍由總監與使用者確認。中央 RedDragon transform、攝影機既有焦距／俯角／安全留白、房間內側 X = −4／+4 與所有定位點維持原值。房間外緣的延伸幾何不得納入 `layout_bounds`；該 bounds 只包含原本房間核心，否則「延伸→鏡頭後退→再次延伸」會形成回授。
+
+### 查詢與通知接口
+
+- `get_visible_horizontal_span(world_y, world_z) -> Dictionary`：以世界 Y／Z 指定水平線，回傳目前 Camera3D 完整視窗左右邊界的世界 `Vector3`，鍵為 `valid`、`left`、`right`。這是純查詢，不取景，不移動鏡頭，不套用 8% `safe_border`；邊界是螢幕 X = 0／viewport width。
+- `get_visible_floor_edges(floor_y, front_z, back_z) -> Dictionary`：回傳 `valid`、`front_left`、`front_right`、`back_left`、`back_right` 四個世界座標。天花板／牆頂另以 `floor_y + room_height` 查詢，不能直接沿用地板寬度。
+- `framing_changed`：每次成功 `reframe()` 後發出；包含 viewport resize 及 `configure_for_layers()` 的取景更新。接收端只重建通道外緣，不能從回呼再次呼叫 `reframe()` 或改 `layout_bounds`。
+- `valid = false` 時只回傳 `reason`，沒有邊界座標。原因包含未進入場景／尚未 ready、非有限輸入、水平線平行側視錐面、超出 near/far 或垂直畫框。編輯器下回傳 `runtime_viewport_required`：編輯器 3D 面板比例與基準構圖不同，本接口以執行時 viewport 為準。
+
+左右點由 Camera3D 世界空間側視錐面與指定水平線求交，再檢查深度與垂直投影。若 Presentation 或房間有位移，傳入真正的世界 Y／Z；回傳點以房間 `to_local()` 換回本地座標後建立幾何。`configure_for_layers()` 的 `floor_origin` 則沿用原接口，屬 Presentation 本地空間。若外部單獨移動 Presentation transform，接收端需自行重新查詢；這種變換不會自動發出取景通知。
+
+房間端接法示意（由場景美術實作，合成師沒有修改房間／Main／Game）：
+
+```gdscript
+func _ready() -> void:
+	presentation.framing_changed.connect(_refresh_outer_corridors)
+	# 等全部樓層建立及 configure_for_layers 完成後再讀第一組邊界。
+	_refresh_outer_corridors.call_deferred()
+
+func _refresh_outer_corridors() -> void:
+	var edges: Dictionary = presentation.get_visible_floor_edges(floor_world_y, front_world_z, back_world_z)
+	if not edges["valid"]:
+		return
+	# 將四角 to_local() 後只更新外側地板、後牆、屋頂與碰撞。
+	# 牆頂／屋頂需以 floor_world_y + room_height 再查一次。
+```
+
+### 目前三層 16:9 的實測邊界
+
+測量條件：1600×900、Presentation identity、三層、層距 5、前 Z = +4、後 Z = −4；目前 camera 本地位置約 `(0, 19.05928, 137.5525)`。以下為世界 X，完整座標為 `(X, 該列 Y, 指定 Z)`，單位均為 Godot 世界單位。
+
+| 樓層 Y | 前緣左 X | 前緣右 X | 後緣左 X | 後緣右 X |
+|---|---:|---:|---:|---:|
+| 0 | −16.16465 | 16.16465 | −17.12099 | 17.12099 |
+| 5 | −16.11235 | 16.11235 | −17.06870 | 17.06870 |
+| 10 | −16.06006 | 16.06006 | −17.01641 | 17.01641 |
+
+這些是接口驗證數值，不能硬寫成房間固定寬度。現有房間外緣 X = ±12，通道從外側向查詢邊界延伸，內側 ±4 保留。透視使後緣比前緣多伸約 0.956 單位，各層與牆頂也不同。矩形模組可取地板／牆頂所有前後角的最外 X 覆蓋，末段加約 0.05～0.1 世界單位越出畫框避免裂縫；或使用各角形成梯形外緣。保持道具原尺寸，不縮房間、不拉伸核心陳設。阻擋外側通道的原牆、地板／後牆／可隱藏屋頂及碰撞需由場景美術同步處理。
+
+### 驗證與交付限制
+
+獨立臨時專案 `C:/Users/LeeDong/AppData/Local/Temp/fgj-camera-edge-validation-20261004`，脚本 `verify_edges.gd`；只複製 presentation 子場景與腳本，沒有匯入共享專案或模型。Godot 4.7.2 headless 執行共 191 項檢查全部通過，取景通知觀察到 9 次：
+
+- 三層各地板及室內頂部的前後四角，投影至螢幕左右邊緣，誤差小於 0.02px。
+- 16:9、直向 900×1600、超寬 2400×900，以及 resize 恢復基準後的查詢。
+- `configure_for_layers(1)`／`(5)`／回到三層後查詢；基準 camera transform 恢復，純查詢前後 transform 相同。
+- Presentation 世界位移後的邊界查詢，以及未 ready、NaN、垂直畫外、鏡頭後方、超出 far 與退化朝向的拒絕處理。
+
+執行退出碼 0。環境有 Windows 根憑證讀取警告，與相機幾何測試無關；本次沒有進行 GPU 房間拼接畫面驗收。ART-13 接口階段完成，完整任務仍待 ART-15 接入後檢查三層地板／牆／屋頂／碰撞接邊、縮放視窗及中央龍／食材／鍋子遮擋。沒有更動任何房間、樓層、Main、Game、模型或共享任務文件，沒有 commit／push。

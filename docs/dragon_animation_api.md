@@ -7,7 +7,7 @@
 - `res://scenes/red_dragon/red_dragon.tscn`：可重用子場景，根節點 `RedDragon` 掛載 `RedDragon` 類別。
 - `res://scenes/red_dragon/red_dragon.gd`：控制腳本；對外透過根節點呼叫，不需要取得匯入模型內部節點。
 - `res://scenes/red_dragon/verify_dragon_animations.gd`：可重跑的 Godot 無視窗功能驗證。
-- 兩個 `.gd.uid` 隨腳本保存。
+- 每個腳本的 `.gd.uid` 隨腳本保存。
 - 來源 `res://Models/dragon/Red_dragon.glb` 及其 `.import` 保持不變。
 
 ```text
@@ -16,6 +16,7 @@ RedDragon (Node3D + RedDragon)
    ├─ Armature
    │  └─ Skeleton3D（111 根骨骼）
    │     ├─ mesh
+   │     ├─ HeadTurn（ready 時建立的 SkeletonModifier3D）
    │     └─ MouthAttachment (BoneAttachment3D，head2)
    │        └─ MouthAnchor (Marker3D，局部 -Z 朝嘴外)
    └─ AnimationPlayer
@@ -61,6 +62,9 @@ set_base_animation(animation_name: StringName) -> bool
 stop_animation(keep_pose: bool = true) -> void
 get_animation_names() -> PackedStringArray
 get_mouth_anchor() -> Marker3D
+set_head_turn(value: float, immediate: bool = false) -> bool
+get_head_turn() -> float
+get_current_head_turn() -> float
 ```
 
 - `play_animation()`：明確呼叫可中斷目前動作。未知名稱（含空字串）或節點尚未 ready 時回傳 `false`，不改變狀態也不發出訊號。相同動畫仍在播放或自然完成後保持姿勢時，預設回傳 `true` 並保持原狀；`restart=true` 才從頭重播。若要改變同一次 `atk` 的位移模式，也需使用 `restart=true`。
@@ -193,6 +197,67 @@ BoneAttachment3D 的原生跟隨行為參考 [Godot BoneAttachment3D](https://do
 ```
 
 請確認輸出有 `RESULT checks=180 failures=0`，不要只憑 Godot 程序退出碼判斷腳本是否成功載入。測試環境的憑證／使用者設定存取警告未阻止動畫載入或 GPU 畫面擷取。
+
+## ART-11／19：0～1 擺頭接口
+
+2026-10-04，使用者確認 **0＝左側食材、0.5＝正前、1＝右側鍋子**。本輪提供接口與獨立展示，尚未將吸／吐或麥克風輸入自動接到擺頭。
+
+| 控制 | 用途 |
+|---|---|
+| `set_head_turn(value, immediate=false) -> bool` | 接受有限數值，限制在 0～1；NaN／Infinity 回傳 `false` 並保留狀態。可在 ready 前設定；初始姿勢直接使用該值。ready 後預設平滑移動，`immediate=true` 立即更新參數，骨架／嘴部在下一次骨架更新套用 |
+| `get_head_turn() -> float` | 讀取目標值 |
+| `get_current_head_turn() -> float` | 讀取實際已平滑到的參數；ready 前等於目標值 |
+| Inspector `head_turn`，預設 0.5 | 初始目標；執行時改值等同平滑設定目標 |
+| Inspector `head_turn_speed`，預設 2.0 | 每秒移動多少參數單位，至少 0.1；預設中立到端點需 0.25 秒 |
+| Inspector `head_turn_max_angle_degrees`，預設 90° | 限制 0～90°，對應兩端的額外左右角；0° 停用額外旋轉，不改參數或基礎動畫 |
+
+```gdscript
+# main 的直接紅龍用 $RedDragon；遊戲包裝則取得 $Dragon/Model。
+var visual: RedDragon = $Dragon/Model
+visual.set_head_turn(0.0)       # 平滑朝左側食材
+visual.set_head_turn(0.5)       # 返回基礎動畫原本的頭部方向
+visual.set_head_turn(1.0, true) # 直接將參數設為右端；下一次骨架更新可見
+```
+
+左右定義在紅龍模型座標：左為 -X、右為 +X，前為既有模型的 +Z。已使用嘴部掛點的最終 `-global_basis.z.normalized()` 實測符號；目前 main／game 未旋轉的根配置也對應世界左右。若呼叫者旋轉整個角色，左右會跟著角色旋轉，不自動改為世界座標瞄準。
+
+中立是**不增加旋轉**，保留動畫自身的低頭、仰頭及左右動作，不強迫每個時間點正對世界 +Z。端點為在這個基礎姿勢上增加 ±90° 模型 Y 軸旋轉；嘴部跟隨龍頭，並非始終指向指定食材／鍋子的精確 IK 瞄準。`fall` 仍保留來源下降與翻倒。
+
+實作檔案：
+
+- `scenes/red_dragon/red_dragon.gd`：公開接口與 Inspector 設定；ready 時為每個實例建立自己的 modifier。
+- `scenes/red_dragon/head_turn_modifier.gd`：`SkeletonModifier3D`，限制只改 `neck1`／`neck2`／`head1` 的局部旋轉，分配 35%／40%／25%；後代 `head2`、眼睛、下顎與嘴部掛點自然繼承。所有骨骼局部位置／比例及其他局部旋轉保持基礎動畫的值。
+- `scenes/red_dragon/head_turn_preview.tscn` 與 `.gd`：F6 獨立展示，含滑桿、左／正前／右、七動畫選擇、重播、停止保留姿勢、停止回中立、立即及近看。黃色箭頭只在展示內表示嘴巴朝向，未加入主場景或遊戲。
+- `scenes/red_dragon/verify_head_turn.gd`：可重跑的新接口驗證；新增腳本各有 `.gd.uid`。
+
+`AnimationTree` 的 Add2／Add3 與骨骼 filter 可實現此類 additive，但啟用 Tree 時應由 Tree 單獨控制播放與轉場，不能同時以原有 AnimationPlayer 方法驅動。本輪為保留既有七動畫、重播、完成／中斷訊號及返回 base 的契約，使用較小的 modifier，**AnimationPlayer 仍是唯一動畫播放 driver**。依 [Godot AnimationTree 文件](https://docs.godotengine.org/en/stable/classes/class_animationtree.html)與 [SkeletonModifier3D 文件](https://docs.godotengine.org/en/stable/classes/class_skeletonmodifier3d.html)，modifier 於動畫播放後處理骨骼；此方案不需要新增／取代任何來源動畫。
+
+`Skeleton3D` 每次處理後恢復基礎輸入 pose，因此 modifier 每次從當次動畫姿勢加旋轉，不把前幀結果累積進下幀。回中立時亦提交 identity 旋轉，使停止或靜態姿勢的 skin 與 BoneAttachment3D 清除前次擺頭。若需讀取**修改後的骨骼 pose**，使用 `Skeleton3D.skeleton_updated` 或 modifier 的 `modification_processed` 時機；平常取得骨骼 pose 可能讀到已恢復的基礎姿勢。特效仍直接讀 `get_mouth_anchor().global_transform`，掛點保留最終呈現位置；詳見 [Skeleton3D 文件](https://docs.godotengine.org/en/stable/classes/class_skeleton3d.html)。
+
+擺頭不播放／中斷 clip、不發出動畫事件。切換及單次動作返回 base 時保留擺頭目標。`stop_animation(true)` 同時凍結目前擺頭參數與基礎動畫；`stop_animation(false)` 套用基礎動畫第一幀並回中立。停止後明確呼叫 `set_head_turn()` 可繼續改頭部，基礎動畫仍保持停止。
+
+驗證：Godot 4.7.2，獨立 Temp 專案，來源與主專案匯入設定不變。
+
+- `HEAD_TURN_RESULT checks=1920 failures=0`：七動畫 × 三個時間點 × 左／中／右 × 根倍率 1／5 × 根旋轉 0／(13°,37°,7°)，共 252 組姿勢；核對限定骨骼修改、實際蒙皮上唇定位、最終嘴部 transform、根／模型／Armature 不變、實例隔離與擺頭不發動畫訊號。
+- 額外涵蓋有限值／越界、ready 前設定、可量測的平滑增量、停止保持／中立、20 次停止姿勢重複更新不累積旋轉、停止後重新擺頭、`atk`／`roar` 完成返回 fly 及原有訊號順序、0.2 秒實際混合與同時平滑擺頭（四個動畫各 15 幀）、執行時最大角度設定。
+- `fly` 第 2 秒的嘴部朝向：左約 `(-0.905667,-0.413635,0.093134)`；中立約 `(0.093134,-0.413635,0.905666)`；右約 `(0.905666,-0.413635,-0.093134)`。上下分量來自來源姿勢。
+- Compatibility／OpenGL 擷取 `idle`／`fly`／`atk`／`roar` 各三端點共 12 張近景及可操作展示畫面，確認頸部／頭部與嘴部箭頭的實際呈現。最終場景構圖由總監另行驗收。
+- 展示的繁中端點按鈕、滑桿、七動畫選擇、重播與兩種停止操作另有 15 項回呼驗證，包含在上述 1,920 項內。最終版本重跑既有驗證為 `RESULT checks=180 failures=0`。
+
+診斷／畫面暫存於 Windows Temp 的 `fgj_head_turn_500b1f80175a42e48e4b3088a3a48cde`；`head_turn_contact_sheet.png` 為四動畫三端點對照，`head_preview_ui.png` 為操作畫面。可使用前文 headless 命令，將 script 替換為 `res://scenes/red_dragon/verify_head_turn.gd` 重跑；以結果行確認，不只看程序退出碼。
+
+## ART-16：幼龍動畫素材盤點（缺素材）
+
+2026-10-04，盤點來源 `Models/dragonBabies/baby_dragon.glb` 及既有 Godot 匯入場景，未修改來源、匯入設定或 `scenes/rooms/baby_dragon.tscn`。
+
+- 來源 GLB JSON：1 個 mesh、0 個 skins、0 個 animations。
+- Godot 匯入：5 個 Node3D 加 1 個 MeshInstance3D；沒有 Skeleton3D、AnimationPlayer 或帶 Skin 的網格，clip 清單為空。
+- 唯一網格路徑為 `Sketchfab_Scene/Sketchfab_model/c5ba2e3ba8374757ae76e45fd02e46e0_fbx/RootNode/Baby_dragon/Baby_dragon_standardSurface1_0`。來源缺少骨架／蒙皮，無法直接套用紅龍動畫或做相同的骨骼擺頭。
+- 現有三張貼圖 `baby_dragon_0.png`／`baby_dragon_1.png`／`baby_dragon_2.png` 不包含動畫資料。
+
+可重跑 `scenes/red_dragon/verify_baby_animation_inventory.gd`，它讀取來源 JSON 並遞迴列出匯入節點，輸出 `BABY_SOURCE skins=0 animations=0 meshes=1`、`BABY_IMPORTED skeletons=0 animation_players=0 skinned_meshes=0 clips=[]` 及 `BABY_INVENTORY_RESULT walk_idle_available=false`；這是缺件盤點結果，不代表 ART-16 的待機／走動已實作。
+
+需要使用者提供同外觀的 **rigged／skinned 幼龍模型及可循環的 idle／walk 動畫**，建議使用同一骨架的 GLB 或原始 Blender 檔與貼圖。walk 請標示是原地步行或帶 root motion、移動方向與來源單位；idle 請保留站姿及首尾連續。素材到位後才能確認比例、腳底定位、循環、移動接口與場景整合；本輪未以靜態浮動替代待機／走動。
 
 ## ART-09：遊戲換層對齊診斷紀錄（修正已撤回）
 

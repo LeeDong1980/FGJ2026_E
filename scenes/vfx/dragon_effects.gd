@@ -5,18 +5,32 @@ extends Node3D
 signal effect_started(effect_name: StringName)
 signal effect_finished(effect_name: StringName)
 signal effect_interrupted(effect_name: StringName)
+signal spit_started(shot_id: int)
+signal spit_finished(shot_id: int)
+signal spit_interrupted(shot_id: int)
 
 const MIN_EFFECT_WIDTH: float = 0.1
 const MAX_EFFECT_WIDTH: float = 8.0
 const MIN_LEGACY_RADIUS: float = 0.01
+const SPIT_SCENE: PackedScene = preload("res://scenes/vfx/spit_projectile.tscn")
+const MAX_SPIT_SHOTS: int = 8
 
 var _suction_width: float = 4.0
 var _fire_width: float = 3.0
+var _fire_particle_count: int = 384
 
 @export_node_path("Node3D") var dragon_path: NodePath
 @export_range(0.05, 10.0, 0.05) var default_duration: float = 0.6
 @export_range(0.1, 20.0, 0.1) var effect_range: float = 6.0
 @export_range(8, 512, 1) var particle_count: int = 192
+
+@export_group("Fire Density")
+## Main flame particles only. Zero inherits the legacy shared particle_count.
+@export_range(0, 512, 1) var fire_particle_count: int = 384:
+	get:
+		return _fire_particle_count
+	set(value):
+		set_fire_particle_count(value)
 
 @export_group("Effect Widths")
 ## Diameter at the widest cross-section, in world units. Does not change range.
@@ -62,6 +76,8 @@ var _remaining: float = 0.0
 var _tail_remaining: float = 0.0
 var _draining: bool = false
 var _request_serial: int = 0
+var _spit_serial: int = 0
+var _spits: Dictionary[int, SpitProjectile] = {}
 
 @onready var _suction: DirectedDragonEffect = %SuctionEffect
 @onready var _fire: DirectedDragonEffect = %FireBreathEffect
@@ -76,7 +92,7 @@ func _ready() -> void:
 func bind_dragon(dragon: Node3D) -> bool:
 	_request_serial += 1
 	var serial: int = _request_serial
-	_cancel_current()
+	_cancel_all()
 	if serial != _request_serial:
 		return false
 	_dragon = dragon
@@ -93,7 +109,84 @@ func play_fire(target_global_position: Vector3, duration: float = 0.6) -> bool:
 
 func stop_effects() -> void:
 	_request_serial += 1
+	_cancel_all()
+
+
+## For releasing a held fire input without cancelling food already in flight.
+func stop_breath_effects() -> void:
+	_request_serial += 1
 	_cancel_current()
+
+
+## Returns an instance ID; -1 rejects without affecting other visuals.
+## Positions are captured at launch; range/width settings do not truncate spit.
+func play_spit(target: Vector3, payload: PackedScene, duration: float = 0.6, arc_height: float = 1.2, payload_type: int = -1) -> int:
+	last_error = ""
+	if not is_node_ready() or payload == null or not target.is_finite() or not is_finite(duration) or duration <= 0.0 or not is_finite(arc_height) or arc_height < 0.0:
+		last_error = "Spit needs a ready controller, payload, finite target, positive duration and nonnegative arc height."
+		return -1
+	var anchor: Marker3D = _get_mouth_anchor()
+	if anchor == null:
+		return -1
+	if _spits.size() >= MAX_SPIT_SHOTS or anchor.global_position.distance_squared_to(target) < 0.0001:
+		last_error = "Spit capacity reached or target is too close to mouth."
+		return -1
+	var node: Node = payload.instantiate()
+	var visual: Node3D = node as Node3D
+	if visual == null or (payload_type != -1 and (not visual is IngredientModel or not IngredientType.NAMES.has(payload_type))):
+		node.free()
+		last_error = "Spit payload must be Node3D; optional type requires the existing IngredientModel and a valid ingredient type."
+		return -1
+	var source: Vector3 = anchor.global_position
+	var shot: SpitProjectile = SPIT_SCENE.instantiate() as SpitProjectile
+	_spit_serial += 1
+	var shot_id: int = _spit_serial
+	_spits[shot_id] = shot
+	add_child(shot)
+	shot.launch(source, target, visual, duration, arc_height)
+	if payload_type != -1:
+		(visual as IngredientModel).setup(payload_type)
+	shot.completed.connect(_on_spit_completed.bind(shot_id), CONNECT_ONE_SHOT)
+	spit_started.emit(shot_id)
+	return shot_id
+
+
+func get_active_spit_count() -> int:
+	return _spits.size()
+
+
+func _on_spit_completed(shot_id: int) -> void:
+	if _spits.has(shot_id):
+		_spits.erase(shot_id)
+		spit_finished.emit(shot_id)
+
+
+func _cancel_all() -> void:
+	# Snapshot and detach old shots before signals, preserving newer callback requests.
+	var old_shots: Dictionary[int, SpitProjectile] = _spits.duplicate()
+	_spits.clear()
+	for shot: SpitProjectile in old_shots.values():
+		shot.cancel()
+	_cancel_current()
+	for shot_id: int in old_shots:
+		spit_interrupted.emit(shot_id)
+
+
+## Changing GPU amount restarts flame particles, but not the controller timer.
+## While draining, store the setting for the next play without reviving the tail.
+func set_fire_particle_count(count: int) -> bool:
+	if count < 0:
+		last_error = "Fire particle count must be nonnegative; zero inherits particle_count."
+		return false
+	_fire_particle_count = 0 if count == 0 else clampi(count, 8, 512)
+	last_error = ""
+	if _active_name == &"fire" and _active_effect != null and not _draining:
+		_active_effect.set_particle_count(get_fire_particle_count())
+	return true
+
+
+func get_fire_particle_count() -> int:
+	return clampi(particle_count, 8, 512) if _fire_particle_count == 0 else _fire_particle_count
 
 
 ## Validates both inputs before updating either width. Positive values clamp.
@@ -168,7 +261,7 @@ func _play(effect_name: StringName, target: Vector3, duration: float) -> bool:
 	_remaining = duration
 	_draining = false
 	_active_effect.radius = _get_effect_radius(effect_name)
-	_active_effect.particle_count = clampi(particle_count, 8, 512)
+	_active_effect.particle_count = get_fire_particle_count() if effect_name == &"fire" else clampi(particle_count, 8, 512)
 	_update_endpoints()
 	if _active_effect == null:
 		return false

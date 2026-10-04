@@ -1,6 +1,81 @@
-# 紅龍吸取與噴火特效
+# 紅龍吸取、噴火與吐出食材特效
 
-交付：@技術美術與特效，2026-10-03。此模組提供視覺效果，食材銷毀、進鍋、命中、換層及動畫作用時刻由玩法程式決定。使用者已確認氣流向嘴收束、暖色錐形火焰，並於 ART-07 緊急任務要求「更誇張、覆蓋更大的範圍」。本文件的「吐」指**胃袋空時噴火**，沒有製作新的胃袋吐食材表現。
+交付：@技術美術與特效，更新於 2026-10-04。此模組提供視覺效果，食材銷毀、進鍋、命中、換層及動畫作用時刻由玩法程式決定。ART-07 已驗收；本輪 ART-18 增加噴火主粒子數量，ART-14 提供吐出食材的可檢視草案。吐出弧線與尾跡尚待使用者驗收，沒有改變立即進鍋判定。
+
+## ART-18 獨立噴火密度
+
+`DragonEffects` Inspector 的 **Fire Density → Fire Particle Count** 預設 **384**，原為 192；吸取仍使用既有 `particle_count`，預設 **192**。只增加主要火焰 Flow，火星 16、煙 12 保持不變，新的噴火總預算為 **412**，原為 220。寬度、射程與生命週期不因密度改變。
+
+`set_fire_particle_count(count: int) -> bool` 或直接寫入 `fire_particle_count`：負數拒絕並保留原值；正數 clamp 至 8～512；**0 代表沿用舊 `particle_count`**（8～512）。`get_fire_particle_count() -> int` 回傳實際主火焰數量，包含 0 的繼承規則。既有 `particle_count` 欄位與播放接口保留；需要舊版兩效果共用數量時，先設 `fire_particle_count=0`。
+
+```gdscript
+effects.set_fire_particle_count(384) # 獨立噴火；吸取不變。
+effects.set_fire_particle_count(0)   # 改回沿用 particle_count。
+```
+
+發射中調整會更新 Flow.amount；Godot 會重建該 GPU 粒子系統，可能短暫重新填滿火焰，但控制器不發 started/interrupted、不重置播放時間，也不重建錐形核心、火星或煙。尾端消散期間只保存設定供下次播放，避免把已停止發射的尾端重啟。這與寬度的無重啟 uniform 更新不同。[Godot GPUParticles3D amount 說明](https://docs.godotengine.org/en/latest/classes/class_gpuparticles3d.html#class-gpuparticles3d-property-amount)。
+
+預覽 **E/D** 增減噴火主粒子 32，**R** 恢復共用數量；畫面列出噴火實際數量與吸取設定。
+
+## ART-14 吐出食材草案與 GM-18 交接
+
+可重用 `spit_projectile.tscn`／`spit_projectile.gd` 提供視覺食材與 12 顆小型淡金尾跡。`DragonEffects` 對外接口：
+
+```gdscript
+func play_spit(target: Vector3, payload: PackedScene, duration: float = 0.6,
+               arc_height: float = 1.2, payload_type: int = -1) -> int
+func get_active_spit_count() -> int
+func stop_breath_effects() -> void
+signal spit_started(shot_id: int)
+signal spit_finished(shot_id: int)
+signal spit_interrupted(shot_id: int)
+```
+
+成功回傳單調遞增的 shot_id；失敗回傳 -1，原因見 `last_error`，不替換既有視覺。payload 是**以 Node3D 為根的視覺 PackedScene**，每次獨立實例化；根位置置零，保留其旋轉與比例，尺寸不乘上龍的根倍率。自訂外觀可用 -1，提供已配置的視覺子場景；既有 `ingredient_model.tscn` 可額外傳入有效的 `IngredientType.Type`，會對該獨立 `IngredientModel` 呼叫 `setup(type)`。這個可選 type 只支援該既有模型，避免假定其他素材的配置接口。模型原點會沿軌跡走；需要中心對準嘴／鍋口時，以自有 Node3D 包裝並偏移內部模型。既有膠囊草案沿其根原點走。
+
+source 是呼叫時的嘴部世界位置，target 是呼叫時的鍋口世界位置，兩者之後固定。路徑為 `source.lerp(target, t) + UP * 4 * arc_height * t * (1-t)`；arc_height 是相對起終點直線的**中點抬升**，不是絕對世界高度。duration 是完整飛行秒數。**不使用 effect_range 截短**，不使用吸取／噴火寬度；目標離嘴超過 6 單位仍完整到達。duration 須有限且正，arc_height 須有限且非負，target 須有限、距嘴至少 0.01 單位，payload 不可為空；控制器須 ready 並綁定有效嘴部。
+
+同一控制器最多同時 8 個食材；第 9 個拒絕，保留先前實例。飛行獨立於吸取／噴火，途中換層或擺頭不拖曳已射出的食材；新吐出讀取新嘴部位置。抵達時精確設到 target、隱藏並釋放食材與尾跡，僅發一次 `spit_finished(id)`。該事件是視覺完成通知，**不得再加鍋子數量或判定勝敗**。payload 的 CollisionObject3D layer/mask 清為 0，視覺不參與命中。
+
+`stop_effects()`／`bind_dragon()` 會清掉所有飛行食材與吸取／噴火，對每個在途 id 發 `spit_interrupted`，閒置不發事件；取消不發 finished。取消先移除舊實例，再送 signal，回呼發出的新 shot 不受舊清場影響。新 `stop_breath_effects()` **只停止吸取／噴火**，供放開噴火輸入使用，保留已射出的食材；`get_active_effect()` 繼續只回傳 suction/fire/空字串，吐出另用 count／spit signals 查詢。
+
+建議露柑的 GM-18 整合方式（本 session 不修改 EffectsView 或 game.tscn）：
+
+```gdscript
+const FOOD_VISUAL: PackedScene = preload("res://scenes/ingredient/ingredient_model.tscn")
+
+func _on_ingredient_spat(lane: int, ingredient: IngredientState) -> void:
+    var pot_base: Vector3 = lane_layout.to_global(lane_layout.get_anchor_position(lane, &"PotAnchor"))
+    # 0.9 是預覽的鍋口偏移；玩法可依實際鍋模型調整。
+    var id: int = effects.play_spit(pot_base + Vector3.UP * 0.9, FOOD_VISUAL, 0.6, 1.2, ingredient.type)
+    if id < 0:
+        print(effects.last_error)
+```
+
+連接 `GameManager.ingredient_spat(lane, ingredient)`；使用 signal 傳出的 ingredient，不在胃袋已清空後重新查詢。保持目前立即進鍋規則，VFX 只是事件後的呈現。EffectsView 釋放噴火的分支改呼叫 `stop_breath_effects()`；重開、勝／敗仍用 `stop_effects()`。目前 game 的外層 `Dragon` 已有嘴部 forwarding，可直接 `bind_dragon(dragon)`。正式擺頭由動畫師處理，此模組不改動畫原點。
+
+F6 `vfx_preview.tscn`：**3** 吐食材草案、**T** 輪替六種外觀，目標為當層 PotAnchor + 世界 UP 0.9；**空白** 全清場。預覽換層會先停止全部，介面測試另確認在途目標不因角色移動改變。沒有外部素材缺件；正式食材外觀可日後傳入其他視覺 PackedScene。
+
+### 本輪驗證與 GPU 圖片
+
+獨立 temp 專案副本驗證，未對共享專案做全專案重匯入。Godot 4.7.2 無視窗 **185 checks／0 failures**：保留原 122 項；新增密度預設／上下界／繼承／執行時更新／消散／序列化，以及吐出完整端點／arc 中點／六種 payload／取消／8 個並發上限／回呼重入／飛行獨立測試。
+
+Forward Plus／D3D12／RTX 4070 Laptop，1600×900：新增 7 張密度與 4 張吐出圖。密度停止、吐出抵達與吐出取消畫面各與對應待機 SHA-256 相同，沒有殘留。384 火焰較 192 更密，右房鍋子／幼龍仍可讀；512 搭配寬度 8 明顯遮住左房與龍爪，保留為可調上限。
+
+每種設定暖機後取 120 個 viewport 渲染時間樣本（含整個展示場景，不是 VFX 單獨耗時）：
+
+| 主火焰數／完整寬度 | 平均 CPU 渲染 ms | 平均 GPU 渲染 ms | GPU 最大 ms |
+|---|---:|---:|---:|
+| 192／3 | 0.278 | 0.803 | 1.085 |
+| 384／3（新預設） | 0.285 | 0.836 | 3.230 |
+| 512／3 | 0.287 | 0.792 | 0.823 |
+| 512／8 | 0.299 | 0.814 | 1.582 |
+
+這批短樣本沒有觀察到平均渲染時間大幅上升；非單調差異及一次峰值不能推論粒子越多越快，亦不代表目標機最低效能。量測透過 [RenderingServer viewport render time](https://docs.godotengine.org/en/latest/classes/class_renderingserver.html#class-renderingserver-method-viewport-get-measured-render-time-gpu)，不包含玩法、麥克風及 UI 執行時間。每次吐出另最多 12 尾跡、8 發並發最多 96 尾跡，到達立即釋放；game 整合回歸由 GM-18 處理。
+
+[原密度 192](../scenes/vfx/qa/density_fire_192.png)、[新密度 384](../scenes/vfx/qa/density_fire_384.png)、[512／寬度 8](../scenes/vfx/qa/density_fire_512_width8.png)、[吐出弧線草案](../scenes/vfx/qa/spit_mid_arc.png)。
+
+QA 工具保留舊寬度比較，另加 `--density`／`--spit` 模式；結果輸出到指定外部目錄。新子場景的 `.gd.uid`、11 張新 PNG 及 `.import` 一併交付。共享 tasks／design／場景歸屬表由美術總監更新；本輪未修改他人的場景／game 程式／Models 源檔，未 commit／push。
 
 ## ART-07 加寬與設定方式
 
@@ -44,12 +119,13 @@ radius 保留為程式與舊 `.tscn` 的相容屬性，不再在新 Inspector �
 |---|---|
 | `dragon_effects.tscn`、`dragon_effects.gd` | `DragonEffects` 控制器；綁定嘴部接口、播放／中斷／完成事件、世界目標更新及視覺射程限制 |
 | `suction_effect.tscn` | `SuctionEffect`；淡藍氣流由目標端收束至嘴部；透過控制器播放時預設 192 粒子 |
-| `fire_breath_effect.tscn` | `FireBreathEffect`；連續錐形核心、暖色粒子、少量火星與淡煙；透過控制器播放時預設 192 + 16 + 12 粒子 |
+| `fire_breath_effect.tscn` | `FireBreathEffect`；連續錐形核心、暖色粒子、少量火星與淡煙；透過控制器播放時預設 384 + 16 + 12 粒子 |
+| `spit_projectile.tscn`、`spit_projectile.gd` | 完整世界弧線、獨立 payload 實例、12 顆淡金尾跡，抵達／取消清場；沒有進鍋判定 |
 | `directed_effect.gd` | 粒子資源隔離、世界端點與剔除邊界更新、發射／尾端消散／立即清場 |
 | `endpoint_flow.gdshader` | `particles` shader；收束／向外流動、錐形展開、旋流、淡出，以及配合加寬的氣流筆畫與火焰粒子形狀 |
 | `flow_surface.gdshader` | `spatial` shader；沿畫面作用方向排列粒子，以 UV 程序形狀產生氣流／火焰／火星／煙；不需要外部貼圖 |
 | `flame_core.gdshader` | 低透明度錐形核心的程序起伏與流動紋理，填補粒子間隙，與尾端一併淡出 |
-| `vfx_preview.tscn`、`vfx_preview.gd` | 實例化目前主場景的 F6 展示，保留使用者主龍變換；使用目標圓環，不生成食材 |
+| `vfx_preview.tscn`、`vfx_preview.gd` | F6 展示；保留使用者主龍變換，可調寬度／密度與輪替六種視覺食材；不生成玩法食材 |
 | `verify_dragon_vfx.gd` | 無視窗接口、資源隔離及實際嘴部／主場景整合驗證 |
 | `capture_dragon_vfx.gd` | Forward Plus GPU 擷取工具；固定取樣的 fly 姿勢以比較特效，不修改來源場景 |
 | `qa/*.png` | 同一主鏡頭、同一龍姿勢的原版／最小／預設／最大寬度、加長射程及停止對比畫面 |
@@ -60,7 +136,7 @@ radius 保留為程式與舊 `.tscn` 的相容屬性，不再在新 Inspector �
 
 根節點類別為 `DragonEffects`。在主場景實例化一次，Inspector 的 `dragon_path` 指向紅龍，例如 `../RedDragon`；或於 ready 後呼叫：
 
-目前 Main 的 `RedDragon` 提供 `get_mouth_anchor() -> Marker3D`。未來接入 `game.tscn` 時，外層 `Game/Dragon` 是玩法移動包裝節點，**沒有此方法**；須綁定內層 **`Game/Dragon/Model`（RedDragon）**，例如在 Game 腳本呼叫 `effects.bind_dragon($Dragon/Model)`。本輪沒有修改 game／dragon 或接入玩法。
+Main 的 `RedDragon` 提供 `get_mouth_anchor() -> Marker3D`。目前 GM-17 已接入 game 的吸取／噴火，外層 `Game/Dragon` 已提供嘴部 forwarding，EffectsView 可直接綁定；內層 `Game/Dragon/Model` 仍可使用原接口。本輪不修改 game／dragon；吐出交接由 GM-18 接入。
 
 ```gdscript
 @onready var effects: DragonEffects = %Effects
@@ -121,14 +197,15 @@ signal effect_interrupted(effect_name: StringName)
 | `suction_width` | 4.0 單位 | 收束氣流最寬截面的完整直徑；0.1～8.0 |
 | `fire_width` | 3.0 單位 | 火焰錐形最寬截面的完整直徑；0.1～8.0 |
 | 舊 `radius` 程式屬性 | 吸取寬度 / 2 | 相容半徑；寫入會同步兩種寬度，詳見上方規則 |
-| `particle_count` | 192 | 主要氣流／火焰粒子數；火星 16、煙 12 於噴火子場景獨立設定 |
+| `particle_count` | 192 | 吸取主氣流數；fire_particle_count=0 時也供噴火沿用 |
+| `fire_particle_count` | 384 | 獨立主火焰數，0 繼承共用值、正數 8～512；火星 16、煙 12 不變 |
 | 子場景 `particle_lifetime` | 0.28 秒 | 主要粒子最長生命週期；火星 0.25、煙 0.38 秒 |
 
 全部距離、半徑、粒子大小與剔除邊界使用 Godot **世界單位**。嘴部掛點繼承角色的變換，特效子場景則隔離父節點變換，以世界座標更新 shader；角色根倍率 2、5 或旋轉／位移不會把火焰尺寸再乘上角色倍率。
 
-預設主粒子由 96 增至 192，避免只擴大空間而氣流過於稀疏；筆畫寬度也隨分布加寬，在 shader 中限制放大倍率。兩種效果互斥播放，吸取可見預算 192、噴火 220；兩套主粒子均播放過後，最大配置合計 412，加上一個 12 邊錐形核心，最多 4 個繪製通道同時可見。每實例的 4 個粒子 process material、4 個繪製 material、核心 material 及 4 個 QuadMesh 均獨立；不可變的 shader 程式與核心 mesh 可共享。沒有新增粒子碰撞／吸引器／光源／Glow／景深。最大寬度 8 的覆蓋面是壓力展示，密度仍可由 particle_count 調整。
+ART-07 主粒子由 96 增至 192，避免只擴大空間而氣流過於稀疏；筆畫寬度也隨分布加寬，在 shader 中限制放大倍率。ART-18 進一步把獨立噴火 Flow 預設增至 384。吸取與噴火仍互斥播放：吸取可見預算 192、噴火 412；兩套均播放過後，預設粒子容量合計 604（隱藏的另一套仍保有 GPU 資源），加上一個 12 邊錐形核心，噴火最多 4 個繪製通道可見。每實例的 4 個粒子 process material、4 個繪製 material、核心 material 及 4 個 QuadMesh 均獨立；不可變的 shader 程式與核心 mesh 可共享。吐出食材另有 payload 及尾跡繪製，不包含在上述 4 通道中。沒有新增粒子碰撞／吸引器／光源／Glow／景深。最大寬度 8 的覆蓋面是壓力展示，噴火密度由 fire_particle_count 調整。
 
-端點超界時，以 `(target - mouth).limit_length(effect_range)` 截短視覺長度，仍朝原目標方向。吸取粒子此時從截短端點收束，**不會在真正超界目標附近生成**；噴火也不會觸及真正超界目標。需完整連接兩點時，由呼叫端調整視覺 `effect_range`，不能據此判定玩法命中。
+吸取／噴火端點超界時，以 `(target - mouth).limit_length(effect_range)` 截短視覺長度，仍朝原目標方向。吸取粒子此時從截短端點收束，**不會在真正超界目標附近生成**；噴火也不會觸及真正超界目標。需完整連接兩點時，由呼叫端調整視覺 `effect_range`，不能據此判定玩法命中。吐出食材有獨立完整路徑，不套用這項截短規則。
 
 ## 預覽
 
@@ -159,7 +236,7 @@ signal effect_interrupted(effect_name: StringName)
 
 ### 同姿勢、同射程的 GPU 寬度對比
 
-以下全部使用本輪驗證時的主龍 fly 取樣、倍率 5、射程 6；固定種子，固定取樣姿勢。原版使用 96 主粒子，新版最小／預設／最大使用 192。圖片包含繁中即時寬度讀值，沒有替鏡頭或主龍重新構圖。
+以下是 ART-07 驗證時保留的主龍 fly 取樣、倍率 5、射程 6；固定種子，固定取樣姿勢。原版使用 96 主粒子，加寬版本最小／預設／最大使用 192，尚不包含 ART-18 的噴火 384 新預設。圖片包含繁中即時寬度讀值，沒有替鏡頭或主龍重新構圖。
 
 | 情境 | 吸取完整寬度 | 噴火完整寬度 | 吸取 | 噴火 |
 |---|---:|---:|---|---|

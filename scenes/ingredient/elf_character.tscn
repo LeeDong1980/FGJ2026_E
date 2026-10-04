@@ -1,12 +1,12 @@
-﻿[gd_scene load_steps=4 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/ingredient/ingredient_character.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://Models/heroElf/elf.glb" id="2_model"]
 [ext_resource type="AnimationLibrary" path="res://Models/heroElf/elf_animations.tres" id="3_anims"]
 
-[node name="ElfCharacter" type="Node3D"]
+[node name="ElfCharacter" type="Node3D" unique_id=1188442347]
 script = ExtResource("1_script")
 extra_library = ExtResource("3_anims")
 
-[node name="Model" parent="." instance=ExtResource("2_model")]
+[node name="Model" type="Node3D" parent="." unique_id=1944933312 instance=ExtResource("2_model")]
 transform = Transform3D(0.39, 0, 0, 0, 0.39, 0, 0, 0, 0.39, 0, 0, 0)

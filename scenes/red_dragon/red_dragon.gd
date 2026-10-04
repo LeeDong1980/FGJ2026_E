@@ -8,6 +8,33 @@ signal animation_interrupted(animation_name: StringName)
 
 const BASE_ANIMATIONS: Array[StringName] = [&"idle", &"fly"]
 const RETURN_TO_BASE_ANIMATIONS: Array[StringName] = [&"atk", &"roar"]
+const HEAD_TURN_MODIFIER = preload("res://scenes/red_dragon/head_turn_modifier.gd")
+
+var _head_turn_modifier: HEAD_TURN_MODIFIER
+
+## 0 = model's left (-X), 0.5 = no additive yaw, 1 = right (+X).
+@export_range(0.0, 1.0, 0.01) var head_turn: float = 0.5:
+	set(value):
+		if not is_finite(value):
+			return
+		head_turn = clampf(value, 0.0, 1.0)
+		if _head_turn_modifier != null:
+			_head_turn_modifier.set_target(head_turn, false)
+## Parameter units per second. A neutral-to-endpoint move takes 0.25 s at 2.
+@export_range(0.1, 20.0, 0.1) var head_turn_speed: float = 2.0:
+	set(value):
+		if not is_finite(value):
+			return
+		head_turn_speed = maxf(value, 0.1)
+		if _head_turn_modifier != null:
+			_head_turn_modifier.turn_speed = head_turn_speed
+@export_range(0.0, 90.0, 1.0) var head_turn_max_angle_degrees: float = 90.0:
+	set(value):
+		if not is_finite(value):
+			return
+		head_turn_max_angle_degrees = clampf(value, 0.0, 90.0)
+		if _head_turn_modifier != null:
+			_head_turn_modifier.max_yaw_degrees = head_turn_max_angle_degrees
 
 @export var base_animation: StringName = &"idle"
 @export_range(0.0, 2.0, 0.01) var blend_time: float = 0.2
@@ -31,6 +58,7 @@ func _ready() -> void:
 		push_error("RedDragon requires Model/AnimationPlayer.")
 		return
 	_make_animations_local()
+	_setup_head_turn()
 	_animation_player.animation_finished.connect(_on_animation_finished)
 	if not BASE_ANIMATIONS.has(base_animation):
 		push_warning("RedDragon base_animation must be idle or fly; using idle.")
@@ -100,6 +128,7 @@ func stop_animation(keep_pose: bool = true) -> void:
 		_animation_player.play(base_animation, 0.0)
 		_animation_player.advance(0.0)
 		_animation_player.stop(true)
+	set_head_turn(get_current_head_turn() if keep_pose else 0.5, true)
 	_active_animation = &""
 	if interrupted != &"":
 		animation_interrupted.emit(interrupted)
@@ -115,6 +144,35 @@ func get_animation_names() -> PackedStringArray:
 ## character/model scales. Attach effects here or read its global_transform.
 func get_mouth_anchor() -> Marker3D:
 	return _mouth_anchor
+
+
+## Accepts finite values before ready; clamps to [0, 1]. Does not play a clip.
+## immediate skips parameter smoothing; the skeleton updates on its next pass.
+func set_head_turn(value: float, immediate: bool = false) -> bool:
+	if not is_finite(value):
+		return false
+	head_turn = value
+	if _head_turn_modifier != null:
+		_head_turn_modifier.set_target(head_turn, immediate)
+	return true
+
+
+func get_head_turn() -> float:
+	return head_turn
+
+
+func get_current_head_turn() -> float:
+	return _head_turn_modifier.current_turn if _head_turn_modifier != null else head_turn
+
+
+func _setup_head_turn() -> void:
+	var skeleton: Skeleton3D = get_node("Model/Armature/Skeleton3D") as Skeleton3D
+	_head_turn_modifier = HEAD_TURN_MODIFIER.new()
+	_head_turn_modifier.name = "HeadTurn"
+	_head_turn_modifier.turn_speed = head_turn_speed
+	_head_turn_modifier.max_yaw_degrees = head_turn_max_angle_degrees
+	_head_turn_modifier.set_target(head_turn, true)
+	skeleton.add_child(_head_turn_modifier)
 
 
 func _make_animations_local() -> void:
