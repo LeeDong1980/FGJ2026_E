@@ -82,7 +82,7 @@
 - [x] NET-06 新增 autoload `RoomManager`（`autoload/room_manager.gd`）：依 docs/lobby-flow.md 實作房間狀態機與換場景（單機、加入、開始、斷線、離開） @Samuel
 - [x] NET-07 新增 `scenes/lobby/room_lobby.tscn`（Host／Client 共用等候頁，獨立可 F6 測試）與暫用主選單 `temp_menu.tscn` @Samuel
 - [ ] NET-08 新增 `NetworkGameBridge` 串接 game.tscn：依 `RoomManager` 模式切換輸入、直接開局、遊戲結束回房間（game.tscn 加節點需 @露柑 同意） @Samuel
-- [ ] NET-09 新增 `scenes/game/client_play.tscn`：Client 遊玩畫面，只顯示麥克風狀態並傳送吸／吐封包 @Samuel
+- [x] NET-09 新增 `scenes/game/client_play.tscn`：Client 遊玩畫面，只顯示麥克風狀態並傳送吸／吐封包 @Samuel
 
 ### 美術與關卡
 
