@@ -9,6 +9,8 @@ signal effect_interrupted(effect_name: StringName)
 const MIN_EFFECT_WIDTH: float = 0.1
 const MAX_EFFECT_WIDTH: float = 8.0
 const MIN_LEGACY_RADIUS: float = 0.01
+## Ice breath shares the fire width. Created in code so dragon_effects.tscn stays unchanged.
+const ICE_BREATH_SCENE: PackedScene = preload("res://scenes/vfx/ice_breath_effect.tscn")
 
 var _suction_width: float = 4.0
 var _fire_width: float = 3.0
@@ -65,10 +67,13 @@ var _request_serial: int = 0
 
 @onready var _suction: DirectedDragonEffect = %SuctionEffect
 @onready var _fire: DirectedDragonEffect = %FireBreathEffect
+var _ice: DirectedDragonEffect
 
 
 func _ready() -> void:
 	process_priority = 50
+	_ice = ICE_BREATH_SCENE.instantiate() as DirectedDragonEffect
+	add_child(_ice)
 	if not dragon_path.is_empty():
 		bind_dragon(get_node_or_null(dragon_path) as Node3D)
 
@@ -89,6 +94,11 @@ func play_suction(target_global_position: Vector3, duration: float = 0.6) -> boo
 
 func play_fire(target_global_position: Vector3, duration: float = 0.6) -> bool:
 	return _play(&"fire", target_global_position, duration)
+
+
+## Same shape and width as fire, in ice colors.
+func play_ice(target_global_position: Vector3, duration: float = 0.6) -> bool:
+	return _play(&"ice", target_global_position, duration)
 
 
 func stop_effects() -> void:
@@ -163,7 +173,13 @@ func _play(effect_name: StringName, target: Vector3, duration: float) -> bool:
 	if serial != _request_serial:
 		return true
 	_target = target
-	_active_effect = _suction if effect_name == &"suction" else _fire
+	match effect_name:
+		&"suction":
+			_active_effect = _suction
+		&"ice":
+			_active_effect = _ice
+		_:
+			_active_effect = _fire
 	_active_name = effect_name
 	_remaining = duration
 	_draining = false

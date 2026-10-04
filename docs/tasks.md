@@ -69,7 +69,7 @@
 - [x] GM-24 煮鍋子：鍋子加滿後不直接完成，面向右、胃空時對鍋子持續噴火累計 1 秒（`cook_time`，中斷保留進度）才完成；滿鍋時再吐食材沒有效果；噴火特效改朝鍋子；PotsDebugView 顯示煮的進度；更新 design.md、api.md @露柑
 - [x] GM-25 無效指令提示：吸／吐沒有效果時不播特效（吸空不吸、空層不噴火），`action_missed(lane, reason)` 附原因，main.tscn 的 `ActionHintBanner` 在上方顯示原因後淡出；更新 design.md、api.md @露柑
 - [x] GM-26 火與冰：玩家 1 大叫（`ShoutElementInput`，原大叫轉頭改用）或按 4 切換火／冰；轉頭改成只有玩家 2 按 L；冰凍住最前端食材 1 秒並歸零攻擊蓄力；鍋子食譜隨機要火或冰，用錯元素煮會倒退進度並提示；FacingIndicator 顯示元素；鍋子底下 `PotElementView` 發光圈顯示食譜（橘火、藍冰）；連線局依座位傳 `turn`／`element` 字音；更新 design.md、api.md、voice-input.md @露柑
-- [ ] GM-27 冰的專用特效（目前和噴火共用火焰特效），需技術美術提供冰息子場景或讓 DragonEffects 支援換色
+- [x] GM-27 冰的專用特效：新增 `scenes/vfx/ice_breath_effect.tscn`（沿用噴火的 shader，冰藍配色、冰晶與白霧），`DragonEffects.play_ice()`（冰息子場景在腳本建立，不改 dragon_effects.tscn）；flame_core／flow_surface shader 加顏色參數，預設值維持原本火焰顏色；EffectsView 依元素播火或冰 @露柑
 
 #### UI（GMF）
 - [x] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF
