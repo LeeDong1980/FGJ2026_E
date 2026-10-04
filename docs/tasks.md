@@ -66,6 +66,7 @@
 - [x] GM-21 難度：開場每層 1 個食材、上限改 6 個；生成間隔隨完成鍋數變短（8 秒起每鍋 -1 秒，最短 3 秒，`@export`），蓄力與走路時間不變 @露柑
 - [x] GM-22 轉頭：龍頭分左（食材）右（鍋子），玩家 B 大叫（音量 > 50%，`ShoutTurnInput`）或按 L 切換，門檻在麥克風設定面板調整並存檔；面向左才能吸、噴火，面向右才能吐進鍋子；暈眩不能轉頭；畫面下方 `FacingIndicator` 框框顯示目前朝向（模型暫不轉）；連線局 Client 用字音 `turn` 傳給 Host；更新 design.md、api.md @露柑
 - [ ] GM-23 轉頭動畫：龍的模型依 `game_manager.facing`（`facing_changed`）轉向左／右，完成後可移除或保留 `FacingIndicator` 框框
+- [x] GM-24 煮鍋子：鍋子加滿後不直接完成，面向右、胃空時對鍋子持續噴火累計 1 秒（`cook_time`，中斷保留進度）才完成；滿鍋時再吐食材沒有效果；噴火特效改朝鍋子；PotsDebugView 顯示煮的進度；更新 design.md、api.md @露柑
 
 #### UI（GMF）
 - [x] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF
@@ -85,6 +86,7 @@
 - [x] UI-15 ResultScreen 不再 `quit()`：最後一關成功改顯示「回主選單」，UIRoot 發 `back_requested`，由 UIGameBridge 呼叫 `RoomManager.return_to_menu()` @露柑
 - [x] UI-16 專案主場景改成主選單 main_menu.tscn；遊戲場景 game.tscn 改名為 `scenes/game/main.tscn`（根節點 Main），原美術展示 `scenes/main/main.tscn` 改名為 `art_prev.tscn`（根節點 ArtPrev，F6 預覽） @露柑
 - [ ] UI-17 連線局結束改用正式的 ResultScreen（目前是 NetworkGameBridge 的臨時「回到房間」畫面，需與 Samuel 協調）
+- [x] UI-18 修正 PotInfo 換小龍後面板永久變寬：`set_forbidden()` 舊圖示先移出再釋放（同一幀 `pot_changed`＋`baby_arrived` 呼叫兩次時會疊在一起），並在更新後 `reset_size()` 縮回 @露柑
 
 #### 區網連線（Samuel）
 - [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel

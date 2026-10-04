@@ -74,6 +74,8 @@ signal game_lost
 @export_group("噴火")
 ## 持續噴火多少秒才會燒掉一個食材。
 @export var burn_time: float = 1.0
+## 鍋子加滿後，要對鍋子持續噴火多少秒才完成一鍋。
+@export var cook_time: float = 1.0
 
 @export_group("食材攻擊")
 ## 每次蓄力的秒數在這個範圍內隨機。
@@ -125,6 +127,7 @@ func _process(delta: float) -> void:
 		_try_spawn(i, delta)
 		_update_attack(i, delta)
 	_update_burning(delta)
+	_update_cooking(delta)
 
 
 ## 開始遊戲或重新遊玩。開場第一次呼叫時直接沿用已擺好的場景，之後每次都原地重置。
@@ -152,8 +155,9 @@ func suck() -> void:
 	stomach_changed.emit(stomach)
 
 
-## 開始喊「吐」。面向右邊且胃袋有食材，立刻吐進所在層的鍋子；
-## 面向左邊且胃袋空著，開始噴火，持續到 spit_released()。其他情況沒有效果。
+## 開始喊「吐」。面向右邊且胃袋有食材，立刻吐進所在層的鍋子（鍋子已滿則沒有效果）；
+## 面向右邊、胃袋空著且鍋子已滿，開始對鍋子噴火煮，持續到 spit_released()；
+## 面向左邊且胃袋空著，開始噴火燒食材，持續到 spit_released()。其他情況沒有效果。
 func spit_pressed() -> void:
 	if state != GameState.PLAYING:
 		return
@@ -165,7 +169,7 @@ func spit_pressed() -> void:
 		if stomach != null:
 			_spit_used_for_pot = true
 			_spit_into_pot(lane)
-		else:
+		elif not _can_cook(lane):
 			spit_missed.emit(lane)
 	elif stomach != null or get_front(lane) == null:
 		spit_missed.emit(lane)
@@ -181,6 +185,11 @@ func spit_released() -> void:
 func is_breathing_fire() -> bool:
 	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null \
 			and facing == Facing.LEFT and not is_stunned()
+
+
+## 正在喊「吐」、面向右邊、胃袋空著，且所在層鍋子已滿（對鍋子噴火煮）。
+func is_cooking() -> bool:
+	return state == GameState.PLAYING and is_spitting and not _spit_used_for_pot and stomach == null 			and facing == Facing.RIGHT and not is_stunned() and _can_cook(dragon.current_lane)
 
 
 ## 龍頭左右切換（玩家 B 大叫或按 L）。暈眩中不能轉頭。
@@ -229,6 +238,21 @@ func _update_burning(delta: float) -> void:
 		ingredient_burned.emit(lane, ingredient)
 
 
+## 對已滿的鍋子持續噴火時累計進度，煮好就完成這一鍋。
+func _update_cooking(delta: float) -> void:
+	if not is_cooking():
+		return
+	var lane := dragon.current_lane
+	var pot := pots[lane]
+	pot.cook_progress = minf(pot.cook_progress + delta / cook_time, 1.0)
+	if pot.cook_progress >= 1.0:
+		_complete_pot(lane)
+
+
+func _can_cook(lane: int) -> bool:
+	return pots[lane].has_baby and pots[lane].is_full()
+
+
 ## 推進暈眩與無敵的倒數。
 func _update_stun(delta: float) -> void:
 	if is_stunned():
@@ -275,7 +299,7 @@ func _stun_dragon() -> void:
 
 func _spit_into_pot(lane: int) -> void:
 	var pot := pots[lane]
-	if not pot.has_baby:
+	if not pot.has_baby or pot.is_full():
 		spit_missed.emit(lane)
 		return
 	var ingredient := stomach
@@ -293,12 +317,14 @@ func _spit_into_pot(lane: int) -> void:
 
 	pot.count += 1
 	pot_changed.emit(lane)
-	if pot.count >= pot.required:
-		completed_count += 1
-		completed_count_changed.emit(completed_count)
-		_baby_leave(lane, BabyLeaveReason.COMPLETED)
-		if completed_count >= pots_to_win:
-			_end_game(true)
+
+
+func _complete_pot(lane: int) -> void:
+	completed_count += 1
+	completed_count_changed.emit(completed_count)
+	_baby_leave(lane, BabyLeaveReason.COMPLETED)
+	if completed_count >= pots_to_win:
+		_end_game(true)
 
 
 ## 小龍離開並清空鍋子，經過 baby_swap_time 後換新的小龍。
@@ -306,6 +332,7 @@ func _baby_leave(lane: int, reason: BabyLeaveReason) -> void:
 	var pot := pots[lane]
 	pot.has_baby = false
 	pot.count = 0
+	pot.cook_progress = 0.0
 	pot_changed.emit(lane)
 	baby_left.emit(lane, reason)
 	get_tree().create_timer(baby_swap_time).timeout.connect(_baby_arrive.bind(lane, _round))
