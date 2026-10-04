@@ -2,7 +2,29 @@
 extends Node3D
 ## Visibility and physical closure are switched together.
 
+## Keep the decorative stone faces below the slab's underside, not coplanar.
+@export_range(0.001, 0.05, 0.001) var underside_offset: float = 0.01:
+	set(value):
+		underside_offset = clampf(value, 0.001, 0.05)
+		if is_node_ready():
+			_apply_underside_offset()
+
 var _extension_geometry: Node3D
+
+
+## Fill up to the upper foundation without overlapping its front/side faces.
+## Duplicate resources so each generated floor keeps its own dimensions.
+func set_fill_height(height: float) -> void:
+	if not is_finite(height) or height <= 0.0:
+		return
+	var slab: MeshInstance3D = get_node("StoneSlab/Mesh") as MeshInstance3D
+	slab.mesh = slab.mesh.duplicate()
+	(slab.mesh as BoxMesh).size.y = height
+	get_node("StoneSlab").position.y = height * 0.5
+	var collision: CollisionShape3D = get_node("Body/Collision") as CollisionShape3D
+	collision.shape = collision.shape.duplicate()
+	(collision.shape as BoxShape3D).size.y = height
+	collision.position.y = height * 0.5
 
 
 func set_outer_extension(distance: float, direction: float) -> void:
@@ -37,7 +59,16 @@ func set_outer_extension(distance: float, direction: float) -> void:
 
 
 func _ready() -> void:
+	_apply_underside_offset()
 	set_enabled(visible)
+
+
+func _apply_underside_offset() -> void:
+	for seed: String in ["StoneUnderside00", "StoneUnderside01", "StoneUnderside10", "StoneUnderside11"]:
+		get_node(seed).position.y = -underside_offset
+	if is_instance_valid(_extension_geometry):
+		for segment: Node3D in _extension_geometry.get_children():
+			segment.position.y = -underside_offset
 
 
 func set_enabled(enabled: bool) -> void:

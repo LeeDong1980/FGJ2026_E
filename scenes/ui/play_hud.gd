@@ -14,8 +14,8 @@ const WORD_DIM_ALPHA := 0.45
 ## 字音亮起後至少維持的秒數（鍵盤一按就放，也看得到）。
 const WORD_MIN_SHOW := 0.5
 
-## 鍋子資訊底部到鍋子錨點的距離（像素）。
-@export var pot_info_gap: float = 12.0
+## 鍋子資訊底部到鍋子錨點的距離（像素）；數值越大，UI 越往上。
+@export var pot_info_gap: float = 48.0
 
 var _pot_infos: Array[PotInfo] = []
 var _camera: Camera3D

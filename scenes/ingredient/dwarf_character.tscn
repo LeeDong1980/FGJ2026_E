@@ -1,10 +1,10 @@
-﻿[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://dwic1kbkyfm8p"]
 
-[ext_resource type="Script" path="res://scenes/ingredient/ingredient_character.gd" id="1_script"]
-[ext_resource type="PackedScene" path="res://Models/heroDrawf/dawrf.glb" id="2_model"]
+[ext_resource type="Script" uid="uid://3qcqjp27unnd" path="res://scenes/ingredient/ingredient_character.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://dxf1kskf0uwno" path="res://Models/heroDrawf/dawrf.glb" id="2_model"]
 
-[node name="DwarfCharacter" type="Node3D"]
+[node name="DwarfCharacter" type="Node3D" unique_id=1417641913]
 script = ExtResource("1_script")
 
-[node name="Model" parent="." instance=ExtResource("2_model")]
-transform = Transform3D(0.39, 0, 0, 0, 0.39, 0, 0, 0, 0.39, 0, 0, 0)
+[node name="Model" parent="." unique_id=701731529 instance=ExtResource("2_model")]
+transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, 0, 0, 0)

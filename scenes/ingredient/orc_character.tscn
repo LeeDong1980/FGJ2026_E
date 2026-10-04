@@ -1,10 +1,10 @@
-﻿[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://dbmx7x4od0k5t"]
 
-[ext_resource type="Script" path="res://scenes/ingredient/ingredient_character.gd" id="1_script"]
-[ext_resource type="PackedScene" path="res://Models/heroOrc/orc.glb" id="2_model"]
+[ext_resource type="Script" uid="uid://3qcqjp27unnd" path="res://scenes/ingredient/ingredient_character.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://dm0i5vt5uj2pi" path="res://Models/heroOrc/orc.glb" id="2_model"]
 
-[node name="OrcCharacter" type="Node3D"]
+[node name="OrcCharacter" type="Node3D" unique_id=404020298]
 script = ExtResource("1_script")
 
-[node name="Model" parent="." instance=ExtResource("2_model")]
-transform = Transform3D(0.39, 0, 0, 0, 0.39, 0, 0, 0, 0.39, 0, 0, 0)
+[node name="Model" parent="." unique_id=1869666654 instance=ExtResource("2_model")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0)
