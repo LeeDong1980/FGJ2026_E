@@ -23,6 +23,8 @@
 - [ ] SET-03 匯出 Windows 與 Web 版本測試效能，決定目標平台（Web 版可能要改用 Compatibility 渲染器）
 - [x] SET-04 整理目前未提交改動，依功能分批 commit 並 push @Codex
 - [x] SET-05 整理本輪樓層、UI 與場景調整，依使用者授權 commit 並 push 至 fix/mainSceneView（a6c81c0 樓層／場景、35e953a 鍋子 UI；使用者手動房間、角色比例與燈光調整一併保留） @Codex
+- [x] SET-06 網頁版試做：Web 輸出預設、內嵌 Noto Sans TC、網頁版略過區網與手機麥克風，單機流程已在瀏覽器實測（見 docs/export.md；分支 feature/web-export） @Claude
+- [ ] SET-07 網頁版實測：真實麥克風（吸／吐、音高）、公開房間經中繼連線、手機瀏覽器、效能與音訊延遲，並決定是否上架網頁版（輸出約 150 MB，可能要壓縮貼圖與模型）
 
 ### 程式
 
