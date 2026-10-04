@@ -18,3 +18,6 @@ Thumbs.db
 # Cloudflare 中繼伺服器
 relay_server/node_modules/
 relay_server/.wrangler/
+
+# cloudflared 執行檔（原型用，各自下載，不 commit）
+/tools/cloudflared/

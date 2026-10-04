@@ -8,6 +8,9 @@ const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const CODE_LENGTH = 6;
 const MAX_MESSAGE_BYTES = 64 * 1024;
 const HOST_RETRIES = 5;
+// 目錄功能：Host 用 cloudflared Quick Tunnel 對外時，把網址登記在房間上，Client 用代碼查詢後直連。
+// 只接受 trycloudflare.com，避免被拿來當任意網址的轉址。
+const TUNNEL_URL_PATTERN = /^https:\/\/[a-z0-9-]{1,100}\.trycloudflare\.com$/;
 
 const CLOSE_HOST_LEFT = 4001;
 const CLOSE_KICKED = 4002;
@@ -33,6 +36,10 @@ export default {
 
 		if (url.pathname === "/health") {
 			return Response.json({ ok: true, time: Date.now() }, { headers: { "Access-Control-Allow-Origin": "*" } });
+		}
+		const resolve = url.pathname.match(/^\/resolve\/([A-Za-z0-9 -]{1,16})$/);
+		if (resolve) {
+			return resolveRoom(request, env, normalizeCode(resolve[1]));
 		}
 		if (!isWebSocketRequest(request)) {
 			return new Response("Expected a WebSocket connection", { status: 426 });
@@ -78,6 +85,20 @@ function joinRoom(request, env, code) {
 	return roomStub(env, code).fetch(forward(request, "client", code));
 }
 
+// 用房間代碼查 Host 登記的 tunnel 網址：{"url": "https://xxx.trycloudflare.com"}，沒有登記或房間不存在回 404。
+async function resolveRoom(request, env, code) {
+	const headers = { "Access-Control-Allow-Origin": "*", "Cache-Control": "no-store" };
+	if (code.length !== CODE_LENGTH) {
+		return Response.json({ error: "room_not_found" }, { status: 404, headers });
+	}
+	const stub = roomStub(env, code);
+	const found = await stub.fetch(forward(request, "resolve", code));
+	if (found.status !== 200) {
+		return Response.json({ error: "room_not_found" }, { status: 404, headers });
+	}
+	return Response.json(await found.json(), { headers });
+}
+
 function roomStub(env, code) {
 	return env.ROOMS.get(env.ROOMS.idFromName(code));
 }
@@ -108,6 +129,9 @@ export class Room extends DurableObject {
 	async fetch(request) {
 		const role = request.headers.get("X-Room-Role");
 		const code = request.headers.get("X-Room-Code");
+		if (role === "resolve") {
+			return this.#tunnel_url();
+		}
 		return role === "host" ? this.#accept_host(code) : this.#accept_client();
 	}
 
@@ -136,6 +160,11 @@ export class Room extends DurableObject {
 		return new Response(null, { status: 101, webSocket: client });
 	}
 
+	#tunnel_url() {
+		const url = this.#socket("host")?.deserializeAttachment()?.url;
+		return url ? Response.json({ url }) : new Response("not found", { status: 404 });
+	}
+
 	#socket(tag) {
 		return this.ctx.getWebSockets(tag)[0] ?? null;
 	}
@@ -146,9 +175,8 @@ export class Room extends DurableObject {
 
 	webSocketMessage(ws, message) {
 		if (typeof message === "string") {
-			// 唯一的文字控制訊息：房主踢掉沒回應的 client（讓下一位可以加入）。
-			if (message.includes('"kick"') && this.ctx.getTags(ws).includes("host")) {
-				safely(() => this.#socket("client")?.close(CLOSE_KICKED, "kicked"));
+			if (this.ctx.getTags(ws).includes("host")) {
+				this.#host_control(ws, message);
 			}
 			return;
 		}
@@ -157,6 +185,23 @@ export class Room extends DurableObject {
 			return;
 		}
 		safely(() => this.#other(ws)?.send(message));
+	}
+
+	// Host 的文字控制訊息：kick＝踢掉沒回應的 client（讓下一位可以加入）；
+	// publish＝登記 Quick Tunnel 網址，讓 Client 用代碼查詢後直連。
+	#host_control(ws, text) {
+		let message;
+		try {
+			message = JSON.parse(text);
+		} catch {
+			return;
+		}
+		if (message.type === "kick") {
+			safely(() => this.#socket("client")?.close(CLOSE_KICKED, "kicked"));
+		} else if (message.type === "publish" && TUNNEL_URL_PATTERN.test(message.url ?? "")) {
+			ws.serializeAttachment({ url: message.url });
+			safely(() => ws.send(JSON.stringify({ type: "published" })));
+		}
 	}
 
 	webSocketClose(ws) {
