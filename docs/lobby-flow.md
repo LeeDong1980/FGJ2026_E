@@ -92,3 +92,16 @@ flowchart TD
 - 座位狀態是 `RoomManager.host_slot`（房主坐的座位，預設 1），`get_my_slot()`／`get_peer_slot()` 取得自己與對方的座位。
 - 按下「開始遊戲」後座位鎖定，連線局結束回到等候頁才能再換。房主新開的房間（進入遊戲、加入失敗、斷線重建）座位重設為房主坐玩家 1；對方離開再加入時沿用房主目前的座位。
 
+## 畫面同步（NET-19）
+
+連線局中，Client 要看到和 Host 一模一樣的畫面。做法：**Client 載入同一個遊戲場景（`scenes/game/main.tscn`），但它的 `GameManager` 是副本**，只接收、不模擬；所有畫面元件（龍、HUD、特效、提示）本來就只讀 `GameManager` 的資料與 signal，所以不用改。
+
+- 副本旗標：`GameManager.replica_mode`（靜態，`RoomManager` 在 Client 載入遊戲場景前設定）→ `GameManager.replica`。副本的 `start_game()`、`suck()`、`spit_pressed()`、`toggle_element()`、`turn_head()` 都沒有作用，`_process` 只預測（暈眩與無敵倒數）。
+- Host：`GameStateSender`（遊戲場景裡的節點，只在 Host 的連線局啟用）。開局前，Host 的 `NetworkGameBridge` 會等 Client 載入完成（它會要求完整狀態，最久等 8 秒）再開局，兩邊從同一個時間點開始。
+- Client：`ClientViewBridge` 建立 `GameStateReceiver`，把 Host 傳來的狀態套用到副本並發出和 Host 相同的 signal；停用本機所有遊戲輸入；房主暫停時凍結畫面並顯示「房主已暫停」；遊戲結束顯示成功／失敗並等房主回到房間（NET-16）。輸入診斷疊層（`client_play.tscn`）預設隱藏，按 **F3** 顯示，Client 依座位回報輸入的元件（`PlayerPitchInput`、`PlayerActionInput`、換元素、轉頭）仍在其中運作。
+- 三種封包（格式與常數見 `scenes/game/game_sync.gd`）：
+  - **full**（可靠）：完整的離散狀態，載入完成時、開局時、之後每 3 秒補送，用來對帳。
+  - **event**（可靠、依序）：單一事件，如計數改變、朝向、元素、龍的目標層、暈眩、勝敗。
+  - **snapshot**（不可靠，20 次／秒）：連續變動的值，如龍的位置、暈眩時間。快照不放離散狀態，避免舊快照蓋掉新事件。
+- 各階段：①龍（目標層、位置、暈眩、無敵）、計數、朝向、元素、勝敗 ②鍋子與胃袋 ③食材與特效事件 ④收尾。
+

@@ -12,7 +12,6 @@ enum Phase { MENU, ROOM, JOINING, SOLO, MATCH }
 const MENU_SCENE: String = "res://scenes/main_menu/main_menu.tscn"
 const LOBBY_SCENE: String = "res://scenes/lobby/room_lobby.tscn"
 const GAME_SCENE: String = "res://scenes/game/main.tscn"
-const CLIENT_SCENE: String = "res://scenes/game/client_play.tscn"
 
 var role: Role = Role.NONE
 var phase: Phase = Phase.MENU
@@ -262,7 +261,7 @@ func _on_match_started() -> void:
 	if role != Role.CLIENT:
 		return
 	phase = Phase.MATCH
-	_go(CLIENT_SCENE)
+	_go(GAME_SCENE)
 	room_changed.emit()
 
 
@@ -311,6 +310,8 @@ func _clear_notice() -> void:
 ## 換場景。目前已經在該場景時不重新載入；場景檔還不存在（例如 client_play）時只警告，不中斷流程。
 func _go(path: String) -> void:
 	_release_pause()
+	# Client 在連線局載入的遊戲場景是副本：不模擬，只顯示 Host 傳來的狀態（NET-19）
+	GameManager.replica_mode = path == GAME_SCENE and role == Role.CLIENT
 	var current: Node = get_tree().current_scene
 	if current != null and current.scene_file_path == path:
 		return
