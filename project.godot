@@ -26,7 +26,6 @@ PauseMenu="*res://scenes/pause_menu/pause_menu.tscn"
 NetworkManager="*res://autoload/network_manager.gd"
 RoomManager="*res://autoload/room_manager.gd"
 PhoneMic="*res://autoload/phone_mic_server.gd"
-SceneFlow="*res://autoload/scene_flow.gd"
 
 [display]
 

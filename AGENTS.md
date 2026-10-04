@@ -14,10 +14,10 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `scenes/ingredient/`：食材種類、食材資料與暫時食材模型。
 - `scenes/red_dragon/`：紅龍模型子場景。
 - `scenes/platforms/`：Cube 平台、左右排列子場景與棋盤格材質。
-- `scenes/lobby/`：區網連線大廳 `lobby.tscn`（舊版）、房間等候頁 `room_lobby.tscn`（流程見 docs/lobby-flow.md）、暫用主選單 `temp_menu.tscn`。
+- `scenes/lobby/`：區網連線大廳 `lobby.tscn`（舊版）、房間等候頁 `room_lobby.tscn`（流程見 docs/lobby-flow.md）。
 - `scenes/network_test/`：雙機語音封包傳輸測試場景（內含大廳）。
-- `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線與語音封包收發，autoload 名稱 `NetworkManager`）。`room_manager.gd` 是房間流程與換場景（autoload 名稱 `RoomManager`）。`scene_flow.gd` 是暫時的場景流程（autoload 名稱 `SceneFlow`，主選單 ↔ 遊戲，之後併入 Samuel 的流程控制器）。`mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。`phone_mic_server.gd` 是手機網頁麥克風的 server（autoload 名稱 `PhoneMic`，見 docs/voice-input.md 9.1）。
-- `scenes/main_menu/`：主選單（從 UIRoot 的 StartScreen 拆出的獨立場景，只發 signal）。
+- `autoload/`：全域單例，目前有 `network_manager.gd`（ENet 連線與語音封包收發，autoload 名稱 `NetworkManager`）。`room_manager.gd` 是房間流程與換場景（autoload 名稱 `RoomManager`）。`mic_controller.gd` 是麥克風輸入控制器（autoload 名稱 `MicInput`，音量、音高、吸/吐三種輸出，設定存在 `user://mic_settings.cfg`）。`phone_mic_server.gd` 是手機網頁麥克風的 server（autoload 名稱 `PhoneMic`，見 docs/voice-input.md 9.1）。
+- `scenes/main_menu/`：主選單（從 UIRoot 的 StartScreen 拆出的獨立場景；「進入遊戲」呼叫 `RoomManager.enter_room()`）。
 - `scenes/pause_menu/`：暫停選單（autoload `PauseMenu`，Esc 開關）、麥克風設定面板 `mic_settings_panel.tscn`、可拖曳區間的觀察條 `range_meter.gd`。
 - `scenes/mic_test/`：麥克風輸入實驗場景，只實例化設定面板，F6 單獨執行用。
 - `scenes/phone_mic/`：手機網頁麥克風（MIC-11）：手機網頁 `phone_mic.html`、每位玩家的聲音換算 `PhoneVoiceSource`、連線測試場景。

@@ -9,9 +9,9 @@ enum Role { NONE, HOST, CLIENT }
 ## MENU：在主選單。ROOM：等候頁。JOINING：Host 正在嘗試連線他人房間。SOLO：單機遊戲。MATCH：連線遊戲。
 enum Phase { MENU, ROOM, JOINING, SOLO, MATCH }
 
-const MENU_SCENE: String = "res://scenes/lobby/temp_menu.tscn"
+const MENU_SCENE: String = "res://scenes/main_menu/main_menu.tscn"
 const LOBBY_SCENE: String = "res://scenes/lobby/room_lobby.tscn"
-const GAME_SCENE: String = "res://scenes/game/game.tscn"
+const GAME_SCENE: String = "res://scenes/game/main.tscn"
 const CLIENT_SCENE: String = "res://scenes/game/client_play.tscn"
 
 var role: Role = Role.NONE

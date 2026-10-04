@@ -3,8 +3,9 @@ extends Node
 ## 把遊戲機制（GameManager、Dragon）與麥克風輸入（MicInput）的資料接到 UI。接口見 docs/api.md。
 ## 放進遊戲場景（scenes/game/main.tscn）時當作 GameManager 的子節點，game_manager 留空會自動使用父節點。
 ##
-## 遊戲流程：場景載入後自動 start_game()（主選單是獨立場景，由 SceneFlow 切過來）；game_started 校正聲音並顯示遊玩狀態介面；
-## game_won／game_lost 顯示遊戲結束介面；重新遊玩 → start_game()（原地重置）；回主選單 → SceneFlow.go_to_main_menu()。
+## 遊戲流程：場景載入後自動 start_game()（由 RoomManager 從等候頁切過來）；game_started 校正聲音並顯示遊玩狀態介面；
+## game_won／game_lost 顯示遊戲結束介面；重新遊玩 → start_game()（原地重置）；回主選單 → RoomManager.return_to_menu()。
+## 連線局由 NetworkGameBridge 接手結束畫面（回到房間）。
 
 ## 「下一關」要等關卡資料完成後才會提供（docs/api.md），目前成功時一律顯示「回主選單」。
 const HAS_NEXT_LEVEL := false
@@ -31,7 +32,7 @@ func _ready() -> void:
 	# 重新遊玩與鍵盤 Enter（KeyboardInput）都只呼叫 start_game()，後續一律在 game_started 處理。
 	ui_root.retry_requested.connect(game_manager.start_game)
 	ui_root.next_level_requested.connect(game_manager.start_game)
-	ui_root.back_requested.connect(SceneFlow.go_to_main_menu)
+	ui_root.back_requested.connect(RoomManager.return_to_menu)
 
 	game_manager.game_started.connect(_on_game_started)
 	game_manager.game_won.connect(_show_result.bind(true))
@@ -49,8 +50,10 @@ func _ready() -> void:
 
 	# GameManager 開場的 signal 可能在連接前就發出了，先主動讀一次目前狀態（docs/api.md 注意事項）。
 	_read_current_state.call_deferred()
-	# 從主選單進來就直接開始；GameManager 的 _ready 要先跑完，所以延到下一個 idle
-	game_manager.start_game.call_deferred()
+	# 進入場景就直接開始；GameManager 的 _ready 要先跑完，所以延到下一個 idle。
+	# 連線局由 NetworkGameBridge 開局，這裡不重複開。
+	if RoomManager.phase != RoomManager.Phase.MATCH:
+		_start_if_waiting.call_deferred()
 
 
 func _process(_delta: float) -> void:
@@ -61,6 +64,11 @@ func _process(_delta: float) -> void:
 	if game_manager.is_spitting and not _was_spitting:
 		_show_spit()
 	_was_spitting = game_manager.is_spitting
+
+
+func _start_if_waiting() -> void:
+	if game_manager.state == GameManager.GameState.WAITING:
+		game_manager.start_game()
 
 
 func _on_game_started() -> void:

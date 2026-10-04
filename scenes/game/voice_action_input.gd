@@ -37,7 +37,8 @@ func _current_voice() -> Node:
 
 
 func _on_action_changed(action: StringName, voice: Node) -> void:
-	if not MicInput.action_input_enabled or voice != _current_voice():
+	# 連線局由 NetworkGameBridge 停用本節點（改收 Client 的吸吐）；signal 擋不住，在這裡檢查
+	if not can_process() or not MicInput.action_input_enabled or voice != _current_voice():
 		return
 	if _spitting and action != MicController.EXHALE:
 		_spitting = false

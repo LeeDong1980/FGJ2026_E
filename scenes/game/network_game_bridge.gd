@@ -1,7 +1,7 @@
 class_name NetworkGameBridge
 extends Node
 ## 連線局的 Host 端橋接：Host 是玩家 A（音高換層），Client 是玩家 B（吸／吐，經 NetworkManager 傳來）。
-## 只在 RoomManager 判定「Host 的連線局」時啟用；單機與直接 F6 執行 game.tscn 時什麼都不做。
+## 只在 RoomManager 判定「Host 的連線局」時啟用；單機與直接 F6 執行遊戲場景（main.tscn）時什麼都不做。
 ##
 ## 啟用時：
 ## - 停用本機鍵盤 J／K 吸吐與語音吸吐（吸吐只來自 Client）；鍵盤 1／2／3 換層保留，當作音高不穩時的保底。

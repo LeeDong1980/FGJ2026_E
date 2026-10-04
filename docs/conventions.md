@@ -48,7 +48,6 @@ autoload/          全域單例
 - `res://scenes/main/dragon_platform_showcase.tscn` @Codex
 - `res://scenes/lobby/lobby.tscn` @Samuel
 - `res://scenes/lobby/room_lobby.tscn` @Samuel
-- `res://scenes/lobby/temp_menu.tscn` @Samuel
 - `res://scenes/game/client_play.tscn` @Samuel
 - `res://scenes/network_test/network_test.tscn` @Samuel
 - `res://scenes/mic_test/mic_test.tscn` @山雷

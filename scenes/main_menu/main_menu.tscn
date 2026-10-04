@@ -192,24 +192,6 @@ layout_mode = 2
 theme_override_constants/separation = 32
 alignment = 1
 
-[node name="MultiplayerButton" type="Button" parent="Footer/ButtonRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 80)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_colors/font_hover_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_colors/font_pressed_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_colors/font_focus_color = Color(0.165, 0.102, 0.02, 1)
-theme_override_font_sizes/font_size = 32
-theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
-theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
-text = "多人"
-disabled = true
-tooltip_text = "等候頁完成後開放"
-
 [node name="StartButton" type="Button" parent="Footer/ButtonRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(400, 100)
@@ -223,7 +205,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
-text = "單人開始"
+text = "進入遊戲"
 
 [node name="QuitButton" type="Button" parent="Footer/ButtonRow"]
 unique_name_in_owner = true
@@ -240,6 +222,15 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
 text = "離開"
+
+[node name="NoticeLabel" type="Label" parent="Footer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
 
 [node name="CalibrationHint" type="Label" parent="Footer"]
 layout_mode = 2

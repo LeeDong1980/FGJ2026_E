@@ -75,8 +75,8 @@ flowchart TD
 - `autoload/room_manager.gd`（`RoomManager`）：狀態機與換場景。等候頁、遊戲、主選單都只呼叫它，不自己換場景。
 - `autoload/network_manager.gd`（`NetworkManager`）：連線、20 秒逾時、拒絕原因、關房通知、開始／結束連線局、斷線判定（約 6 秒）。
 - `scenes/lobby/room_lobby.tscn`：Host／Client 共用等候頁，可單獨 F6 執行。
-- `scenes/lobby/temp_menu.tscn`：暫用主選單，主選單從 game.tscn 拆出後（UI-14）由正式版取代。
+- `scenes/main_menu/main_menu.tscn`：主選單（「進入遊戲」呼叫 `RoomManager.enter_room()`、「離開」關閉遊戲）。原暫用主選單 `temp_menu.tscn` 已由它取代。
 - `scenes/game/client_play.tscn`：Client 連線局畫面，只回報吸／吐（麥克風或 J／K）。Host 端收 `NetworkManager.voice_action_received`：`inhale` 呼叫 `suck()`、`exhale` 開始噴火／吐、`none` 放開。
-- `scenes/game/network_game_bridge.gd`（`NetworkGameBridge`，game.tscn 尾端的節點）：只在 Host 的連線局啟用。停用本機 J／K 吸吐與語音吸吐、保留 1／2／3 換層、直接開局；Client 的 `inhale` 呼叫 `suck()`，`exhale` 與 `none` 對應 `spit_pressed()`／`spit_released()`；結束時顯示臨時的「回到房間」（UI-15 完成後可拿掉）。單機與直接 F6 執行 game.tscn 時不做任何事。
+- `scenes/game/network_game_bridge.gd`（`NetworkGameBridge`，遊戲場景 `scenes/game/main.tscn` 尾端的節點）：只在 Host 的連線局啟用。停用本機 J／K 吸吐與語音吸吐、保留 1／2／3 換層、直接開局；Client 的 `inhale` 呼叫 `suck()`，`exhale` 與 `none` 對應 `spit_pressed()`／`spit_released()`；結束時顯示臨時的「回到房間」（UI-17 改用正式 ResultScreen 後可拿掉）。單機與直接 F6 執行遊戲場景時不做任何事。
 - 「嘗試連線」期間會先關掉自己的房間（ENet 一次只能是 Server 或 Client），失敗後重新建立，效果等同流程圖的「保留自己的房間」。
 - 遊戲端要回到房間時呼叫 `RoomManager.finish_match()`（Host）；單機結束呼叫 `RoomManager.return_to_menu()`。
