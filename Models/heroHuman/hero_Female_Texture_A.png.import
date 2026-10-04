@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cvijrcd2lofj8"
 path.s3tc="res://.godot/imported/hero_Female_Texture_A.png-741763b0aff90b0ad0af0efd2683d5b9.s3tc.ctex"
+path.etc2="res://.godot/imported/hero_Female_Texture_A.png-741763b0aff90b0ad0af0efd2683d5b9.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Models/heroHuman/hero_Female_Texture_A.png"
-dest_files=["res://.godot/imported/hero_Female_Texture_A.png-741763b0aff90b0ad0af0efd2683d5b9.s3tc.ctex"]
+dest_files=["res://.godot/imported/hero_Female_Texture_A.png-741763b0aff90b0ad0af0efd2683d5b9.s3tc.ctex", "res://.godot/imported/hero_Female_Texture_A.png-741763b0aff90b0ad0af0efd2683d5b9.etc2.ctex"]
 
 [params]
 

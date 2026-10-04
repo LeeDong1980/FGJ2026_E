@@ -38,6 +38,7 @@ Game Jam 3D 遊戲專案（玩法與已定案美術規格見 docs/design.md）�
 - `docs/design.md`：玩法、操作、勝敗條件、範圍。實作遊戲功能前先讀。
 - `docs/conventions.md`：命名、資料夾、場景歸屬規則。新增或修改檔案、場景前先讀。
 - `docs/relay.md`：遠端連線（公開房間、房間代碼、Cloudflare 中繼）的運作方式、部署與測試。改連線層或中繼伺服器前先讀。
+- `docs/export.md`：電腦版（Windows／macOS）輸出設定、輸出前置與檢查、Mac 版 Gatekeeper 說明與上傳頁面文字。打包前先讀。
 - `docs/voice-input.md`：聲音輸入系統（`MicInput`）的使用方法與串接方式。接聲音輸入前先讀。
 - `docs/api.md`：遊戲機制對外的函式與 signal（給 UI 與麥克風輸入）。
 - `docs/ui_art_prompts.md`：UI 與背景美術的生圖提示詞，以及替換暫時美術的方法。

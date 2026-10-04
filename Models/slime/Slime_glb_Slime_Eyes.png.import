@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://c3g4not6ci03g"
 path.s3tc="res://.godot/imported/Slime_glb_Slime_Eyes.png-6c8fa1d6f78c3fce9cf991f7aa97c02f.s3tc.ctex"
+path.etc2="res://.godot/imported/Slime_glb_Slime_Eyes.png-6c8fa1d6f78c3fce9cf991f7aa97c02f.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Models/slime/Slime_glb_Slime_Eyes.png"
-dest_files=["res://.godot/imported/Slime_glb_Slime_Eyes.png-6c8fa1d6f78c3fce9cf991f7aa97c02f.s3tc.ctex"]
+dest_files=["res://.godot/imported/Slime_glb_Slime_Eyes.png-6c8fa1d6f78c3fce9cf991f7aa97c02f.s3tc.ctex", "res://.godot/imported/Slime_glb_Slime_Eyes.png-6c8fa1d6f78c3fce9cf991f7aa97c02f.etc2.ctex"]
 
 [params]
 

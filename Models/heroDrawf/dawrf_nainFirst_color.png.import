@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bevxvpu2dlfhm"
 path.s3tc="res://.godot/imported/dawrf_nainFirst_color.png-0364b319e4566fa1d60e0b05efc74169.s3tc.ctex"
+path.etc2="res://.godot/imported/dawrf_nainFirst_color.png-0364b319e4566fa1d60e0b05efc74169.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Models/heroDrawf/dawrf_nainFirst_color.png"
-dest_files=["res://.godot/imported/dawrf_nainFirst_color.png-0364b319e4566fa1d60e0b05efc74169.s3tc.ctex"]
+dest_files=["res://.godot/imported/dawrf_nainFirst_color.png-0364b319e4566fa1d60e0b05efc74169.s3tc.ctex", "res://.godot/imported/dawrf_nainFirst_color.png-0364b319e4566fa1d60e0b05efc74169.etc2.ctex"]
 
 [params]
 

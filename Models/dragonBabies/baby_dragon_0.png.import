@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cq2nm240n1emp"
 path.s3tc="res://.godot/imported/baby_dragon_0.png-1f3bbc014809654161356a11613de011.s3tc.ctex"
+path.etc2="res://.godot/imported/baby_dragon_0.png-1f3bbc014809654161356a11613de011.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Models/dragonBabies/baby_dragon_0.png"
-dest_files=["res://.godot/imported/baby_dragon_0.png-1f3bbc014809654161356a11613de011.s3tc.ctex"]
+dest_files=["res://.godot/imported/baby_dragon_0.png-1f3bbc014809654161356a11613de011.s3tc.ctex", "res://.godot/imported/baby_dragon_0.png-1f3bbc014809654161356a11613de011.etc2.ctex"]
 
 [params]
 

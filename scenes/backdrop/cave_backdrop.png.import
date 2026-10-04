@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://2los8fb5ortk"
 path.s3tc="res://.godot/imported/cave_backdrop.png-a2dc359e53c235f6cc03182ab87db3c0.s3tc.ctex"
+path.etc2="res://.godot/imported/cave_backdrop.png-a2dc359e53c235f6cc03182ab87db3c0.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://scenes/backdrop/cave_backdrop.png"
-dest_files=["res://.godot/imported/cave_backdrop.png-a2dc359e53c235f6cc03182ab87db3c0.s3tc.ctex"]
+dest_files=["res://.godot/imported/cave_backdrop.png-a2dc359e53c235f6cc03182ab87db3c0.s3tc.ctex", "res://.godot/imported/cave_backdrop.png-a2dc359e53c235f6cc03182ab87db3c0.etc2.ctex"]
 
 [params]
 

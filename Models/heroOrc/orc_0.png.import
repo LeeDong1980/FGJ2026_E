@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://hhavf5r13msw"
 path.s3tc="res://.godot/imported/orc_0.png-ed62201d0c0bf5f5740dd60c9e636ba5.s3tc.ctex"
+path.etc2="res://.godot/imported/orc_0.png-ed62201d0c0bf5f5740dd60c9e636ba5.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Models/heroOrc/orc_0.png"
-dest_files=["res://.godot/imported/orc_0.png-ed62201d0c0bf5f5740dd60c9e636ba5.s3tc.ctex"]
+dest_files=["res://.godot/imported/orc_0.png-ed62201d0c0bf5f5740dd60c9e636ba5.s3tc.ctex", "res://.godot/imported/orc_0.png-ed62201d0c0bf5f5740dd60c9e636ba5.etc2.ctex"]
 
 [params]
 

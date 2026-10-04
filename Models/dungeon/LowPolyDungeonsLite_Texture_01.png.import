@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dj6y4la7c2buu"
 path.s3tc="res://.godot/imported/LowPolyDungeonsLite_Texture_01.png-5a237f1fae9cf8b6c54e8a285dd63bc0.s3tc.ctex"
+path.etc2="res://.godot/imported/LowPolyDungeonsLite_Texture_01.png-5a237f1fae9cf8b6c54e8a285dd63bc0.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://Models/dungeon/LowPolyDungeonsLite_Texture_01.png"
-dest_files=["res://.godot/imported/LowPolyDungeonsLite_Texture_01.png-5a237f1fae9cf8b6c54e8a285dd63bc0.s3tc.ctex"]
+dest_files=["res://.godot/imported/LowPolyDungeonsLite_Texture_01.png-5a237f1fae9cf8b6c54e8a285dd63bc0.s3tc.ctex", "res://.godot/imported/LowPolyDungeonsLite_Texture_01.png-5a237f1fae9cf8b6c54e8a285dd63bc0.etc2.ctex"]
 
 [params]
 
