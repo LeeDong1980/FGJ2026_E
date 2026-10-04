@@ -14,6 +14,8 @@ const MAX_EFFECT_WIDTH: float = 8.0
 const MIN_LEGACY_RADIUS: float = 0.01
 ## Ice breath shares the fire width. Created in code so dragon_effects.tscn stays unchanged.
 const ICE_BREATH_SCENE: PackedScene = preload("res://scenes/vfx/ice_breath_effect.tscn")
+const SPIT_SCENE: PackedScene = preload("res://scenes/vfx/spit_projectile.tscn")
+const MAX_SPIT_SHOTS: int = 8
 
 var _suction_width: float = 4.0
 var _fire_width: float = 3.0
