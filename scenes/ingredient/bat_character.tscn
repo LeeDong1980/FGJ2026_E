@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/ingredient/ingredient_character.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://Models/bat/Bat_Level_1.fbx" id="2_model"]
+
+[node name="BatCharacter" type="Node3D"]
+script = ExtResource("1_script")
+idle_animation = &"Take 001"
+move_animation = &"Take 001"
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+transform = Transform3D(4.5, 0, 0, 0, 4.5, 0, 0, 0, 4.5, 0, 0.3, 0)

@@ -39,6 +39,7 @@ autoload/          全域單例
 - `res://scenes/main/main.tscn` @場景美術
 - `res://scenes/main/prototype_presentation.tscn` @合成師
 - `res://scenes/red_dragon/red_dragon.tscn` @動畫師
+- `res://scenes/red_dragon/head_turn_preview.tscn` @動畫師
 - `res://scenes/platforms/cube_platform.tscn` @Codex
 - `res://scenes/platforms/platform_layout.tscn` @Codex
 - `res://scenes/game/game.tscn` @露柑
@@ -64,11 +65,16 @@ autoload/          全域單例
 - `res://scenes/vfx/dragon_effects.tscn` @技術美術與特效
 - `res://scenes/vfx/suction_effect.tscn` @技術美術與特效
 - `res://scenes/vfx/fire_breath_effect.tscn` @技術美術與特效
+- `res://scenes/vfx/spit_projectile.tscn` @技術美術與特效
 - `res://scenes/vfx/vfx_preview.tscn` @技術美術與特效
 - `res://scenes/rooms/dragon_egg.tscn` @場景美術
 - `res://scenes/rooms/dragon_egg_lowpoly.tscn` @場景美術
 - `res://scenes/rooms/stylized_dragon_egg.tscn` @場景美術
 - `res://scenes/rooms/baby_dragon.tscn` @場景美術
+- `res://scenes/ingredient/human_character.tscn` @素材整合
+- `res://scenes/ingredient/slime_character.tscn` @素材整合
+- `res://scenes/ingredient/bat_character.tscn` @素材整合
+- `res://scenes/ingredient/ingredient_preview.tscn` @素材整合
 
 ## Git
 - `.import` 和 `.uid` 檔要 commit，`.godot/` 不要 commit

@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/ingredient/ingredient_character.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://Models/heroHuman/hero.glb" id="2_model"]
+
+[node name="HumanCharacter" type="Node3D"]
+script = ExtResource("1_script")
+idle_animation = &"Idle_001"
+move_animation = &"walk"
+action_animation = &"attack"
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+transform = Transform3D(0.27, 0, 0, 0, 0.27, 0, 0, 0, 0.27, 0, 0, 0)
