@@ -1,7 +1,7 @@
 class_name FacingIndicator
 extends CanvasLayer
 ## 畫面下方正中的框框：左「◀ 食材」、右「鍋子 ▶」顯示龍頭朝向，目前朝向的那格亮起；
-## 旁邊一格顯示目前的元素（火／冰）。轉頭動畫與冰的特效完成前用它代替。
+## 中間一格顯示目前的元素（火／冰）。轉頭動畫與冰的特效完成前用它代替。
 
 @export var game_manager: GameManager
 ## 和畫面底部的距離。
@@ -24,8 +24,8 @@ func _ready() -> void:
 	_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_box)
 	_left = _add_slot("◀ 食材")
-	_right = _add_slot("鍋子 ▶")
 	_element = _add_slot("")
+	_right = _add_slot("鍋子 ▶")
 	game_manager.facing_changed.connect(_show.unbind(1))
 	game_manager.element_changed.connect(_show.unbind(1))
 	_show()
