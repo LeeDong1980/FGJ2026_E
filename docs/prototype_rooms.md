@@ -8,7 +8,7 @@
 |---|---|
 | `res://scenes/rooms/hero_challenge_room.tscn` | 左側勇者挑戰房：石牆、柱子、煉金桌、書瓶、木箱及火把；隊伍行進區保持開放 |
 | `res://scenes/rooms/dragon_nursery_room.tscn` | 右側幼龍哺育房：石造外殼、照護用品、獨立玩法鍋子、幼龍及蛋組；巢穴與鋪墊待補 |
-| `res://scenes/rooms/room_ceiling.tscn` | 8 × 8 通用封頂，石板厚 0.3，石地板模型翻轉作底面 |
+| `res://scenes/rooms/room_ceiling.tscn` | 8 × 8 通用封頂，獨立使用石板厚 0.3；生成樓層時依上下層空帶調厚，石地板模型翻轉作底面 |
 | `res://scenes/rooms/baby_dragon.tscn` | 原材質的藍色幼龍，安定靜態站姿，展示高 1.15 |
 | `res://scenes/rooms/dragon_egg.tscn` | 保留原材質的棕金龍蛋，展示高 0.9 |
 | `res://scenes/rooms/dragon_egg_lowpoly.tscn` | 保留原材質的黑紅鱗片龍蛋，展示高 0.9 |
@@ -55,6 +55,9 @@
 - `get_room(&"left")`／`get_room(&"right") -> Node3D`；其他名稱回傳 null。
 - `get_anchor(name: StringName) -> Marker3D`：支援 Dragon、QueueSpawn、QueueFront、Pot、Nest、Hatchling、Egg 的定位點；其他名稱回傳 null。
 - `set_ceilings_visible(enabled: bool)`：切換兩房天花板的可見性與碰撞。
+- `fit_ceilings_to_floor(upper_floor: Node3D)`：以左右上層地基的實際底面計算層間封板厚度；傳入 null 時移除層間封頂設定。`LaneLayout` 在生成全部樓層後自動呼叫，然後另配置外側封板。
+- `configure_boundary_caps(top_enabled: bool, bottom_enabled: bool)`：標記最高層／最低層；最高層啟用既有天花板，最低層在兩房地基下實例化 `BottomCeiling`。單層時同時封上、封下。runtime 依視錐上下邊界調厚，並把水平延伸範圍納入計算，補滿畫面上下緣。
+- `boundary_cap_min_height`：鏡頭尚未可用時與外側封板的最小厚度，預設 0.3；`edge_overscan` 同時作為封板超出畫框的餘量。
 - Inspector：`floor_index` 供程式識別；`ceilings_visible` 預設 false。
 - `ROOM_SIZE = Vector3(8, 4, 8)`、`CHANNEL_WIDTH = 8`、`FLOOR_SPACING = 5` 為製作基準。
 
@@ -73,7 +76,7 @@ func add_floor(index: int, parent: Node3D) -> Node3D:
 
 玩法升降可使用 `floor_node.get_anchor(&"DragonAnchor").global_position` 作為定位基準，但不要直接覆寫已確認的展示布局；目前主龍使用獨立展示變換。新增樓層後，亦需呼叫展示子場景的 `configure_for_layers()` 調整攝影機，參數見合成師的 `docs/prototype_camera.md`。
 
-天花板切換會一併切換其 CollisionShape3D，碰撞變更採 deferred，下一個更新週期生效。直接勾選 Node3D 的 Visible 只會改變視覺；請使用上述 Inspector 屬性或方法。主場景預設六個天花板皆隱藏，碰撞亦停用，避免影響內部觀看。
+天花板切換會一併切換其 CollisionShape3D，碰撞變更採 deferred，下一個更新週期生效。直接勾選 Node3D 的 Visible 只會改變視覺；請使用上述 Inspector 屬性或方法。靜態美術展示 `art_prev.tscn` 預設六個天花板皆隱藏；遊戲 `LaneLayout` 生成的樓層會啟用上下層間的天花板，以及最高層上方與最低層下方的外側封板。
 
 ## 碰撞與材質
 
@@ -217,6 +220,7 @@ Forward Plus／D3D12、1600 × 900 真實主鏡頭確認：幼龍、蛋組與鍋
 修改 `room_module.gd`、`room_ceiling.gd`、`prototype_floor.gd` 及挑戰房的 `outward_direction=-1`。左房向 −X、右房向 +X 增接，原來的 8 × 4 × 8 是固定核心房間尺寸；房間原點、世界內側 X=−4／+4、中央通道、Props 及 Queue／Pot／Nest／Hatchling／Egg／Dragon 定位點均固定。
 
 - `Room.set_outer_extension(distance)`：距離是房間局部單位，有限值限制在 0～40；0 恢復核心外殼。`outward_direction` 指定左／右，`outer_extension` 可在 Inspector 設定。
+- 地基及背牆簷帶寬度重算為 `8 + outer_extension`，局部 X 中心重算為 `outward_direction * outer_extension / 2`；不沿用手動加長場景的 X = ±6 中心。地基以 `Foundation/Mesh` 與相同尺寸碰撞覆蓋全區域，其他直接掛在 Foundation 下的 MeshInstance3D 補片會隱藏以免重疊。
 - 同步增接 4 單位地板及背牆片，末片僅縮窄建築片的 X 尺寸；延長 foundation、背簷及其碰撞。外牆、外簷、外側前後柱移到新外緣，內側後牆不動，+Z 視線開口保留，沒有拉伸核心道具。左側外牆仍保留既有前半段隊伍入口。
 - `RoomCeiling.set_outer_extension(distance, direction)`：屋頂板、碰撞及下表面地板片同步延伸；仍由原 `set_enabled` 一起控制可見性與碰撞。各實例的 BoxMesh／BoxShape3D 先複製，修改一層不污染另一層。
 - `PrototypeFloor.fit_screen_edges=true`：僅 runtime 生效。尋找祖先內的 `PrototypePresentation`，讀取合成師 `get_visible_horizontal_span(world_y, world_z)`；對地板與牆頂 Y，以及前 Z=4／後 Z=−4，共四組世界座標取樣，再轉回各房間局部 X。
@@ -265,3 +269,54 @@ Forward Plus／D3D12、1600 × 900 真實主鏡頭確認：幼龍、蛋組與鍋
 - Forward Plus／D3D12、RTX 4070、1600 × 900：[延伸房間＋幼龍 2.4 草案](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/extended_rooms_baby_2_4_draft.png)。Godot 4.7.2，Jolt；截圖保存結果0、程序退出0，無 script／shader 解析錯誤。副本的使用者資料／憑證權限及 UID 快取回退訊息不影響結果，沒有重匯入共享專案。
 - [幼龍四種高度量測](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/role_ratio_measurements.json)、[延伸尺寸與檢查數](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/extended_room_measurements.json)、[鏡頭邊界與主龍 fly 八姿勢外框](C:/Users/LeeDong/.codex/visualizations/2026/10/03/01a10081-9bc7-7c82-8c12-4295ae71f90b/layout_requirements.json)。
 - 暫存 `C:/Users/LeeDong/AppData/Local/Temp/fgj_main_effects_qa` 保存 `capture_role_ratios.gd`、`measure_layout_requirements.gd`、`verify_extended_rooms.gd`、`verify_generated_rooms.gd` 及 `role_ratio*`／`layout_requirements*`／`extended_rooms*`／`generated_rooms*` 日誌。所有本輪驗證程序已退出。
+
+## 2026-10-04 ART-23 生成樓層補縫與 Z-fighting
+
+- ART-23 首版：`LaneLayout` 生成全部樓層後，各層透過 `fit_ceilings_to_floor(upper_floor)` 配置既有左右 `room_ceiling`，不新增跨越中央通道的封板。當時最高層未封頂；目前已由 ART-25 加上外側上下封板。
+- 封板從 CeilingAnchor（室內 Y = 4）接到上層 Foundation 的實際底面。預設層距 5、地基厚 0.25 時，封板厚 0.75；`RoomCeiling.set_fill_height(height)` 同步修改獨立 BoxMesh 與 BoxShape3D。沒有正空帶時停用該房天花板，非正／非有限厚度不修改幾何。
+- 既有左右接邊接口維持：`set_outer_extension` 更新寬度時保留封板厚度，下表面石材與碰撞一併延伸。
+- `RoomCeiling.underside_offset` 預設 0.01，將底面裝飾移到板底下；`Room.floor_surface_offset` 預設 0.01，將地板石材移到地基上表面上方。兩者可在 Inspector 調整 0.001～0.05，避免共面。
+- `room_module.gd` 在建構程式延伸時停用舊 `FloorExt*`／`BackWallExt*` 的可見性與碰撞，以免與新段重複。沒有修改房間／樓層 `.tscn`、來源模型、Gameplay Marker 或攝影機。
+- 獨立暫存專案 `C:/Users/LeeDong/AppData/Local/Temp/fgj-ceiling-validation-20261004` 的 `verify_ceiling.gd` 以 Godot 4.7.2／Jolt 完成 2813 項檢查，0 失敗：1／3／10 層、層距 4.25／4.3／5／6.5、左右末段延伸、碰撞／可見性、上層接縫、中央通道、底面分離與共用資源隔離。
+- Forward Plus／D3D12 實際渲染檢查通過，圖存於 `C:/Users/LeeDong/.codex/visualizations/2026/10/04/01a105be-61de-7091-a0d7-fa2fc5732b55/floor_ceiling_preview.png`。Windows 憑證、Wacom 設定及沙箱外 shader cache 的訊息不影響本輪幾何與渲染驗證。該階段驗證時尚未提交；後續授權提交狀態見本文最後一節。
+
+## 2026-10-04 ART-24 game.tscn 洞穴背景後移
+
+- 修改 `scenes/game/game.tscn` 的場景實例設定：`GameUI/CaveBackdrop.depth_ratio = 0.95`、`PrototypePresentation.far_padding = 40.0`。背景由腳本逐幀定位，單改 transform 會被覆寫；上述設定讓背景在較遠的位置持續蓋滿畫面，並防止紅龍尾部被原遠裁切面切除。
+- 未改紅龍根變換、共用背景 shader／腳本或其他遊戲場景。原有龍 Z = -15 與場景 UID 的使用者修改保留。
+- 獨立暫存專案使用來源場景的 LaneLayout、Dragon、PrototypePresentation 及 CaveBackdrop 設定載入、實例化並渲染；僅排除 GameManager、UI 與輸入控制。Godot 4.7.2／Forward Plus／D3D12 檢查三層、左中右擺頭與九個 fly 動畫取樣，共 81 姿勢，0 失敗。以當前骨架姿勢烘焙的模型外框量測，背景比龍最後緣至少遠 8.29，背景与龍都在 far 內，畫面完整覆蓋。
+- 1280×720 基準背景世界位置約 `(0, 3.905, -35.657)`，camera far 約 182.996；位置隨鏡頭取景自動計算，不寫死世界 Z。驗證腳本為暫存專案 `preview_backdrop.gd`；預覽圖 `C:/Users/LeeDong/.codex/visualizations/2026/10/04/01a105be-61de-7091-a0d7-fa2fc5732b55/game_backdrop_preview.png`。該階段驗證時尚未提交；後續授權提交狀態見本文最後一節。
+
+## 2026-10-04 ART-25 畫面上下邊緣封板
+
+- 使用者確認最高房間頂部至畫面上緣、最低房間地基底部至畫面下緣都補滿，中央龍通道保留。修改 `lane_layout.gd`、`prototype_floor.gd`、`room_module.gd`，未修改任何房間／樓層 `.tscn` 或攝影機。
+- 最高層沿用 `CeilingAnchor/RoomCeiling`，最低層各房新增 runtime `BottomCeiling`，都使用既有 `room_ceiling.tscn`。封板只在外側樓層出現；中間層保留原先接到上層地基的封板。
+- 封板高度依 Camera3D 視錐的上下邊界計算，前後深度角點取足夠的覆蓋量；較厚封板所需的水平覆蓋亦納入左右延伸。沿用 `framing_changed` 在 resize／層數變更後更新，保持原構圖與 Gameplay Marker。底部封板上表面與地基底面接齊，不重疊可見側面；石材下表面保留原防共面偏移。
+- `Room.set_bottom_ceiling_height(height)` 同步定位、厚度、碰撞、左右延伸；非正高度移除底板，非有限值不修改。重建不會累積底板；手動恢復核心房間時外側封板也恢復最小厚度 0.3。
+- Godot 4.7.2／Jolt 回歸 2973 項檢查、Forward Plus／D3D12 覆蓋及碰撞 297 項檢查皆 0 失敗。後者包含 1／3／5 層、1280×720／900×1600／2400×900 視窗、恢復尺寸、上下與水平角點、單層雙封板、底面接縫及中央通道。
+- 暫存驗證 `verify_boundary_caps.gd`／`preview_boundary_caps.gd` 位於 `C:/Users/LeeDong/AppData/Local/Temp/fgj-ceiling-validation-20261004`；預覽 `C:/Users/LeeDong/.codex/visualizations/2026/10/04/01a105be-61de-7091-a0d7-fa2fc5732b55/room_boundary_caps_preview.png`。該階段驗證時尚未提交；後續授權提交狀態見本文最後一節。
+
+## 2026-10-04 ART-26 地板空缺修正與調整位置
+
+- 原因：左右房間子場景的 Foundation 仍保留手動延伸的中心 X = −6／+6，`room_module.gd` 卻把寬度改為 `8 + outer_extension`，造成核心地基偏離房間與天花板。後加的 Mesh2 只有外觀，沒有配對碰撞，且與程序地基重疊。
+- 修正：`room_module.gd::_apply_extension()` 重算地基／背牆簷帶的中心，保留原 Y／Z；地基額外補片隱藏。地板石片維持在地基上方，避免原場景負 Y 偏移抵消表面間距。房間陳設與定位點不變。
+- 調整：`prototype_floor.tscn` 根節點的 `Fit Screen Edges` 預設啟用，遊戲依鏡頭覆寫兩房 `Outer Extension`。需要手動設定寬度時，先關閉 `Fit Screen Edges`，再選 `LeftRoom`／`RightRoom` 調整 `Outer Extension`；`Floor Surface Offset` 控制石片與地基的間距。不要移動 Foundation 或複製 Mesh 補洞。
+- `prototype_floor.tscn` 的左右房間 Transform 是房間整體位置，不能修正房間內地基的中心偏移。`game.tscn` 的 LaneLayout 使用 `Floor Scene` 指定的 PackedScene 重新生成 Floor0、Floor1 等節點；應編輯來源子場景，停止後重新 F6／F5 驗證。
+- 回歸：`scenes/rooms/verify_room_floors.gd` 使用實際 LaneLayout 與房間來源，驗證單層／三層、延伸 0／2.5／12／0、完整碰撞、封板邊界、重複補板停用與石片間距，Jolt 616 項通過。以目前房間場景在隔離暫存專案執行，避免啟動網路／麥克風 autoload；Forward Plus 另驗證單層／三層／五層和橫向／直向／超寬視窗共 297 項通過。
+- 預覽：`C:/Users/LeeDong/.codex/visualizations/2026/10/04/01a105be-61de-7091-a0d7-fa2fc5732b55/room_floor_gap_fixed.png`。缺件：無；後續授權提交狀態見本文最後一節。
+
+## 2026-10-04 ART-27 遊戲龍深度與實際入口
+
+- `dragon.gd::_ready()` 呼叫 `reset_position()`，重置與每幀換層只改 `position.y`；網路 `GameStateReceiver.apply_snapshot()` 也只同步 Y。Z 沿用場景 Transform，沒有改回 DragonAnchor 的 Z。
+- F5 從主選單進入的場景由 `autoload/room_manager.gd::GAME_SCENE` 指定，實際為 `scenes/game/main.tscn`。另一份 `game.tscn` 的變更只在直接 F6 該場景時使用。
+- 本次把 main.tscn 的 Dragon Z 從 −11.913324 同步為使用者 game.tscn 的 −25，PrototypePresentation 的 Far Padding 同步為 40；X、Y、倍率與玩法節點保留。
+- 後續在 `scenes/game/main.tscn` 選 Dragon → Inspector → Transform → Position → Z 調整；負值越大越遠離目前位於 +Z 的鏡頭。例如 −25 → −28 往後 3 單位。停止後重新 F5／F6。修改來源 `dragon.tscn` 的 Transform 會被 main.tscn 的實例 Transform 蓋過。
+- 驗證：使用正式場景的 LaneLayout、Dragon、PrototypePresentation 實例設定在隔離暫存專案執行 Forward Plus；生成、換層、重置、三層 × 三種擺頭 × 九個飛行時間點共 171 項檢查通過，Z 維持 −25，模型距遠裁切面至少 7.45。缺件：無；後續授權提交狀態見本文最後一節。
+
+## 2026-10-04 使用者驗收後提交
+
+- 使用者授權本輪修改 commit／push，目標分支 `fix/mainSceneView`。
+- `a6c81c0`：樓層上下封板、地板與碰撞接邊、龍 Z = −25、遠裁切空間及地板回歸腳本；保留使用者已存檔的房間、角色倍率與燈光調整。
+- `35e953a`：鍋子 UI 移除進度條、圖示與實際食譜收集數同列，腳本間距預設 48、場景覆寫 100；包含必要的 UI 資源／圖示匯入設定。
+- 兩項提交已推送至 `origin/fix/mainSceneView`。提交前重跑 Jolt 地板 616 項、Forward Plus 龍深度 171 項及鍋子 UI 渲染檢查，皆通過；上下邊緣封板的 Forward Plus 297 項驗證已於 ART-26 完成。
+- 後續場景儲存移除了 game.tscn 的背景 Depth Ratio = 0.95 覆寫，現沿用背景子場景值；最遠深度著色器與 Far Padding = 40 保留。ART-24 的背景位置數值為該階段驗證紀錄。

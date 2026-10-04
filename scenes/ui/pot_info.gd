@@ -17,7 +17,6 @@ var _flash_tween: Tween
 var _shake_tween: Tween
 
 @onready var _icons: HBoxContainer = %ForbiddenIcons
-@onready var _progress_bar: ProgressBar = %ProgressBar
 @onready var _progress_label: Label = %ProgressLabel
 
 
@@ -43,9 +42,8 @@ func set_forbidden(types: Array) -> void:
 
 
 func set_progress(have: int, need: int) -> void:
-	_progress_bar.max_value = maxi(need, 1)
-	_progress_bar.value = have
-	_progress_label.text = "%d / %d" % [have, need]
+	_progress_label.text = "%d/%d" % [have, need]
+	reset_size()
 
 
 func set_active(active: bool) -> void:

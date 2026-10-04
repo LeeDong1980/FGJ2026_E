@@ -1,14 +1,14 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bd0skegxcg65i"]
 
-[ext_resource type="Script" path="res://scenes/ui/play_hud.gd" id="1_script"]
-[ext_resource type="Script" path="res://scenes/ui/volume_meter.gd" id="2_meter"]
-[ext_resource type="Theme" path="res://scenes/ui/ui_theme.tres" id="3_theme"]
-[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/UI_Etc/ResourceBar_Bg01.Png" id="4_bar"]
-[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Bg.Png" id="5_panel"]
-[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Trophy.Png" id="6_trophy"]
-[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Skull.Png" id="7_skull"]
-[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Timer.Png" id="8_timer"]
-[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Frame/ProfileFrame_199_Border.Png" id="9_ring"]
+[ext_resource type="Script" uid="uid://jy3jskjoxfxd" path="res://scenes/ui/play_hud.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://db0ny2k54w0xa" path="res://scenes/ui/volume_meter.gd" id="2_meter"]
+[ext_resource type="Theme" uid="uid://dtra483bc0tmu" path="res://scenes/ui/ui_theme.tres" id="3_theme"]
+[ext_resource type="Texture2D" uid="uid://tc5klqrjatcs" path="res://scenes/ui/UI/Sprites/Components/UI_Etc/ResourceBar_Bg01.Png" id="4_bar"]
+[ext_resource type="Texture2D" uid="uid://dsy8emwad1ola" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Bg.Png" id="5_panel"]
+[ext_resource type="Texture2D" uid="uid://c36x1wggcn0h2" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Trophy.Png" id="6_trophy"]
+[ext_resource type="Texture2D" uid="uid://dmqgacoaosd2w" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Skull.Png" id="7_skull"]
+[ext_resource type="Texture2D" uid="uid://dv5qbr8r0ruma" path="res://scenes/ui/UI/Sprites/Components/Icon_ItemIcons/ItemIcon_128/Icon_ItemIcon_Timer.Png" id="8_timer"]
+[ext_resource type="Texture2D" uid="uid://bvkgrqx1vo8vx" path="res://scenes/ui/UI/Sprites/Components/Frame/ProfileFrame_199_Border.Png" id="9_ring"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bar"]
 content_margin_left = 14.0
@@ -32,7 +32,7 @@ texture_margin_top = 56.0
 texture_margin_right = 56.0
 texture_margin_bottom = 56.0
 
-[node name="PlayHud" type="Control"]
+[node name="PlayHud" type="Control" unique_id=816019820]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -42,8 +42,9 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("3_theme")
 script = ExtResource("1_script")
+pot_info_gap = 100.0
 
-[node name="PotInfoContainer" type="Control" parent="."]
+[node name="PotInfoContainer" type="Control" parent="." unique_id=1140498493]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -53,7 +54,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="TopBar" type="HBoxContainer" parent="."]
+[node name="TopBar" type="HBoxContainer" parent="." unique_id=549085954]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -67,18 +68,18 @@ mouse_filter = 2
 theme_override_constants/separation = 28
 alignment = 1
 
-[node name="CompletedBar" type="PanelContainer" parent="TopBar"]
+[node name="CompletedBar" type="PanelContainer" parent="TopBar" unique_id=836145107]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_bar")
 
-[node name="Row" type="HBoxContainer" parent="TopBar/CompletedBar"]
+[node name="Row" type="HBoxContainer" parent="TopBar/CompletedBar" unique_id=1479946544]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="Icon" type="TextureRect" parent="TopBar/CompletedBar/Row"]
+[node name="Icon" type="TextureRect" parent="TopBar/CompletedBar/Row" unique_id=1251358114]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 mouse_filter = 2
@@ -86,7 +87,7 @@ texture = ExtResource("6_trophy")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CompletedLabel" type="Label" parent="TopBar/CompletedBar/Row"]
+[node name="CompletedLabel" type="Label" parent="TopBar/CompletedBar/Row" unique_id=1774128446]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -94,18 +95,18 @@ theme_override_font_sizes/font_size = 36
 text = "完成 0 / 6"
 horizontal_alignment = 1
 
-[node name="ClearedBar" type="PanelContainer" parent="TopBar"]
+[node name="ClearedBar" type="PanelContainer" parent="TopBar" unique_id=627284664]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_bar")
 
-[node name="Row" type="HBoxContainer" parent="TopBar/ClearedBar"]
+[node name="Row" type="HBoxContainer" parent="TopBar/ClearedBar" unique_id=132582623]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="Icon" type="TextureRect" parent="TopBar/ClearedBar/Row"]
+[node name="Icon" type="TextureRect" parent="TopBar/ClearedBar/Row" unique_id=298182977]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 mouse_filter = 2
@@ -113,7 +114,7 @@ texture = ExtResource("7_skull")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ClearedLabel" type="Label" parent="TopBar/ClearedBar/Row"]
+[node name="ClearedLabel" type="Label" parent="TopBar/ClearedBar/Row" unique_id=1934812397]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -122,7 +123,7 @@ theme_override_font_sizes/font_size = 36
 text = "清空 0 / 3"
 horizontal_alignment = 1
 
-[node name="CountdownPanel" type="PanelContainer" parent="."]
+[node name="CountdownPanel" type="PanelContainer" parent="." unique_id=1017016569]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -137,12 +138,12 @@ grow_horizontal = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_bar")
 
-[node name="Row" type="HBoxContainer" parent="CountdownPanel"]
+[node name="Row" type="HBoxContainer" parent="CountdownPanel" unique_id=450257423]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 8
 
-[node name="Icon" type="TextureRect" parent="CountdownPanel/Row"]
+[node name="Icon" type="TextureRect" parent="CountdownPanel/Row" unique_id=2038965995]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 mouse_filter = 2
@@ -150,7 +151,7 @@ texture = ExtResource("8_timer")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CountdownLabel" type="Label" parent="CountdownPanel/Row"]
+[node name="CountdownLabel" type="Label" parent="CountdownPanel/Row" unique_id=93271277]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -158,7 +159,7 @@ theme_override_font_sizes/font_size = 32
 text = "剩餘時間 1:00"
 horizontal_alignment = 1
 
-[node name="PlayerAPanel" type="PanelContainer" parent="."]
+[node name="PlayerAPanel" type="PanelContainer" parent="." unique_id=479010636]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -171,26 +172,26 @@ grow_vertical = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
 
-[node name="Content" type="VBoxContainer" parent="PlayerAPanel"]
+[node name="Content" type="VBoxContainer" parent="PlayerAPanel" unique_id=1419397766]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 16
 
-[node name="TitleLabel" type="Label" parent="PlayerAPanel/Content"]
+[node name="TitleLabel" type="Label" parent="PlayerAPanel/Content" unique_id=1452022745]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.84, 0.45, 1)
 theme_override_font_sizes/font_size = 30
 text = "玩家 1｜高度"
 horizontal_alignment = 1
 
-[node name="VolumeMeter" type="Control" parent="PlayerAPanel/Content"]
+[node name="VolumeMeter" type="Control" parent="PlayerAPanel/Content" unique_id=345172433]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 script = ExtResource("2_meter")
 
-[node name="PlayerBPanel" type="PanelContainer" parent="."]
+[node name="PlayerBPanel" type="PanelContainer" parent="." unique_id=31553136]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -206,19 +207,19 @@ grow_vertical = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
 
-[node name="Content" type="VBoxContainer" parent="PlayerBPanel"]
+[node name="Content" type="VBoxContainer" parent="PlayerBPanel" unique_id=366259847]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="TitleLabel" type="Label" parent="PlayerBPanel/Content"]
+[node name="TitleLabel" type="Label" parent="PlayerBPanel/Content" unique_id=885332670]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.84, 0.45, 1)
 theme_override_font_sizes/font_size = 30
 text = "玩家 2｜吸 / 吐"
 horizontal_alignment = 1
 
-[node name="WordRing" type="TextureRect" parent="PlayerBPanel/Content"]
+[node name="WordRing" type="TextureRect" parent="PlayerBPanel/Content" unique_id=1532472675]
 custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 size_flags_vertical = 3
@@ -227,7 +228,7 @@ texture = ExtResource("9_ring")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="WordLabel" type="Label" parent="PlayerBPanel/Content/WordRing"]
+[node name="WordLabel" type="Label" parent="PlayerBPanel/Content/WordRing" unique_id=1685381385]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15

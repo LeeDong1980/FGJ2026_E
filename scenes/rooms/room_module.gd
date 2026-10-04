@@ -3,7 +3,15 @@ extends Node3D
 ## Origin stays at the original core-floor centre while the outside extends.
 ## +Z is the open front. Props and gameplay anchors do not inherit extension.
 
+const CEILING_SCENE: PackedScene = preload("res://scenes/rooms/room_ceiling.tscn")
+
 @export_enum("Left:-1", "Right:1") var outward_direction: int = 1
+## Separate the decorative floor tiles from the foundation's top surface.
+@export_range(0.001, 0.05, 0.001) var floor_surface_offset: float = 0.01:
+	set(value):
+		floor_surface_offset = clampf(value, 0.001, 0.05)
+		if is_node_ready():
+			_apply_extension()
 @export_range(0.0, 40.0, 0.05) var outer_extension: float = 0.0:
 	set(value):
 		if not is_finite(value):
@@ -48,14 +56,33 @@ func _apply_extension() -> void:
 	for child_name: StringName in _original_positions:
 		var child: Node3D = architecture.get_node(NodePath(child_name)) as Node3D
 		var original: Vector3 = _original_positions[child_name]
+		# Legacy authored extensions cover the same area as the generated segments.
+		# Keep only generated geometry visible/solid, including when resetting to 0.
+		if str(child_name).begins_with("FloorExt") or str(child_name).begins_with("BackWallExt"):
+			child.visible = false
+			for collision: Node in child.find_children("*", "CollisionShape3D", true, false):
+				collision.set_deferred("disabled", true)
+		if str(child_name).begins_with("Floor"):
+			# Imported floor surfaces are at local Y = 0. Keep them above the slab
+			# even if an authored negative offset cancels the minimum separation.
+			child.position.y = maxf(original.y + floor_surface_offset, floor_surface_offset)
 		if str(child_name).begins_with("OuterWall") or child_name == &"OuterCornice" \
 				or child_name == &"ColumnOuterFront" \
 				or child_name == (&"ColumnBackLeft" if direction < 0.0 else &"ColumnBackRight"):
 			child.position = original + Vector3(direction * outer_extension, 0.0, 0.0)
 	for name: String in ["Foundation", "BackCornice"]:
 		var node: Node3D = architecture.get_node(name) as Node3D
-		node.position = _original_positions[StringName(name)] + Vector3(direction * outer_extension * 0.5, 0.0, 0.0)
+		var original: Vector3 = _original_positions[StringName(name)]
+		# Authored extended rooms have their slab centre at +/-6. Runtime width
+		# replaces that extension, so its centre must start at the core's X = 0.
+		node.position = Vector3(direction * outer_extension * 0.5, original.y, original.z)
 		_resize_box(node, 8.0 + outer_extension)
+	# One resized foundation covers both the core and its outside extension.
+	# Manual visual patches would overlap it and have no matching collision.
+	var foundation: Node3D = architecture.get_node("Foundation") as Node3D
+	for child: Node in foundation.get_children():
+		if child is MeshInstance3D and child.name != &"Mesh":
+			(child as MeshInstance3D).visible = false
 	var cursor: float = 0.0
 	while cursor < outer_extension - 0.00001:
 		var width: float = minf(4.0, outer_extension - cursor)
@@ -65,6 +92,31 @@ func _apply_extension() -> void:
 		_add_segment(architecture.get_node("BackWall0") as Node3D, x, width)
 		cursor += width
 	get_node("CeilingAnchor/RoomCeiling").call("set_outer_extension", outer_extension, direction)
+	var bottom_ceiling: Node3D = get_node_or_null("BottomCeiling") as Node3D
+	if bottom_ceiling != null:
+		bottom_ceiling.call("set_outer_extension", outer_extension, direction)
+
+
+## Add a separate ceiling slab below the foundation, sharing only its boundary.
+func set_bottom_ceiling_height(height: float) -> void:
+	if not is_finite(height):
+		return
+	var bottom_ceiling: Node3D = get_node_or_null("BottomCeiling") as Node3D
+	if height <= 0.0:
+		if bottom_ceiling != null:
+			remove_child(bottom_ceiling)
+			bottom_ceiling.queue_free()
+		return
+	if bottom_ceiling == null:
+		bottom_ceiling = CEILING_SCENE.instantiate() as Node3D
+		bottom_ceiling.name = "BottomCeiling"
+		add_child(bottom_ceiling)
+	var foundation: MeshInstance3D = get_node("Architecture/Foundation/Mesh") as MeshInstance3D
+	var underside: Vector3 = to_local(foundation.to_global(Vector3(0.0, foundation.get_aabb().position.y, 0.0)))
+	bottom_ceiling.position.y = underside.y - height
+	bottom_ceiling.call("set_fill_height", height)
+	bottom_ceiling.call("set_outer_extension", outer_extension, float(outward_direction))
+	bottom_ceiling.call("set_enabled", true)
 
 
 func _add_segment(seed: Node3D, x: float, width: float) -> void:

@@ -69,5 +69,12 @@ func _rebuild() -> void:
 		floor_node.set(&"floor_index", i)
 		add_child(floor_node)
 		_floors.append(floor_node)
+	# Fit intermediate ceilings, then mark the outside floors for viewport closure.
+	for i in _floors.size():
+		if _floors[i].has_method(&"fit_ceilings_to_floor"):
+			var upper_floor: Node3D = _floors[i + 1] if i + 1 < _floors.size() else null
+			_floors[i].call(&"fit_ceilings_to_floor", upper_floor)
+		if _floors[i].has_method(&"configure_boundary_caps"):
+			_floors[i].call(&"configure_boundary_caps", i == _floors.size() - 1, i == 0)
 	if presentation != null and presentation.has_method(&"configure_for_layers"):
 		presentation.call(&"configure_for_layers", lane_count, lane_spacing)

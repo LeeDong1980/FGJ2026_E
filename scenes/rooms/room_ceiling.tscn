@@ -1,25 +1,11 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3 uid="uid://bx2ls1qeusnss"]
 
-[ext_resource type="Texture2D" path="res://Models/dungeon/LowPolyDungeonsLite_Texture_01.png" id="Ext1"]
-
-[ext_resource type="Script" path="res://scenes/rooms/room_ceiling.gd" id="Ext2"]
-
-[ext_resource type="PackedScene" path="res://Models/dungeon/Ground_01.fbx" id="Ext3"]
-
-[sub_resource type="StandardMaterial3D" id="DungeonMaterial"]
-vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("Ext1")
-roughness = 0.92
-
-[sub_resource type="StandardMaterial3D" id="FlameMaterial"]
-shading_mode = 0
-albedo_color = Color(1, 0.63, 0.17, 1)
-emission_enabled = true
-emission = Color(1, 0.28, 0.04, 1)
-emission_energy_multiplier = 2.0
+[ext_resource type="Texture2D" uid="uid://dj6y4la7c2buu" path="res://Models/dungeon/LowPolyDungeonsLite_Texture_01.png" id="Ext1"]
+[ext_resource type="Script" uid="uid://7by61ypmkp31" path="res://scenes/rooms/room_ceiling.gd" id="Ext2"]
+[ext_resource type="PackedScene" uid="uid://cp7feud7m4t0" path="res://Models/dungeon/Ground_01.fbx" id="Ext3"]
 
 [sub_resource type="StandardMaterial3D" id="StoneMaterial"]
-albedo_color = Color(0.24, 0.21, 0.18, 1)
+albedo_color = Color(0.16983765, 0.12698242, 0.07777474, 1)
 roughness = 0.95
 
 [sub_resource type="BoxMesh" id="MeshStoneSlab"]
@@ -29,70 +15,65 @@ size = Vector3(8, 0.3, 8)
 [sub_resource type="BoxShape3D" id="CeilingShape"]
 size = Vector3(8, 0.3, 8)
 
-[node name="RoomCeiling" type="Node3D"]
+[sub_resource type="StandardMaterial3D" id="DungeonMaterial"]
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("Ext1")
+roughness = 0.92
+
+[node name="RoomCeiling" type="Node3D" unique_id=841323162]
 script = ExtResource("Ext2")
+underside_offset = null
 
-[node name="StoneSlab" type="Node3D" parent="."]
-position = Vector3(0, 0.15, 0)
+[node name="StoneSlab" type="Node3D" parent="." unique_id=1334238194]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="StoneSlab"]
+[node name="Mesh" type="MeshInstance3D" parent="StoneSlab" unique_id=179775207]
 mesh = SubResource("MeshStoneSlab")
 
-[node name="Body" type="StaticBody3D" parent="."]
+[node name="Body" type="StaticBody3D" parent="." unique_id=639647477]
 
-[node name="Collision" type="CollisionShape3D" parent="Body"]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=407305633]
 unique_name_in_owner = true
-position = Vector3(0, 0.15, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 shape = SubResource("CeilingShape")
 
-[node name="StoneUnderside00" type="Node3D" parent="."]
-position = Vector3(-2, 0, -2)
-rotation = Vector3(3.141592654, 0, 0)
+[node name="StoneUnderside00" type="Node3D" parent="." unique_id=2080929535]
+transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, -2, 0, -2)
 
-[node name="Model" parent="StoneUnderside00" instance=ExtResource("Ext3")]
-position = Vector3(4.85722584e-15, -0, 4.85722584e-15)
-scale = Vector3(100.000002, 100.000002, 100.000002)
+[node name="Model" parent="StoneUnderside00" unique_id=661096815 instance=ExtResource("Ext3")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 4.8572257e-15, 0, 4.8572257e-15)
 
-[node name="Ground_01" parent="StoneUnderside00/Model" index="0"]
+[node name="Ground_01" parent="StoneUnderside00/Model" index="0" unique_id=477728221]
 material_override = SubResource("DungeonMaterial")
 
-[node name="StoneUnderside01" type="Node3D" parent="."]
-position = Vector3(-2, 0, 2)
-rotation = Vector3(3.141592654, 0, 0)
+[node name="StoneUnderside01" type="Node3D" parent="." unique_id=1580717123]
+transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, -2, 0, 2)
 
-[node name="Model" parent="StoneUnderside01" instance=ExtResource("Ext3")]
-position = Vector3(4.85722584e-15, -0, 4.85722584e-15)
-scale = Vector3(100.000002, 100.000002, 100.000002)
+[node name="Model" parent="StoneUnderside01" unique_id=1710627280 instance=ExtResource("Ext3")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 4.8572257e-15, 0, 4.8572257e-15)
 
-[node name="Ground_01" parent="StoneUnderside01/Model" index="0"]
+[node name="Ground_01" parent="StoneUnderside01/Model" index="0" unique_id=477728221]
 material_override = SubResource("DungeonMaterial")
 
-[node name="StoneUnderside10" type="Node3D" parent="."]
-position = Vector3(2, 0, -2)
-rotation = Vector3(3.141592654, 0, 0)
+[node name="StoneUnderside10" type="Node3D" parent="." unique_id=371677916]
+transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, 2, 0, -2)
 
-[node name="Model" parent="StoneUnderside10" instance=ExtResource("Ext3")]
-position = Vector3(4.85722584e-15, -0, 4.85722584e-15)
-scale = Vector3(100.000002, 100.000002, 100.000002)
+[node name="Model" parent="StoneUnderside10" unique_id=1141018988 instance=ExtResource("Ext3")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 4.8572257e-15, 0, 4.8572257e-15)
 
-[node name="Ground_01" parent="StoneUnderside10/Model" index="0"]
+[node name="Ground_01" parent="StoneUnderside10/Model" index="0" unique_id=477728221]
 material_override = SubResource("DungeonMaterial")
 
-[node name="StoneUnderside11" type="Node3D" parent="."]
-position = Vector3(2, 0, 2)
-rotation = Vector3(3.141592654, 0, 0)
+[node name="StoneUnderside11" type="Node3D" parent="." unique_id=452382191]
+transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, 2, 0, 2)
 
-[node name="Model" parent="StoneUnderside11" instance=ExtResource("Ext3")]
-position = Vector3(4.85722584e-15, -0, 4.85722584e-15)
-scale = Vector3(100.000002, 100.000002, 100.000002)
+[node name="Model" parent="StoneUnderside11" unique_id=26521051 instance=ExtResource("Ext3")]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 4.8572257e-15, 0, 4.8572257e-15)
 
-[node name="Ground_01" parent="StoneUnderside11/Model" index="0"]
+[node name="Ground_01" parent="StoneUnderside11/Model" index="0" unique_id=477728221]
 material_override = SubResource("DungeonMaterial")
 
 [editable path="StoneUnderside00/Model"]
-
 [editable path="StoneUnderside01/Model"]
-
 [editable path="StoneUnderside10/Model"]
-
 [editable path="StoneUnderside11/Model"]
