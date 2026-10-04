@@ -1,12 +1,27 @@
-[gd_scene format=3]
+﻿[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/ingredient/ingredient_character.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://Models/heroElf/elf.glb" id="2_model"]
 [ext_resource type="AnimationLibrary" path="res://Models/heroElf/elf_animations.tres" id="3_anims"]
+[ext_resource type="PackedScene" path="res://Models/heroElf/bow.glb" id="4_bow"]
+[ext_resource type="PackedScene" path="res://Models/heroElf/arrow.glb" id="5_arrow"]
 
-[node name="ElfCharacter" type="Node3D" unique_id=1188442347]
+[node name="ElfCharacter" type="Node3D"]
 script = ExtResource("1_script")
 extra_library = ExtResource("3_anims")
 
-[node name="Model" type="Node3D" parent="." unique_id=1944933312 instance=ExtResource("2_model")]
+[node name="Model" parent="." instance=ExtResource("2_model")]
 transform = Transform3D(0.39, 0, 0, 0, 0.39, 0, 0, 0, 0.39, 0, 0, 0)
+
+[node name="Skeleton3D" parent="Model/metarig" index="0"]
+
+[node name="LeftHandAttachment" type="BoneAttachment3D" parent="Model/metarig/Skeleton3D" index="1"]
+bone_name = "hand.L"
+
+[node name="Bow" parent="Model/metarig/Skeleton3D/LeftHandAttachment" index="0" instance=ExtResource("4_bow")]
+
+[node name="RightHandAttachment" type="BoneAttachment3D" parent="Model/metarig/Skeleton3D" index="2"]
+bone_name = "hand.R"
+
+[node name="Arrow" parent="Model/metarig/Skeleton3D/RightHandAttachment" index="0" instance=ExtResource("5_arrow")]
+
