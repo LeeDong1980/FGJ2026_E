@@ -3,7 +3,7 @@ extends MeshInstance3D
 ## 龍洞穴的 2D 背景圖：每幀放在目前攝影機正前方、面向攝影機，並放大到蓋滿畫面。
 ## 著色器把背景的深度寫成最遠，所以場景裡所有 3D 物件（包括穿過背景位置的大型龍模型）都會完整畫在它前面，
 ## 換攝影機（例如 PrototypePresentation 鏡頭）也不用調整。
-## 構圖：左邊三層山洞隧道，中間是龍飛行的巨大山中洞穴與龍巢，右邊是上中下三個料理洞窟。
+## 構圖：低多邊形風格的山中巨大洞穴，左右各有上中下三間磚造房間，中間是有瀑布的深邃洞穴。
 
 const BACKDROP_SHADER := preload("res://scenes/backdrop/cave_backdrop.gdshader")
 

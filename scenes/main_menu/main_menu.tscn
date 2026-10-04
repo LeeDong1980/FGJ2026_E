@@ -146,8 +146,8 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_constants/line_spacing = 8
 theme_override_font_sizes/font_size = 26
-text = "對麥克風發聲，音量大小決定龍的高度
-大聲飛高、小聲飛低"
+text = "對麥克風發聲，音高決定龍的高度
+高音飛高、低音飛低"
 horizontal_alignment = 1
 
 [node name="PlayerBCard" type="PanelContainer" parent="."]

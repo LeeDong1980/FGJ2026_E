@@ -19,7 +19,7 @@
 ## 2. 核心玩法循環
 
 1. 每一層的食材從左邊排隊走向龍。
-2. **玩家 1** 用音量大小，讓龍飛到想處理的那一層。
+2. **玩家 1** 用音高（高音／低音），讓龍飛到想處理的那一層。
 3. **玩家 2** 看該層最前面的食材：
    - 想要的食材：喊「吸」，吞進龍的胃袋（一次只能裝一個）。
    - 不要的食材：胃袋空著時喊「吐」，噴火燒掉，讓後面的食材遞補上來。
@@ -33,20 +33,20 @@
 
 ## 3. 操作設計
 
-### 3.1 玩家 1：移動（音量）
+### 3.1 玩家 1：移動（音高）
 
-用聲音大小決定龍停在哪一層。
+用聲音的高低（音高）決定龍停在哪一層。
 
 | 玩家 1 的聲音 | 龍的位置 |
 |---|---|
-| 大聲 | 最高層 |
-| 中音量 | 中間層 |
-| 小聲 | 最低層 |
+| 高音 | 最高層 |
+| 中音 | 中間層 |
+| 低音 | 最低層 |
 | 沒出聲 | 停在最後的高度，不會改變 |
 
 - 龍只會上下移動，不會左右或前後移動。
 - 遊戲開始時，以當下測到的音量作為校正基準。
-- 層數和「音量對應哪一層」做成可調整的設定，增加層數時改設定即可。
+- 層數和「音高對應哪一層」做成可調整的設定，增加層數時改設定即可。音高區間平均切成層數段（`PitchLaneInput`）。
 
 ### 3.2 玩家 2：吸與吐（字音辨識）
 
@@ -113,7 +113,7 @@
 - 場景分成多層，目前做三層（高、中、低），之後可能增加。
 - 各層垂直往上疊，層與層的間距可以調整。鏡頭從正面稍微往下看，最上面一層是高層，最下面一層是低層。
 - 每一層左邊的平台放食材隊伍，右邊的平台放鍋子，龍在中間。
-- 3D 場景最後面有一張 2D 龍洞穴背景圖（`scenes/backdrop/cave_backdrop.png`），自動對齊攝影機並蓋滿畫面，不影響 3D 房間。構圖：左邊上中下三層山洞隧道，中間是龍飛行的巨大山中洞穴，底部是龍巢與龍蛋，右邊是上中下三個料理洞窟。已換成正式美術（原檔名 `FGJ2026TeamE_GameSceneBG.png`）。
+- 3D 場景最後面有一張 2D 龍洞穴背景圖（`scenes/backdrop/cave_backdrop.png`），自動對齊攝影機並蓋滿畫面，不影響 3D 房間。構圖：低多邊形風格的山中巨大洞穴，左右兩側各有上中下三間磚造房間（對應三層），中間是有瀑布的深邃洞穴，前景是石板地面。已換成正式美術（原檔名 `FGJ2026TeamE_GameBg2.png`，取代第一版 `FGJ2026TeamE_GameSceneBG.png`）。
 - 每一層由左到右依序是：**食材 → 龍 → 鍋子**。
 - 龍在畫面中間，面向左邊的食材。
 - 鏡頭：攝影機面向龍頭。
@@ -274,7 +274,7 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 - 整個畫面蓋上一層半透明的深色底，後面隱約看得到 3D 場景和龍。
 - 畫面正中偏上是大字的遊戲名稱，下面一行小字是一句話介紹。
 - 名稱下方左右並排兩張說明卡：
-  - 左卡「玩家 1｜控制高度」：用音量控制龍的高度，大聲飛高、小聲飛低。
+  - 左卡「玩家 1｜控制高度」：用音高控制龍的高度，高音飛高、低音飛低。
   - 右卡「玩家 2｜吸與吐」：喊「吸」把食材吸進鍋，喊「吐」噴火燒掉禁止的食材。
 - 說明卡下方正中是一顆大的「進入遊戲」按鍵，右邊一顆較小的「離開」；上方一行提示文字顯示 `RoomManager.notice`（例如對方關閉房間），沒有提示時隱藏。
 =======
@@ -282,7 +282,7 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 - 畫面左右兩側的岩壁上各一張說明卡，避開中央的龍與標題：
   - 左上「遊玩方式」：① 吸取左邊排隊走來的食材 ② 飛到右邊，把食材吐進鍋裡 ③ 鍋子收集滿後，對鍋子吐火完成料理。
   - 右上「雙人合作」：兩位玩家合作操控中間的大龍；完成 6 鍋料理就成功；吐錯食材會打翻鍋子，打翻 3 次就失敗。
-  - 左下「玩家 A｜控制高度」：對麥克風發聲，音量大小決定龍的高度，大聲飛高、小聲飛低。
+  - 左下「玩家 A｜控制高度」：對麥克風發聲，音高決定龍的高度，高音飛高、低音飛低。
   - 右卡「玩家 B｜吸與吐」：喊「吸」把食材吞進胃袋，喊「吐」吐進鍋子，胃空時噴火。
 - 畫面底部正中是一顆大的「進入遊戲」按鍵，右邊一顆較小的「離開」；上方一行提示文字顯示 `RoomManager.notice`（例如對方關閉房間），沒有提示時隱藏。
 >>>>>>> 修改備份_20261004_1321
@@ -325,8 +325,8 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 - **每一層鍋子旁邊**：一塊小面板，跟著該層鍋子在畫面上的位置（見 6.6）。
 - **畫面左下角**：玩家 1 面板。
   - 標題「玩家 1｜高度」。
-  - 一根直立的音量條，即時顯示玩家 1 目前的音量。
-  - 音量條上畫出各層的門檻線，每一段旁邊標上「高」「中」「低」。
+  - 一根直立的音高條，即時顯示玩家 1 目前的音高。
+  - 音高條上畫出各層的門檻線，每一段旁邊標上「高」「中」「低」。
   - 龍目前所在的那一段會亮起。
 - **畫面右下角**：玩家 2 面板。
   - 標題「玩家 2｜吸 / 吐」。
@@ -342,7 +342,7 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 | PotInfoContainer | Control | 放置各層的鍋子資訊，依層數產生 PotInfo |
 | PlayerAPanel | PanelContainer | 玩家 1 面板 |
 | VolumeBar | ProgressBar（直立） | 玩家 1 目前音量 |
-| ThresholdLines | Control | 依各層門檻在音量條上畫線並標示層名 |
+| ThresholdLines | Control | 依各層門檻在音高條上畫線並標示層名 |
 | PlayerBPanel | PanelContainer | 玩家 2 面板 |
 | WordLabel | Label | 最後辨識到的字音「吸」或「吐」 |
 | CountdownPanel | PanelContainer | 倒數計時「剩餘時間 0:59」，在上方資訊列下方。**僅測試用**：正式遊戲不限時間，預設隱藏 |
@@ -427,7 +427,7 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 | 各層禁止食材與進度 | `baby_arrived`、`pot_changed` 後讀 `get_pot(lane)` 的 `forbidden`、`count`、`required` |
 | 鍋子完成（閃綠色）／被踢翻（閃紅色） | `baby_left(lane, reason)`，`reason` 為 `COMPLETED` 或 `KICKED` |
 | 龍所在的層 | `Dragon.current_lane_changed` |
-| 玩家 A 音量條 | 每幀讀 `MicInput.volume_value`（0～100），門檻線依層數平均分段 |
+| 玩家 1 音高條 | 每幀讀 `MicInput.pitch_value`（0～100；手機 1 連上時讀手機），門檻線依層數平均分段 |
 | 玩家 B「吸」 | `ingredient_swallowed`、`suck_missed` |
 | 玩家 B「吐」 | `ingredient_spat`、`spit_missed`，以及開始噴火（`is_spitting` 變成 true） |
 | 開始遊戲 | `game_started` 時顯示遊玩狀態介面；從開始介面進入時呼叫麥克風校正（`MicInput.calibrate()`，完成前略過），重新遊玩不重新校正 |
@@ -449,13 +449,18 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 | 上方數值條、倒數計時 | `UI_Etc/ResourceBar_Bg01`，圖示 `Icon_ItemIcon_Trophy`、`Icon_ItemIcon_Skull`、`Icon_ItemIcon_Timer` |
 | 玩家 A／B 面板 | `Popup/Popup_Bg` |
 | 玩家 B 字音外圈 | `Frame/ProfileFrame_199_Border` |
-| 音量條底 | `UI_Etc/InputField_Bg_Demo_Normal`（填色為橘金色） |
+| 音高條底 | `UI_Etc/InputField_Bg_Demo_Normal`（填色為橘金色） |
 | 鍋子資訊 | `Frame/StageFrame_Demo_n`（一般）、`StageFrame_Demo_f`（龍所在層）；進度條 `Slider/Slider_Basic02_Bg_Demo`、`Slider_Basic02_Fill_Orange` |
 | 禁止符號 | `Icon_PictoIcon_Block`（染成紅色） |
 | 遊戲結束面板 | `Frame/PanelFrame02_Demo`、標題牌 `Popup/Popup_Title_Center`（兩側 `Popup_Title_DecoLeft`／`DecoRight`） |
 | 遊戲結束橫幅 | `ActionText/ActionText_Victory`／`ActionText_Defeat`，裝飾 `Image_Deco_Laurel_L／R`、`Image_DefeatScene_Skull2／3` |
 
-路徑都在 `scenes/ui/UI/Sprites/Components/` 或 `scenes/ui/UI/Sprites/Demo/Demo_Image/` 底下。主選單（露柑負責）尚未套用這套風格。
+路徑都在 `scenes/ui/UI/Sprites/Components/` 或 `scenes/ui/UI/Sprites/Demo/Demo_Image/` 底下。
+
+同一套風格也套用在其他介面：
+- 主選單（`main_menu.tscn`）：套用 `ui_theme.tres`，說明卡用 `Popup_Bg` 石框。
+- 連線等候頁與玩家側邊面板（`room_lobby.tscn`、`player_input_panels.tscn`）：主題 `scenes/lobby/lobby_theme.tres`，一般按鍵 `Button01_Brown`、主要按鍵 `Button_Square02`、座位 `StageFrame_Demo_n／_f`、輸入框 `ResourceBar_Bg01`，卡片與面板用 `Popup_Bg`。
+- Esc 暫停選單（`pause_menu.tscn`）：外框 `PanelFrame02_Demo`，上方「遊戲暫停」橫幅 `Label-Title/Title_Ribbon01_Brown`，設定面板套用小字主題 `scenes/ui/panel_theme.tres`。
 
 ## 7. 關卡設定參數
 
@@ -464,7 +469,7 @@ UIRoot 同一時間只會顯示一個主要介面（遊玩、結束二選一）�
 | 參數（每關各自設定） | 預設值 / 範圍 |
 |---|---|
 | 層數 | 3 |
-| 音量分段對應的層 | 大聲 → 高、中音量 → 中、小聲 → 低 |
+| 音高分段對應的層 | 高音 → 高、中音 → 中、低音 → 低 |
 | 每層食材上限 | 6 |
 | 開場每層食材數 | 1 |
 | 每鍋禁止食材數 | 1～3 種 |

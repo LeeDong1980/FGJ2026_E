@@ -1,0 +1,90 @@
+[gd_resource type="Theme" format=3]
+
+[ext_resource type="FontFile" path="res://scenes/ui/UI/Fonts/Changa-Bold.ttf" id="1_font"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Button/Button01_Brown.png" id="2_button"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/UI_Etc/ResourceBar_Bg01.Png" id="3_field"]
+
+[sub_resource type="SystemFont" id="SystemFont_cjk"]
+font_names = PackedStringArray("PingFang TC", "Noto Sans TC", "Noto Sans CJK TC", "Microsoft JhengHei", "Microsoft YaHei")
+font_weight = 700
+
+[sub_resource type="FontVariation" id="FontVariation_main"]
+fallbacks = Array[Font]([SubResource("SystemFont_cjk")])
+base_font = ExtResource("1_font")
+
+[sub_resource type="StyleBoxEmpty" id="focus"]
+
+[sub_resource type="StyleBoxTexture" id="button_normal"]
+content_margin_left = 22.0
+content_margin_top = 8.0
+content_margin_right = 22.0
+content_margin_bottom = 14.0
+texture = ExtResource("2_button")
+texture_margin_left = 24.0
+texture_margin_top = 20.0
+texture_margin_right = 24.0
+texture_margin_bottom = 26.0
+
+[sub_resource type="StyleBoxTexture" id="button_hover"]
+content_margin_left = 22.0
+content_margin_top = 8.0
+content_margin_right = 22.0
+content_margin_bottom = 14.0
+texture = ExtResource("2_button")
+texture_margin_left = 24.0
+texture_margin_top = 20.0
+texture_margin_right = 24.0
+texture_margin_bottom = 26.0
+modulate_color = Color(1.2, 1.12, 1.05, 1)
+
+[sub_resource type="StyleBoxTexture" id="button_pressed"]
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 22.0
+content_margin_bottom = 12.0
+texture = ExtResource("2_button")
+texture_margin_left = 24.0
+texture_margin_top = 20.0
+texture_margin_right = 24.0
+texture_margin_bottom = 26.0
+modulate_color = Color(0.8, 0.75, 0.72, 1)
+
+[sub_resource type="StyleBoxTexture" id="field"]
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+texture = ExtResource("3_field")
+texture_margin_left = 26.0
+texture_margin_top = 26.0
+texture_margin_right = 26.0
+texture_margin_bottom = 26.0
+
+[resource]
+default_font = SubResource("FontVariation_main")
+default_font_size = 20
+Button/colors/font_color = Color(1, 0.95, 0.85, 1)
+Button/colors/font_focus_color = Color(1, 0.95, 0.85, 1)
+Button/colors/font_hover_color = Color(1, 1, 0.92, 1)
+Button/colors/font_outline_color = Color(0.15, 0.07, 0.02, 0.95)
+Button/colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
+Button/constants/outline_size = 5
+Button/font_sizes/font_size = 22
+Button/styles/focus = SubResource("focus")
+Button/styles/hover = SubResource("button_hover")
+Button/styles/normal = SubResource("button_normal")
+Button/styles/pressed = SubResource("button_pressed")
+CheckButton/colors/font_color = Color(1, 0.95, 0.85, 1)
+CheckButton/colors/font_hover_color = Color(1, 1, 0.92, 1)
+CheckButton/colors/font_outline_color = Color(0.15, 0.07, 0.02, 0.95)
+CheckButton/constants/outline_size = 5
+Label/colors/font_color = Color(1, 0.95, 0.85, 1)
+Label/colors/font_outline_color = Color(0.1, 0.05, 0.02, 0.95)
+Label/constants/outline_size = 5
+OptionButton/colors/font_color = Color(1, 0.95, 0.85, 1)
+OptionButton/colors/font_outline_color = Color(0.15, 0.07, 0.02, 0.95)
+OptionButton/constants/outline_size = 5
+OptionButton/styles/focus = SubResource("focus")
+OptionButton/styles/hover = SubResource("field")
+OptionButton/styles/normal = SubResource("field")
+OptionButton/styles/pressed = SubResource("field")
