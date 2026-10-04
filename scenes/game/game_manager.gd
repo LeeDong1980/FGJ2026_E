@@ -472,6 +472,11 @@ func _process_replica(delta: float) -> void:
 	invincible_remaining = maxf(invincible_remaining - delta, 0.0)
 
 
+## 這次按下「吐」是不是已經吐進鍋子（放開前不會接著噴）。Host 的 GameStateSender 要把它傳給 Client。
+func is_spit_used_for_pot() -> bool:
+	return _spit_used_for_pot
+
+
 ## 副本模式：設定 Host 傳來的噴吐狀態（is_breathing_fire()、is_cooking() 要用）。
 func apply_replica_spit(spitting: bool, used_for_pot: bool) -> void:
 	is_spitting = spitting

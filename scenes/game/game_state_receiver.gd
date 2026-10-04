@@ -28,6 +28,13 @@ func apply_full(state: Dictionary) -> void:
 	_set_facing(int(state.get("facing", game_manager.facing)) as GameManager.Facing)
 	_set_element(int(state.get("element", game_manager.element)) as GameManager.Element)
 	dragon.set_target_lane(int(state.get("target", dragon.target_lane)))
+	var pots: Array = state.get("pots", [])
+	for lane in mini(pots.size(), game_manager.pots.size()):
+		if _apply_pot(lane, pots[lane]):
+			game_manager.pot_changed.emit(lane)
+	_set_stomach(int(state.get("stomach", -1)), true)
+	var spit: Array = state.get("spit", [false, false])
+	game_manager.apply_replica_spit(bool(spit[0]), bool(spit[1]))
 	apply_snapshot(state.get("snapshot", {}), true)
 	# 晚進場時（Client 載入比 Host 開局慢），完整狀態已經是遊玩中，補發「開始」讓 UI 進入遊玩狀態
 	if game_manager.state == GameManager.GameState.PLAYING:
@@ -50,6 +57,21 @@ func apply_event(event: Dictionary) -> void:
 			_set_element(int(value) as GameManager.Element)
 		GameSync.EV_TARGET:
 			dragon.set_target_lane(int(value))
+		GameSync.EV_POT:
+			var lane: int = int(event["lane"])
+			_apply_pot(lane, event["pot"])
+			game_manager.pot_changed.emit(lane)
+		GameSync.EV_BABY_LEFT:
+			game_manager.baby_left.emit(int(event["lane"]), int(value) as GameManager.BabyLeaveReason)
+		GameSync.EV_BABY_ARRIVED:
+			game_manager.baby_arrived.emit(int(event["lane"]))
+		GameSync.EV_STOMACH:
+			_set_stomach(int(value))
+		GameSync.EV_SPAT:
+			game_manager.ingredient_spat.emit(int(event["lane"]), IngredientState.new(int(value) as IngredientType.Type, 0.0))
+		GameSync.EV_SPIT:
+			var spit: Array = value
+			game_manager.apply_replica_spit(bool(spit[0]), bool(spit[1]))
 		GameSync.EV_STUNNED:
 			game_manager.stun_remaining = game_manager.stun_time
 			dragon.stunned = true
@@ -75,6 +97,39 @@ func apply_snapshot(snapshot: Dictionary, force_position: bool = false) -> void:
 	game_manager.stun_remaining = float(snapshot.get("stun", 0.0))
 	game_manager.invincible_remaining = float(snapshot.get("inv", 0.0))
 	dragon.stunned = game_manager.stun_remaining > 0.0
+	# 鍋子煮的進度（連續值）
+	var cook: Array = snapshot.get("cook", [])
+	for lane in mini(cook.size(), game_manager.pots.size()):
+		game_manager.pots[lane].cook_progress = float(cook[lane])
+
+
+## 套用一個鍋子的資料，回傳有沒有任何欄位改變（煮的進度不算，那是連續值）。
+func _apply_pot(lane: int, data: Dictionary) -> bool:
+	if lane < 0 or lane >= game_manager.pots.size():
+		return false
+	var pot: PotState = game_manager.pots[lane]
+	var forbidden: Array = data.get("forbidden", [])
+	var changed: bool = Array(pot.forbidden) != forbidden \
+			or pot.required != int(data.get("required", 0)) \
+			or pot.count != int(data.get("count", 0)) \
+			or pot.has_baby != bool(data.get("has_baby", false)) \
+			or pot.element != int(data.get("element", 0))
+	pot.forbidden.assign(forbidden)
+	pot.required = int(data.get("required", 0))
+	pot.count = int(data.get("count", 0))
+	pot.has_baby = bool(data.get("has_baby", false))
+	pot.element = int(data.get("element", 0)) as GameManager.Element
+	pot.cook_progress = float(data.get("cook", 0.0))
+	return changed
+
+
+## 胃袋裡的食材。type 是 -1 表示胃空。quiet 為 true 時內容沒變就不發 signal（完整狀態對帳用）。
+func _set_stomach(type: int, quiet: bool = false) -> void:
+	var current: int = -1 if game_manager.stomach == null else game_manager.stomach.type
+	if quiet and type == current:
+		return
+	game_manager.stomach = null if type < 0 else IngredientState.new(type as IngredientType.Type, 0.0)
+	game_manager.stomach_changed.emit(game_manager.stomach)
 
 
 func _emit_started() -> void:
