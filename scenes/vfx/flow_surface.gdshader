@@ -5,6 +5,9 @@ uniform vec3 source_position = vec3(0.0);
 uniform vec3 target_position = vec3(-4.0, 0.0, 0.0);
 uniform int effect_kind = 0;
 uniform vec4 tint : source_color = vec4(0.52, 0.86, 1.0, 0.55);
+// Flame (effect_kind 1) gradient from edge to center. Defaults are the fire colors; the ice breath overrides them.
+uniform vec3 flame_edge_color : source_color = vec3(1.0, 0.15, 0.015);
+uniform vec3 flame_center_color : source_color = vec3(1.0, 0.72, 0.16);
 varying float particle_phase;
 
 void vertex() {
@@ -32,7 +35,7 @@ void fragment() {
 		float wave = sin(UV.y * 14.0 + TIME * 18.0 + particle_phase * 17.0) * 0.10;
 		point.x = (point.x + wave) / taper;
 		shape = 1.0 - smoothstep(0.15, 1.0, dot(point, point));
-		color = mix(vec3(1.0, 0.15, 0.015), vec3(1.0, 0.72, 0.16), shape);
+		color = mix(flame_edge_color, flame_center_color, shape);
 		brightness = 2.2;
 	} else if (effect_kind == 2) {
 		brightness = 2.4;
