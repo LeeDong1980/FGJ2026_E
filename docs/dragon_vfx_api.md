@@ -161,10 +161,11 @@ func cancel_action() -> void:
 | `bind_dragon(dragon: Node3D) -> bool` | 綁定具 `get_mouth_anchor() -> Marker3D` 的角色；更換綁定會中斷舊效果。節點或掛點不可用時回傳 false |
 | `play_suction(target_global_position: Vector3, duration: float = 0.6) -> bool` | 從目標端吸向嘴部；duration 是發射秒數。每次呼叫重新播放，並中斷既有效果 |
 | `play_fire(target_global_position: Vector3, duration: float = 0.6) -> bool` | 從嘴部噴向目標端；參數及重播規則同上 |
+| `play_ice(target_global_position: Vector3, duration: float = 0.6) -> bool` | 冰息：和噴火同形狀、同寬度（`fire_width`），冰藍配色（`ice_breath_effect.tscn`，在腳本中建立）；參數及重播規則同上 |
 | `set_target_global_position(position: Vector3) -> void` | 更新世界目標，可在效果播放時逐幀呼叫；不保存食材節點引用 |
 | `stop_effects() -> void` | 立即停止發射並隱藏／清除尾端；無作用中的效果時不發事件 |
 | `set_effect_widths(suction: float, fire: float) -> bool` | 同時設定完整寬度；非法輸入不修改任何一邊，正的超界值 clamp；播放中即時更新 |
-| `get_active_effect() -> StringName` | 回傳 `suction`、`fire` 或空字串；消散期間仍算作用中 |
+| `get_active_effect() -> StringName` | 回傳 `suction`、`fire`、`ice` 或空字串；消散期間仍算作用中 |
 | `get_visual_end_global_position() -> Vector3` | 最近一次計算的視覺端點，供除錯或範圍提示使用；閒置時可能是前次端點 |
 
 未 ready、未綁定、缺掛點、非有限座標／duration、非正 duration，或目標距嘴部小於 0.01 單位，播放會回傳 false；原因可讀 `last_error`。失敗的播放請求不替換既有效果。掛點於播放中被移除，或目標移到嘴部，則中斷並清場。非有限目標更新會被忽略。

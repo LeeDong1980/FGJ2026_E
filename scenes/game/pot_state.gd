@@ -9,6 +9,8 @@ var count: int = 0
 var has_baby: bool = false
 ## 鍋子加滿後對鍋子噴火的進度，0～1；到 1 才完成這一鍋。中途停止不會歸零。
 var cook_progress: float = 0.0
+## 食譜：要用火還是冰煮。
+var element: GameManager.Element = GameManager.Element.FIRE
 
 
 func is_forbidden(type: IngredientType.Type) -> bool:
@@ -28,3 +30,4 @@ func randomize_request(forbidden_min: int, forbidden_max: int, required_min: int
 	required = randi_range(required_min, required_max)
 	count = 0
 	cook_progress = 0.0
+	element = GameManager.Element.values().pick_random()

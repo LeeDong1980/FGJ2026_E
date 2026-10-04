@@ -1,0 +1,117 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scenes/vfx/directed_effect.gd" id="1"]
+[ext_resource type="Shader" path="res://scenes/vfx/endpoint_flow.gdshader" id="2"]
+[ext_resource type="Shader" path="res://scenes/vfx/flow_surface.gdshader" id="3"]
+[ext_resource type="Shader" path="res://scenes/vfx/flame_core.gdshader" id="4"]
+
+[sub_resource type="ShaderMaterial" id="CoreMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("4")
+shader_parameter/base_color = Color(0.25, 0.55, 1, 1)
+shader_parameter/tip_color = Color(0.8, 0.95, 1, 1)
+
+[sub_resource type="CylinderMesh" id="CoreMesh"]
+top_radius = 1.0
+bottom_radius = 0.08
+height = 1.0
+radial_segments = 12
+rings = 3
+cap_top = false
+cap_bottom = false
+
+[sub_resource type="ShaderMaterial" id="Process_Flow"]
+resource_local_to_scene = true
+shader = ExtResource("2")
+shader_parameter/effect_kind = 1
+shader_parameter/enabled = false
+
+[sub_resource type="ShaderMaterial" id="Surface_Flow"]
+resource_local_to_scene = true
+shader = ExtResource("3")
+shader_parameter/effect_kind = 1
+shader_parameter/tint = Color(0.6, 0.85, 1, 0.62)
+shader_parameter/flame_edge_color = Color(0.15, 0.45, 1, 1)
+shader_parameter/flame_center_color = Color(0.85, 0.97, 1, 1)
+
+[sub_resource type="QuadMesh" id="Mesh_Flow"]
+resource_local_to_scene = true
+material = SubResource("Surface_Flow")
+size = Vector2(1, 1)
+
+[sub_resource type="ShaderMaterial" id="Process_Sparks"]
+resource_local_to_scene = true
+shader = ExtResource("2")
+shader_parameter/effect_kind = 2
+shader_parameter/enabled = false
+
+[sub_resource type="ShaderMaterial" id="Surface_Sparks"]
+resource_local_to_scene = true
+shader = ExtResource("3")
+shader_parameter/effect_kind = 2
+shader_parameter/tint = Color(0.85, 0.97, 1, 0.85)
+
+[sub_resource type="QuadMesh" id="Mesh_Sparks"]
+resource_local_to_scene = true
+material = SubResource("Surface_Sparks")
+size = Vector2(1, 1)
+
+[sub_resource type="ShaderMaterial" id="Process_Smoke"]
+resource_local_to_scene = true
+shader = ExtResource("2")
+shader_parameter/effect_kind = 3
+shader_parameter/enabled = false
+
+[sub_resource type="ShaderMaterial" id="Surface_Smoke"]
+resource_local_to_scene = true
+shader = ExtResource("3")
+shader_parameter/effect_kind = 3
+shader_parameter/tint = Color(0.85, 0.93, 1, 0.14)
+
+[sub_resource type="QuadMesh" id="Mesh_Smoke"]
+resource_local_to_scene = true
+material = SubResource("Surface_Smoke")
+size = Vector2(1, 1)
+
+[node name="IceBreathEffect" type="Node3D"]
+script = ExtResource("1")
+
+[node name="FlameCore" type="MeshInstance3D" parent="."]
+visible = false
+cast_shadow = 0
+extra_cull_margin = 0.1
+mesh = SubResource("CoreMesh")
+material_override = SubResource("CoreMaterial")
+
+[node name="Flow" type="GPUParticles3D" parent="."]
+emitting = false
+visible = false
+amount = 96
+lifetime = 0.28
+local_coords = false
+fixed_fps = 60
+cast_shadow = 0
+process_material = SubResource("Process_Flow")
+draw_pass_1 = SubResource("Mesh_Flow")
+
+[node name="Sparks" type="GPUParticles3D" parent="."]
+emitting = false
+visible = false
+amount = 24
+lifetime = 0.3
+local_coords = false
+fixed_fps = 60
+cast_shadow = 0
+process_material = SubResource("Process_Sparks")
+draw_pass_1 = SubResource("Mesh_Sparks")
+
+[node name="Smoke" type="GPUParticles3D" parent="."]
+emitting = false
+visible = false
+amount = 12
+lifetime = 0.45
+local_coords = false
+fixed_fps = 60
+cast_shadow = 0
+process_material = SubResource("Process_Smoke")
+draw_pass_1 = SubResource("Mesh_Smoke")

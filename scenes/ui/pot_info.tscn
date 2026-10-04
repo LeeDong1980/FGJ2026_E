@@ -1,43 +1,41 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/pot_info.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Frame/StageFrame_Demo_n.Png" id="2_frame"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Slider/Slider_Basic02_Bg_Demo.png" id="3_bar_bg"]
+[ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Slider/Slider_Basic02_Fill_Orange.png" id="4_bar_fill"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-content_margin_left = 16.0
-content_margin_top = 10.0
-content_margin_right = 16.0
-content_margin_bottom = 12.0
-bg_color = Color(0.08, 0.067, 0.125, 0.94)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 1, 1, 0.2)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frame"]
+content_margin_left = 26.0
+content_margin_top = 16.0
+content_margin_right = 26.0
+content_margin_bottom = 20.0
+texture = ExtResource("2_frame")
+texture_margin_left = 40.0
+texture_margin_top = 40.0
+texture_margin_right = 40.0
+texture_margin_bottom = 40.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
-bg_color = Color(1, 1, 1, 0.13)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bar_bg"]
+texture = ExtResource("3_bar_bg")
+texture_margin_left = 11.0
+texture_margin_top = 11.0
+texture_margin_right = 11.0
+texture_margin_bottom = 11.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
-bg_color = Color(0.275, 0.769, 0.42, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bar_fill"]
+texture = ExtResource("4_bar_fill")
+texture_margin_left = 13.0
+texture_margin_top = 11.0
+texture_margin_right = 13.0
+texture_margin_bottom = 11.0
 
 [node name="PotInfo" type="PanelContainer"]
-custom_minimum_size = Vector2(250, 0)
-offset_right = 250.0
-offset_bottom = 104.0
+custom_minimum_size = Vector2(260, 0)
+offset_right = 260.0
+offset_bottom = 120.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+theme_override_styles/panel = SubResource("StyleBoxTexture_frame")
 script = ExtResource("1_script")
 
 [node name="Content" type="VBoxContainer" parent="."]
@@ -47,26 +45,26 @@ theme_override_constants/separation = 6
 
 [node name="ForbiddenIcons" type="HBoxContainer" parent="Content"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 alignment = 1
 
 [node name="ProgressRow" type="HBoxContainer" parent="Content"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 12
 
 [node name="ProgressBar" type="ProgressBar" parent="Content/ProgressRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(130, 16)
+custom_minimum_size = Vector2(120, 24)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
+theme_override_styles/background = SubResource("StyleBoxTexture_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxTexture_bar_fill")
 max_value = 5.0
 step = 1.0
 show_percentage = false

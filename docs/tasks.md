@@ -66,10 +66,21 @@
 - [x] GM-19 食材攻擊：每層最前端食材蓄力（每次隨機 10～20 秒），蓄滿攻擊龍（任何層都打得到），攻擊後重新蓄力；龍暈眩 1.5 秒（不能換層、吸、吐、噴火），醒來後無敵 2 秒，暈眩或無敵時攻擊打空；新增 signal 並更新 api.md @露柑
 - [x] GM-20 攻擊測試畫面：食材上顯示蓄力條；main.tscn 的 `StunBanner` 在螢幕上方（上方資訊列下面）顯示暈眩／無敵倒數，暈眩時文字晃動、被打中時放大彈出 @露柑
 - [x] GM-21 難度：開場每層 1 個食材、上限改 6 個；生成間隔隨完成鍋數變短（8 秒起每鍋 -1 秒，最短 3 秒，`@export`），蓄力與走路時間不變 @露柑
+<<<<<<< HEAD
 - [x] GM-22 轉頭：龍頭分左（食材）右（鍋子），玩家 B 大叫（音量 > 50%，`ShoutTurnInput`）或按 L 切換，門檻在麥克風設定面板調整並存檔；面向左才能吸、噴火，面向右才能吐進鍋子；暈眩不能轉頭；畫面下方 `FacingIndicator` 框框顯示目前朝向（模型暫不轉）；連線局 Client 用字音 `turn` 傳給 Host；更新 design.md、api.md @露柑
 - [ ] GM-23 轉頭動畫：龍的模型依 `game_manager.facing`（`facing_changed`）轉向左／右，完成後可移除或保留 `FacingIndicator` 框框
 - [x] GM-24 煮鍋子：鍋子加滿後不直接完成，面向右、胃空時對鍋子持續噴火累計 1 秒（`cook_time`，中斷保留進度）才完成；滿鍋時再吐食材沒有效果；噴火特效改朝鍋子；PotsDebugView 顯示煮的進度；更新 design.md、api.md @露柑
 - [x] GM-25 無效指令提示：吸／吐沒有效果時不播特效（吸空不吸、空層不噴火），`action_missed(lane, reason)` 附原因，main.tscn 的 `ActionHintBanner` 在上方顯示原因後淡出；更新 design.md、api.md @露柑
+- [x] GM-26 火與冰：玩家 1 大叫（`ShoutElementInput`，原大叫轉頭改用）或按 4 切換火／冰；轉頭改成只有玩家 2 按 L；冰凍住最前端食材 1 秒並歸零攻擊蓄力；鍋子食譜隨機要火或冰，用錯元素煮會倒退進度並提示；FacingIndicator 顯示元素；鍋子底下 `PotElementView` 發光圈顯示食譜（橘火、藍冰）；連線局依座位傳 `turn`／`element` 字音；更新 design.md、api.md、voice-input.md @露柑
+- [x] GM-27 冰的專用特效：新增 `scenes/vfx/ice_breath_effect.tscn`（沿用噴火的 shader，冰藍配色、冰晶與白霧），`DragonEffects.play_ice()`（冰息子場景在腳本建立，不改 dragon_effects.tscn）；flame_core／flow_surface shader 加顏色參數，預設值維持原本火焰顏色；EffectsView 依元素播火或冰 @露柑
+- [x] GM-28 食材正式模型接入遊戲：IngredientModel 依種類換成 ART-20 的人類／史萊姆／蝙蝠角色子場景（精靈、矮人、獸人仍為膠囊），斜 60 度面向龍；走路播 Walk、停下播 Idle、攻擊播 Atk；凍住時動畫停住並蓋冰藍色；史萊姆 0.65 倍、蝙蝠 1.8 倍配合隊伍間隔（比例定案後再調） @露柑
+- [x] GM-29 通關改成完成 3 鍋；新增分數：每鍋 100 分，距上一鍋完成（或開局）60 秒內完成再加 50 分（全場一個計時），`score_changed` signal，main.tscn 的 `ScoreBanner` 在右上角顯示分數、快速加分倒數與加分提示；更新 design.md、api.md @露柑
+- [x] GM-30 轉頭與換元素對調：玩家 1 大叫或按 4 轉頭（`ShoutTurnInput`），玩家 2 按 L 換元素；連線局字音依座位對調；更新 design.md、api.md、voice-input.md @露柑
+- [x] GM-31 食材放大：IngredientModel `body_scale` 2 倍（膠囊與角色模型，名稱與進度條跟著上移、字不放大），隊伍間隔 0.6→1.2，噴吐瞄準高度 0.4→0.8；排滿 6 個仍在出生點內 @露柑
+- [ ] UI-19 遊戲結束介面（ResultScreen）顯示最終分數（`game_manager.score`）
+=======
+- [ ] GM-22 新規則：鍋子收滿需求數量後不自動完成，要在該層對鍋子噴火才完成一鍋（細節見 design.md 未定事項），並提供 UI 用的「已收滿、等噴火」狀態與 signal
+>>>>>>> 修改備份_20261004_1321
 
 #### UI（GMF）
 - [x] UI-01 建立 UI 根場景，依遊戲狀態（開始 / 遊玩中 / 結束）開關三個介面元件 @GMF
@@ -79,8 +90,8 @@
 - [x] UI-05 遊玩狀態介面：玩家 A 音量條，標出各層門檻線 @GMF
 - [x] UI-06 遊玩狀態介面：顯示玩家 B 最後辨識到的字音（「吸」或「吐」） @GMF
 - [x] UI-07 製作遊戲結束介面：依成功 / 失敗與是否為最後一關，顯示「下一關」「關閉遊戲」或「重新遊玩」 @GMF
-- [ ] UI-08 準備支援繁體中文的字型與 UI Theme
-- [ ] UI-09 和遊戲機制、麥克風輸入確認 UI 需要的 signal 與資料（鍋子狀態、勝敗、音量、辨識結果）
+- [x] UI-08 準備支援繁體中文的字型與 UI Theme：`scenes/ui/ui_theme.tres`（Changa 粗體＋系統中文粗體、文字描邊、金框按鍵） @GMF
+- [x] UI-09 和遊戲機制、麥克風輸入確認 UI 需要的 signal 與資料（鍋子狀態、勝敗、音量、辨識結果） @GMF
 - [ ] UI-10 請主場景負責人把 UI 根場景放進 main.tscn
 - [x] UI-11 建立 UI 測試場景 `ui_test.tscn` 與測試控制中心：依階段切換介面、測試用倒數計時（時間到算失敗）、Ctrl+Shift+W／L 強制成功或失敗（可在 Inspector 開關） @GMF
 - [x] UI-12 擴充 UI 測試快捷鍵：Ctrl+Shift+1／2 增加完成數或清空次數（達到上限跳出結束介面）、4／5／6 重新隨機上／中／下層禁止食材、↑／←／↓ 龍高度顯示、I／O 顯示吸／吐 @GMF
@@ -89,7 +100,22 @@
 - [x] UI-15 ResultScreen 不再 `quit()`：最後一關成功改顯示「回主選單」，UIRoot 發 `back_requested`，由 UIGameBridge 呼叫 `RoomManager.return_to_menu()` @露柑
 - [x] UI-16 專案主場景改成主選單 main_menu.tscn；遊戲場景 game.tscn 改名為 `scenes/game/main.tscn`（根節點 Main），原美術展示 `scenes/main/main.tscn` 改名為 `art_prev.tscn`（根節點 ArtPrev，F6 預覽） @露柑
 - [ ] UI-17 連線局結束改用正式的 ResultScreen（目前是 NetworkGameBridge 的臨時「回到房間」畫面，需與 Samuel 協調）
+<<<<<<< HEAD
 - [x] UI-18 修正 PotInfo 換小龍後面板永久變寬：`set_forbidden()` 舊圖示先移出再釋放（同一幀 `pot_changed`＋`baby_arrived` 呼叫兩次時會疊在一起），並在更新後 `reset_size()` 縮回 @露柑
+=======
+- [x] UI-18 UI 對接遊戲機制：`UIGameBridge`（`scenes/ui/game_ui.tscn`）依 docs/api.md 接上完成鍋數、清空次數、各層鍋子、龍所在層、音量、吸吐、開始／結束／重新遊玩 @GMF
+- [x] UI-19 把 `scenes/ui/game_ui.tscn` 實例化進 game.tscn（GameManager 的子節點 `GameUI`），（之後 UI-14 已把開始介面改成獨立主選單，game.tscn 也改名為 scenes/game/main.tscn）。經使用者同意由 GMF 直接修改，已通知露柑：GM-16 改 game.tscn 時請保留 `GameUI` 節點 @GMF
+- [ ] UI-20 遊玩狀態介面顯示胃袋裡的食材（`stomach_changed`）與換小龍中的狀態（`PotState.has_baby`），設計確定後再做
+- [x] UI-21 依 Logo 風格製作暫時美術：開始介面（現為主選單）改用 Logo 當背景；遊戲結束背景（Logo 加工）、資訊面板（九宮格石板火焰框）、龍洞穴 2D 背景（`scenes/backdrop/`，已換成正式美術 FGJ2026TeamE_GameSceneBG），並寫生圖提示詞 `docs/ui_art_prompts.md` @GMF
+- [ ] UI-22 用 `docs/ui_art_prompts.md` 生成遊戲結束背景的正式美術，覆蓋 `result_background.png`（龍洞穴背景已完成；資訊面板改用 UI 素材包，不再需要）
+- [x] UI-23 介面改版：遊玩狀態介面、鍋子資訊、音量條、禁止圖示、遊戲結束介面改用 UI 素材包 `scenes/ui/UI/`（石框、金框按鍵、圖示、VICTORY／DEFEAT 橫幅），說明見 design.md 6.9；修正龍洞穴背景在新鏡頭下擋住 3D 場景 @GMF
+- [x] UI-24 請露柑讓主選單 `main_menu.tscn` 套用 `scenes/ui/ui_theme.tres` 與相同的石框卡片、金框按鍵（設計見 design.md 6.9）（經使用者同意由 GMF 直接修改，見 UI-27） @GMF
+- [x] UI-25 真正遊戲裡的 Ctrl+Shift 測試快捷鍵：`scenes/ui/game_debug_hotkeys.gd`（`game_ui.tscn` 的 DebugHotkeys 節點），按鍵同 ui_test；只在除錯版本、單機局、遊玩中有效 @GMF
+- [ ] UI-26 請露柑在 GameManager 提供測試用接口（設定完成鍋數／清空次數、強制勝敗、換某層禁止清單），讓 UI-25 不必直接改 GameManager 的資料
+- [x] UI-27 主選單：玩家 A 說明改為「對麥克風發聲，音量大小決定龍的高度」；新增「遊玩方式」「雙人合作」說明卡；套用 ui_theme 與石框卡片、金框按鍵。主選單是露柑的場景，經使用者同意由 GMF 直接修改，節點名稱與腳本接口不變 @GMF
+- [x] UI-28 修正龍洞穴背景遮住龍模型：背景改用深度一律寫成最遠的著色器（`cave_backdrop.gdshader`），所有 3D 物件都畫在背景前面 @GMF
+- [ ] UI-29 鍋子資訊顯示「已收滿，對鍋子吐火」的提示（等 GM-22 提供狀態與 signal）
+>>>>>>> 修改備份_20261004_1321
 
 #### 區網連線（Samuel）
 - [x] NET-01 建立 `autoload/network_manager.gd`（ENet 建立房間／加入、連線 signal）與 `scenes/lobby/lobby.tscn`（輸入 IP 加入、顯示本機 IP） @Samuel
@@ -102,10 +128,10 @@
 - [x] NET-13 新增 `NetworkGameBridge` 串接 game.tscn：依 `RoomManager` 模式切換輸入、直接開局、遊戲結束回房間（game.tscn 加節點需 @露柑 同意） @Samuel
 - [x] NET-14 新增 `scenes/game/client_play.tscn`：Client 遊玩畫面，只顯示麥克風狀態並傳送吸／吐封包 @Samuel
 - [ ] NET-15 連線局暫停：Host 按 Esc 只凍結 Host 的遊戲並通知 Client（畫面顯示「房主已暫停」，暫停中 Client 的吸／吐不生效，繼續後接上）；Client 的 Esc 只疊出設定選單、不凍結，可繼續回報吸／吐；等候頁與連線中也不凍結；換場景前一律解除暫停（改動 `pause_menu.gd` 需告知 @山雷） @Samuel
-- [ ] NET-16 連線局結束時，Client 也顯示成功／失敗（`match_ended` 帶結果）；目前 Client 只是被帶回等候頁
+- [x] NET-16 連線局結束時，Client 也顯示成功／失敗並等房主回到房間（由 NET-19 的畫面同步一併完成，`ClientViewBridge`） @Samuel
 - [x] NET-17 單機局結束後回主選單：結果畫面改為「回主選單」，呼叫 `RoomManager.return_to_menu()`（隨 UI-14、UI-15 完成） @露柑
 - [x] NET-18 房間等候頁介面優化：沿用主選單視覺（logo 背景、深色卡片、橘色按鈕，主題 `lobby_theme.tres`）；顯示玩家 1／2 欄位；左下玩家 1 音高條、右下玩家 2 吸／吐（沿用遊玩介面樣式），讓兩位玩家進遊戲前先測試；Host 的音高經 `send_lobby_pitch` 同步給 Client；吸／吐本機輸入抽成 `PlayerActionInput`（client_play 共用） @Samuel
-- [ ] NET-19 Client 畫面同步顯示遊戲（Host 傳遊戲狀態，Client 以唯讀方式顯示；與 NET-02 一併規劃，做法見討論）@Samuel
+- [x] NET-19 Client 畫面同步顯示遊戲：連線局 Client 載入同一個遊戲場景，GameManager 為副本，由 Host 的事件、快照與完整狀態填入，畫面元件不用改（做法見 docs/lobby-flow.md「畫面同步」）。已完成四階段：①龍、計數、勝敗 ②鍋子、小龍、胃袋、噴吐狀態 ③食材與特效事件 ④HUD 音高、掉包與斷線測試 @Samuel
 - [x] NET-20 等候頁自選座位：點選「玩家 1」「玩家 2」切換角色（不需對方同意、不需準備）；`RoomManager.host_slot`；音高與吸／吐改為雙向傳輸；`NetworkGameBridge` 與 `client_play` 依座位切換（Client 可坐玩家 1 以音高換層）；遊玩 HUD 的音高條改讀音高並可讀對方傳來的音高；介面「玩家 A／B」統一改為「玩家 1／2」 @Samuel
 
 ### 美術與關卡
@@ -146,6 +172,7 @@
 - [x] ART-08 驗證加寬特效的最小／預設／最大表現、即時調整、停止清場與三層遮擋，統整設定方式供使用者驗收（使用者已驗收，授權提交 PR） @美術總監
 - [x] ART-09 [緊急] game.tscn 按 1／2／3 換層後紅龍模型不對齊目標（使用者表示已解決並撤回修正；本輪未改動畫，診斷資料保留供參考） @動畫師
 - [x] ART-10 統整兩項緊急任務進度與確認方式（使用者撤回 ART-09，沒有本輪動畫修正須交叉回歸；特效檢查已完成於 ART-08） @美術總監
+<<<<<<< HEAD
 - [ ] ART-11 套用紅龍龍頭左右轉動動畫，評估 Godot AnimationTree 的加法動畫混合（additive）與骨骼過濾可行性，確認既有動畫及嘴部掛點的相容方式 @動畫師
 - [ ] ART-12 為中央紅龍所在區域配置洞穴背景；使用者計畫提供洞穴模型，先確認所需尺寸、開口與掛載位置，模型到位後配置 @場景美術
 - [ ] ART-13 左右樓層拼接完成後對齊 Camera3D 的可見畫面邊界，確認拼接範圍與攝影機構圖的配合方式 @合成師
@@ -158,6 +185,9 @@
 - [x] ART-20 匯入人類（hero.glb）、史萊姆、蝙蝠三種食材模型，建立 `human_character`／`slime_character`／`bat_character` 子場景與共用腳本 `ingredient_character.gd`，設定動畫循環與播放接口，並提供 `ingredient_preview.tscn` 展示；蝙蝠改用 bat.glb，`fly` 為整段飛行、`attack` 擷取自 Armature.006 第 76～105 格（`scenes/ingredient/build_bat_animations.gd` 產生 `Models/bat/bat_animations.tres`）；待使用者驗收，尺寸與朝向待確認，GM 串接另行處理 @素材整合
 
 2026-10-04：使用者再次授權接續 ART-11～ART-19，上輪因用量中斷，已重新派工。擺頭映射確認為 0＝左、0.5＝前、1＝右，先交接口與展示，玩法自動轉頭另接。吐出軌跡、角色比例與接邊基準討論中；洞穴模型及幼龍動畫素材待提供。本輪成果待使用者驗收後才 commit／push。
+=======
+- [x] ART-11 勇者挑戰房往左加長到超出畫面左緣：`hero_challenge_room.tscn` 複製地板、背牆模組到 x = -16（新增 3 段 4 單位），地基與上方飾帶加長，左端外牆、柱子、飾帶移到新左端，加 2 支壁掛火把；隊伍定位點不變。房間是場景美術的場景，經使用者同意由 GMF 直接修改 @GMF
+>>>>>>> 修改備份_20261004_1321
 
 ### 音效與 UI
 

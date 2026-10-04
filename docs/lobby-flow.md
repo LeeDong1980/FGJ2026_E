@@ -92,3 +92,20 @@ flowchart TD
 - 座位狀態是 `RoomManager.host_slot`（房主坐的座位，預設 1），`get_my_slot()`／`get_peer_slot()` 取得自己與對方的座位。
 - 按下「開始遊戲」後座位鎖定，連線局結束回到等候頁才能再換。房主新開的房間（進入遊戲、加入失敗、斷線重建）座位重設為房主坐玩家 1；對方離開再加入時沿用房主目前的座位。
 
+## 畫面同步（NET-19）
+
+連線局中，Client 要看到和 Host 一模一樣的畫面。做法：**Client 載入同一個遊戲場景（`scenes/game/main.tscn`），但它的 `GameManager` 是副本**，只接收、不模擬；所有畫面元件（龍、HUD、特效、提示）本來就只讀 `GameManager` 的資料與 signal，所以不用改。
+
+- 副本旗標：`GameManager.replica_mode`（靜態，`RoomManager` 在 Client 載入遊戲場景前設定）→ `GameManager.replica`。副本的 `start_game()`、`suck()`、`spit_pressed()`、`toggle_element()`、`turn_head()` 都沒有作用，`_process` 只預測（暈眩與無敵倒數）。
+- Host：`GameStateSender`（遊戲場景裡的節點，只在 Host 的連線局啟用）。開局前，Host 的 `NetworkGameBridge` 會等 Client 載入完成（它會要求完整狀態，最久等 8 秒）再開局，兩邊從同一個時間點開始。
+- Client：`ClientViewBridge` 建立 `GameStateReceiver`，把 Host 傳來的狀態套用到副本並發出和 Host 相同的 signal；停用本機所有遊戲輸入；房主暫停時凍結畫面並顯示「房主已暫停」；遊戲結束顯示成功／失敗並等房主回到房間（NET-16）。輸入診斷疊層（`client_play.tscn`）預設隱藏，按 **F3** 顯示，Client 依座位回報輸入的元件（`PlayerPitchInput`、`PlayerActionInput`、換元素、轉頭）仍在其中運作。
+- 三種封包（格式與常數見 `scenes/game/game_sync.gd`）：
+  - **full**（可靠）：完整的離散狀態，載入完成時、開局時、之後每 3 秒補送，用來對帳。
+  - **event**（可靠、依序）：單一事件，如計數改變、朝向、元素、龍的目標層、暈眩、勝敗。
+  - **snapshot**（不可靠，20 次／秒）：連續變動的值，如龍的位置、暈眩時間。快照不放離散狀態，避免舊快照蓋掉新事件。
+- 各階段：①龍（目標層、位置、暈眩、無敵）、計數、朝向、元素、勝敗 ②鍋子與小龍（禁止清單、需求、數量、食譜元素、小龍是否到位、煮的進度）、胃袋、噴吐狀態（`is_spitting`、這次是否已吐進鍋子，鍋子底下光圈的跳動與特效要用）③食材與特效事件 ④收尾。
+- 第三階段：食材（`IngredientState` 新增 `id`，由 `GameManager` 生成時指定）。誰在隊伍裡只靠事件（`spawn`、`removed`）與完整狀態，快照只更新已存在食材的位置與進度（燒毀、攻擊蓄力、冰凍），避免舊快照蓋掉新事件；Client 本機沿隊伍走預測位置，差超過 0.3 才硬拉。特效與提示靠事件重現：`swallowed`（吸取特效）、`burned`、`attacked`、`frozen`、`suck_missed`、`spit_missed`、`action_missed`（上方提示）；噴火噴冰特效是 `EffectsView` 讀副本的狀態（元素、噴吐狀態、胃袋、朝向、隊伍最前端）自己判斷的，不需要額外事件。
+- 第四階段：Host 坐玩家 1 時，`GameStateSender` 持續用 `PlayerPitchInput` 把音高傳給 Client，Client 坐玩家 2 時 HUD 的音高條讀它（`UIGameBridge.remote_pitch_level`）；自己坐玩家 1 時用本機音高。穩健性測試：隨機丟掉 70% 快照（`GameSync.debug_snapshot_loss`）後，食材位置與進度仍一致；重送完整狀態不會產生重複食材（晚進場、重新對帳都靠它）；Client 中途離開時 Host 回等候頁、Host 被強制中斷時 Client 重建自己的房間。量測：快照約 340 B（20 次／秒）、完整狀態約 1.4 KB。
+- 分數（GM-29）：`score` 走 `score` 事件（附 `gained`、`fast`，ScoreBanner 的「+150 快速！」靠它）與完整狀態；快速加分倒數 `since_last_pot` 是連續值，放快照並在 Client 本機預測。
+- 鍋子的離散資料走事件（`pot`、`baby_left`、`baby_arrived`、`stomach`、`spat`、`spit`），煮的進度（連續值）放在快照；完整狀態每 3 秒對帳一次，Client 比對有差異才補發 signal。
+

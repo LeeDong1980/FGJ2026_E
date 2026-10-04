@@ -174,7 +174,7 @@ func _on_action_changed(action: StringName) -> void:
 
 | 參數 | 預設 | 存檔 | 說明 |
 |---|---|---|---|
-| `shout_threshold` | 50 | 是 | 音量（`volume_value`，0~100）往上超過此值算一次大叫，龍頭左右切換（`ShoutTurnInput`） |
+| `shout_threshold` | 50 | 是 | 音量（`volume_value`，0~100）往上超過此值算一次大叫，龍頭左右切換（`ShoutTurnInput`，讀玩家 1 的聲音） |
 | `shout_release` | 35 | 是 | 音量降到此值以下才能再叫一次 |
 
 設定面板的「大叫轉頭」條：左把手是 `shout_release`，右把手是 `shout_threshold`，白線是目前音量。門檻是音量輸出的百分比，調整「音量」的小聲／大聲區間也會改變實際需要的 dB。
