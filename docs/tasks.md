@@ -90,9 +90,11 @@
 - [x] NET-12 新增 `scenes/lobby/room_lobby.tscn`（Host／Client 共用等候頁，獨立可 F6 測試）與暫用主選單 `temp_menu.tscn` @Samuel
 - [x] NET-13 新增 `NetworkGameBridge` 串接 game.tscn：依 `RoomManager` 模式切換輸入、直接開局、遊戲結束回房間（game.tscn 加節點需 @露柑 同意） @Samuel
 - [x] NET-14 新增 `scenes/game/client_play.tscn`：Client 遊玩畫面，只顯示麥克風狀態並傳送吸／吐封包 @Samuel
-- [ ] NET-15 連線局中 Esc 暫停選單不要暫停遊戲（目前 `PauseMenu` 會 `get_tree().paused = true`，Host 一按 Esc 兩邊都停住）（需 @山雷 同意改 pause_menu.gd）
+- [ ] NET-15 連線局暫停：Host 按 Esc 只凍結 Host 的遊戲並通知 Client（畫面顯示「房主已暫停」，暫停中 Client 的吸／吐不生效，繼續後接上）；Client 的 Esc 只疊出設定選單、不凍結，可繼續回報吸／吐；等候頁與連線中也不凍結；換場景前一律解除暫停（改動 `pause_menu.gd` 需告知 @山雷） @Samuel
 - [ ] NET-16 連線局結束時，Client 也顯示成功／失敗（`match_ended` 帶結果）；目前 Client 只是被帶回等候頁
 - [x] NET-17 單機局結束後回主選單：結果畫面改為「回主選單」，呼叫 `RoomManager.return_to_menu()`（隨 UI-14、UI-15 完成） @露柑
+- [ ] NET-18 房間等候頁介面優化（目前只有基本控制項，沒有 Theme 與版面設計）@Samuel
+- [ ] NET-19 Client 畫面同步顯示遊戲（Host 傳遊戲狀態，Client 以唯讀方式顯示；與 NET-02 一併規劃，做法見討論）@Samuel
 
 ### 美術與關卡
 

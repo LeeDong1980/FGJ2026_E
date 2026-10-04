@@ -80,3 +80,4 @@ flowchart TD
 - `scenes/game/network_game_bridge.gd`（`NetworkGameBridge`，遊戲場景 `scenes/game/main.tscn` 尾端的節點）：只在 Host 的連線局啟用。停用本機 J／K 吸吐與語音吸吐、保留 1／2／3 換層、直接開局；Client 的 `inhale` 呼叫 `suck()`，`exhale` 與 `none` 對應 `spit_pressed()`／`spit_released()`；結束時顯示臨時的「回到房間」（UI-17 改用正式 ResultScreen 後可拿掉）。單機與直接 F6 執行遊戲場景時不做任何事。
 - 「嘗試連線」期間會先關掉自己的房間（ENet 一次只能是 Server 或 Client），失敗後重新建立，效果等同流程圖的「保留自己的房間」。
 - 遊戲端要回到房間時呼叫 `RoomManager.finish_match()`（Host）；單機結束呼叫 `RoomManager.return_to_menu()`。
+- 暫停（`PauseMenu`，Esc）：Host 在遊戲中會凍結遊戲並以 `NetworkManager.send_pause_state()` 通知 Client（Client 顯示「房主已暫停」）；暫停中 `NetworkGameBridge` 只記下 Client 的動作，繼續時再接上噴火。Client、等候頁、連線中的 Esc 只疊出麥克風設定，不凍結（`RoomManager.pause_freezes_game()`）。`RoomManager` 換場景前一律解除暫停。

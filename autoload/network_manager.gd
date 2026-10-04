@@ -23,6 +23,8 @@ signal room_closed_by_host
 ## Client 端：Host 開始或結束連線局。
 signal match_started
 signal match_ended
+## Client 端：房主暫停或繼續遊戲（暫停時 Host 會忽略 Client 的吸／吐）。
+signal host_pause_changed(paused: bool)
 ## Host 端：Client 的吸／吐動作改變（ACTION_INHALE、ACTION_EXHALE、ACTION_NONE）。Host 收到後會回覆確認。
 signal voice_action_received(peer_id: int, action: String)
 ## Host 端：收到 Client 的語音輸入封包
@@ -138,6 +140,14 @@ func start_match() -> void:
 	match_in_progress = true
 	for id: int in _accepted_peers:
 		_rpc_match_started.rpc_id(id)
+
+
+## Host 暫停或繼續遊戲時通知 Client，讓對方畫面顯示提示。
+func send_pause_state(paused: bool) -> void:
+	if not is_host():
+		return
+	for id: int in _accepted_peers:
+		_rpc_pause_state.rpc_id(id, paused)
 
 
 ## Host 結束連線局，回到房間等候。
@@ -358,6 +368,11 @@ func _rpc_match_started() -> void:
 @rpc("authority", "call_remote", "reliable")
 func _rpc_match_ended() -> void:
 	match_ended.emit()
+
+
+@rpc("authority", "call_remote", "reliable")
+func _rpc_pause_state(paused: bool) -> void:
+	host_pause_changed.emit(paused)
 
 
 @rpc("any_peer", "call_remote", "reliable")

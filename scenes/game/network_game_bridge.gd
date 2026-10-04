@@ -23,12 +23,15 @@ const LANE_ACTIONS: Array[StringName] = [&"lane_1", &"lane_2", &"lane_3"]
 var _remote_action: String = NetworkManager.ACTION_NONE
 var _received_count: int = 0
 var _debug_label: Label
+var _was_paused: bool = false
 
 
 func _ready() -> void:
 	if not _is_host_match():
 		set_process_unhandled_input(false)
 		return
+	# Host 暫停時本節點也要持續運作，才能在暫停與繼續的瞬間補上噴火的放開與接續。
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_disable_local_action_input()
 	if show_debug:
 		_build_debug_label()
@@ -39,7 +42,20 @@ func _ready() -> void:
 	game_manager.start_game.call_deferred()
 
 
+func _process(_delta: float) -> void:
+	var paused: bool = get_tree().paused
+	if paused == _was_paused:
+		return
+	_was_paused = paused
+	if paused:
+		game_manager.spit_released()
+	elif _remote_action == NetworkManager.ACTION_EXHALE:
+		game_manager.spit_pressed()
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if get_tree().paused:
+		return
 	for i in LANE_ACTIONS.size():
 		if event.is_action_pressed(LANE_ACTIONS[i]):
 			dragon.set_target_lane(i)
@@ -67,9 +83,12 @@ func _on_remote_action(_peer_id: int, action: String) -> void:
 		_debug_label.text = "Client 動作：%s（已收到 %d 個封包）" % [action, _received_count]
 	if action == _remote_action:
 		return
-	if _remote_action == NetworkManager.ACTION_EXHALE:
-		game_manager.spit_released()
+	var was_exhale: bool = _remote_action == NetworkManager.ACTION_EXHALE
 	_remote_action = action
+	if get_tree().paused:
+		return  # 暫停中只記下 Client 目前的動作，繼續遊戲時再接上
+	if was_exhale:
+		game_manager.spit_released()
 	match action:
 		NetworkManager.ACTION_INHALE:
 			game_manager.suck()

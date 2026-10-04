@@ -15,6 +15,7 @@ const ACTION_TEXT: Dictionary = {
 @onready var _voice_toggle: CheckButton = %VoiceToggle
 @onready var _mic_label: Label = %MicLabel
 @onready var _debug_label: Label = %DebugLabel
+@onready var _paused_label: Label = %PausedLabel
 @onready var _net_label: Label = %NetLabel
 @onready var _leave_button: Button = %LeaveButton
 
@@ -33,6 +34,7 @@ func _ready() -> void:
 	_show_action(_sent_action)
 	NetworkManager.voice_ack_received.connect(_on_ack_received)
 	NetworkManager.voice_ack_timeout.connect(_on_ack_timeout)
+	NetworkManager.host_pause_changed.connect(func(paused: bool) -> void: _paused_label.visible = paused)
 
 
 func _process(_delta: float) -> void:

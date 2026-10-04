@@ -48,6 +48,14 @@ func get_player_count() -> int:
 	return 0
 
 
+## 按 Esc 開暫停選單時，要不要凍結遊戲（get_tree().paused）。
+## Client 沒有遊戲邏輯，等候頁也沒有東西要凍結，這兩處只疊出設定選單，讓玩家可以繼續操作。
+func pause_freezes_game() -> bool:
+	if role == Role.CLIENT:
+		return false
+	return phase != Phase.ROOM and phase != Phase.JOINING
+
+
 func can_start_solo() -> bool:
 	return role == Role.HOST and phase == Phase.ROOM and get_player_count() == 1
 
@@ -239,12 +247,20 @@ func _join_failed(reason: String) -> void:
 	room_changed.emit()
 
 
+## 換場景前解除暫停：暫停中被斷線或回房間時，新場景不能還卡在暫停。
+func _release_pause() -> void:
+	if PauseMenu.visible:
+		PauseMenu.close()
+	get_tree().paused = false
+
+
 func _clear_notice() -> void:
 	notice = ""
 
 
 ## 換場景。目前已經在該場景時不重新載入；場景檔還不存在（例如 client_play）時只警告，不中斷流程。
 func _go(path: String) -> void:
+	_release_pause()
 	var current: Node = get_tree().current_scene
 	if current != null and current.scene_file_path == path:
 		return
