@@ -27,7 +27,7 @@
 - 層數：`game_manager.lane_layout.lane_count`。
 - 樓層位置：`lane_layout.get_lane_position(lane)` 是該層地板頂面的 Y（LaneLayout 本地座標，層距 5）；`lane_layout.get_anchor_position(lane, name)` 取房間定位點（`QueueSpawnAnchor`、`QueueFrontAnchor`、`PotAnchor` 等，名稱見 `docs/prototype_rooms.md`），例如 UI 跟隨鍋子用 `PotAnchor`。
 - 龍暈眩時（`game_manager.is_stunned()`）龍停在原地，`suck()`、`spit_pressed()` 沒有效果，也不會發出 `suck_missed`／`spit_missed`。`set_target_lane()` 照常記錄，醒來後才飛過去；`spit_pressed()` 仍會記錄正在喊「吐」，持續喊到醒來會接著噴火。
-- 朝向：`game_manager.facing` 是 `GameManager.Facing.LEFT`（面向食材）時 `suck()` 與噴火有效；`RIGHT`（面向鍋子）時 `spit_pressed()` 才會吐進鍋子；胃袋空著且鍋子已滿（`PotState.is_full()`）時，持續喊「吐」是對鍋子噴火煮，累計 `cook_time` 秒（預設 1 秒）才完成一鍋。鍋子已滿時吐食材沒有效果。朝向不對時發出 `suck_missed`／`spit_missed`。暈眩中 `turn_head()` 沒有效果，每局開始時面向左。
+- 朝向：`game_manager.facing` 是 `GameManager.Facing.LEFT`（面向食材）時 `suck()` 與噴火有效；`RIGHT`（面向鍋子）時 `spit_pressed()` 才會吐進鍋子；胃袋空著且鍋子已滿（`PotState.is_full()`）時，持續喊「吐」是對鍋子噴火煮，累計 `cook_time` 秒（預設 1 秒）才完成一鍋。鍋子已滿時吐食材沒有效果。沒有效果時發出 `suck_missed`／`spit_missed`，同時發出 `action_missed(lane, reason)` 附上原因。暈眩中 `turn_head()` 沒有效果，每局開始時面向左。
 - 大叫轉頭由 `scenes/game/shout_turn_input.gd`（`ShoutTurnInput`）處理：讀玩家 B 的音量（手機 2 有連上讀手機，否則讀電腦麥克風），`volume_value` 超過 `MicInput.shout_threshold`（預設 50）呼叫一次 `turn_head()`，降到 `MicInput.shout_release`（預設 35）以下才能再觸發；兩個門檻在麥克風設定面板調整並存進 `user://mic_settings.cfg`。偵測邏輯在 `ShoutDetector`，Client 的 `ClientPlay` 共用，連線局用 `NetworkManager.send_voice_word(WORD_TURN)` 傳給 Host。
 - 鍵盤測試輸入 `scenes/game/keyboard_input.gd` 就是用這些呼叫（按住 K 噴火、L 轉頭），可以當作範例。
 
@@ -90,7 +90,8 @@
 | `dragon_stunned` | 龍被打中開始暈眩 |
 | `dragon_recovered` | 龍暈眩結束，接著進入無敵時間（`invincible_remaining` 秒） |
 | `facing_changed(facing)` | 龍頭朝向改變（`GameManager.Facing.LEFT`／`RIGHT`），重置時轉回左邊也會發出 |
-| `suck_missed(lane)` / `spit_missed(lane)` | 喊了吸或吐但沒有效果（可以用來播放空動作）。噴火時只在一開始沒有可燒的食材才會發出 |
+| `suck_missed(lane)` / `spit_missed(lane)` | 喊了吸或吐但沒有效果。噴火時只在一開始沒有可燒的食材才會發出。遊戲場景不再為此播放特效 |
+| `action_missed(lane, reason)` | 和 `suck_missed`／`spit_missed` 一起發出。`reason` 是 `GameManager.MissReason`：`NO_INGREDIENT`、`STOMACH_FULL`、`FACING_RIGHT`、`SPIT_FACING_LEFT`、`NOTHING_TO_SPIT`、`POT_FULL`、`NO_BABY`；`ActionHintBanner` 用它在畫面上方顯示提示 |
 
 `Dragon`：
 

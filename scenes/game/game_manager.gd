@@ -7,6 +7,16 @@ enum GameState { WAITING, PLAYING, ENDED }
 enum BabyLeaveReason { COMPLETED, KICKED }
 ## 龍頭朝向：LEFT 面向食材隊伍，RIGHT 面向鍋子。目前只有狀態與畫面提示，龍的模型不會轉。
 enum Facing { LEFT, RIGHT }
+## 吸或吐沒有效果的原因（action_missed 使用）。
+enum MissReason {
+	NO_INGREDIENT,  ## 所在層最前端沒有食材
+	STOMACH_FULL,  ## 胃裡已有食材，不能再吸
+	FACING_RIGHT,  ## 面向鍋子時喊吸
+	SPIT_FACING_LEFT,  ## 胃裡有食材但面向食材，吐不進鍋子
+	NOTHING_TO_SPIT,  ## 面向鍋子、胃空、鍋子未滿
+	POT_FULL,  ## 鍋子已滿，要先噴火煮好
+	NO_BABY,  ## 小龍還沒到位
+}
 
 ## start_game() 之後發出，此時已重置完畢並開始遊玩。
 signal game_started
@@ -21,6 +31,8 @@ signal ingredient_spat(lane: int, ingredient: IngredientState)
 ## 喊了吸或吐，但沒有效果（噴火時是一開始就沒有可以燒的食材）。
 signal suck_missed(lane: int)
 signal spit_missed(lane: int)
+## 吸或吐沒有效果，和 suck_missed／spit_missed 一起發出，附上原因給畫面提示。
+signal action_missed(lane: int, reason: MissReason)
 ## 胃袋內容改變，胃空時 ingredient 為 null。
 signal stomach_changed(ingredient: IngredientState)
 ## 鍋子的數量或要求改變。
@@ -143,11 +155,15 @@ func suck() -> void:
 	if state != GameState.PLAYING or is_stunned():
 		return
 	var lane := dragon.current_lane
-	var ingredient: IngredientState = null
-	if facing == Facing.LEFT and stomach == null:
-		ingredient = get_front(lane)
+	var ingredient: IngredientState = get_front(lane)
+	if facing == Facing.RIGHT:
+		_miss_suck(lane, MissReason.FACING_RIGHT)
+		return
+	if stomach != null:
+		_miss_suck(lane, MissReason.STOMACH_FULL)
+		return
 	if ingredient == null:
-		suck_missed.emit(lane)
+		_miss_suck(lane, MissReason.NO_INGREDIENT)
 		return
 	_take_front(lane)
 	stomach = ingredient
@@ -169,10 +185,14 @@ func spit_pressed() -> void:
 		if stomach != null:
 			_spit_used_for_pot = true
 			_spit_into_pot(lane)
-		elif not _can_cook(lane):
-			spit_missed.emit(lane)
-	elif stomach != null or get_front(lane) == null:
-		spit_missed.emit(lane)
+		elif not pots[lane].has_baby:
+			_miss_spit(lane, MissReason.NO_BABY)
+		elif not pots[lane].is_full():
+			_miss_spit(lane, MissReason.NOTHING_TO_SPIT)
+	elif stomach != null:
+		_miss_spit(lane, MissReason.SPIT_FACING_LEFT)
+	elif get_front(lane) == null:
+		_miss_spit(lane, MissReason.NO_INGREDIENT)
 
 
 ## 停止喊「吐」。
@@ -284,6 +304,16 @@ func _update_attack(lane: int, delta: float) -> void:
 		_stun_dragon()
 
 
+func _miss_suck(lane: int, reason: MissReason) -> void:
+	suck_missed.emit(lane)
+	action_missed.emit(lane, reason)
+
+
+func _miss_spit(lane: int, reason: MissReason) -> void:
+	spit_missed.emit(lane)
+	action_missed.emit(lane, reason)
+
+
 func _set_facing(value: Facing) -> void:
 	if value == facing:
 		return
@@ -299,8 +329,11 @@ func _stun_dragon() -> void:
 
 func _spit_into_pot(lane: int) -> void:
 	var pot := pots[lane]
-	if not pot.has_baby or pot.is_full():
-		spit_missed.emit(lane)
+	if not pot.has_baby:
+		_miss_spit(lane, MissReason.NO_BABY)
+		return
+	if pot.is_full():
+		_miss_spit(lane, MissReason.POT_FULL)
 		return
 	var ingredient := stomach
 	stomach = null
