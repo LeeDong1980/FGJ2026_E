@@ -21,6 +21,11 @@ enum MissReason {
 	WRONG_ELEMENT,  ## 煮鍋子用錯元素（進度會倒退，不是沒效果；只發 action_missed）
 }
 
+## 下一個建立的 GameManager 是不是「副本」。連線局的 Client 用副本顯示 Host 傳來的畫面：
+## 副本不模擬、不接受輸入，狀態由 GameStateReceiver 填入並發出同樣的 signal，畫面元件不用改。
+## 由 RoomManager 在載入遊戲場景前設定。
+static var replica_mode: bool = false
+
 ## start_game() 之後發出，此時已重置完畢並開始遊玩。
 signal game_started
 
@@ -146,16 +151,27 @@ var stun_remaining: float = 0.0
 var invincible_remaining: float = 0.0
 ## 每次重置加一，用來忽略上一局還沒觸發的換小龍計時。
 var _round: int = 0
+## 這個 GameManager 是不是副本（見 replica_mode）。副本的 _process 只預測不模擬，輸入函式都沒有作用。
+var replica: bool = false
+## 下一個食材的編號（IngredientState.id）。
+var _next_ingredient_id: int = 1
 
 
 func _ready() -> void:
+	replica = replica_mode
 	if use_room_anchors:
 		spawn_x = lane_layout.get_anchor_position(0, &"QueueSpawnAnchor").x
 		front_x = lane_layout.get_anchor_position(0, &"QueueFrontAnchor").x
-	_setup_round()
+	if replica:
+		_setup_replica()
+	else:
+		_setup_round()
 
 
 func _process(delta: float) -> void:
+	if replica:
+		_process_replica(delta)
+		return
 	if state != GameState.PLAYING:
 		return
 	since_last_pot += delta
@@ -170,6 +186,8 @@ func _process(delta: float) -> void:
 
 ## 開始遊戲或重新遊玩。開場第一次呼叫時直接沿用已擺好的場景，之後每次都原地重置。
 func start_game() -> void:
+	if replica:
+		return
 	if state != GameState.WAITING:
 		_setup_round()
 	state = GameState.PLAYING
@@ -178,7 +196,7 @@ func start_game() -> void:
 
 ## 面向左邊且胃袋空著時，把所在層最前端的食材吞進胃袋。
 func suck() -> void:
-	if state != GameState.PLAYING or is_stunned():
+	if replica or state != GameState.PLAYING or is_stunned():
 		return
 	var lane := dragon.current_lane
 	var ingredient: IngredientState = get_front(lane)
@@ -201,7 +219,7 @@ func suck() -> void:
 ## 面向右邊、胃袋空著且鍋子已滿，開始對鍋子噴火煮，持續到 spit_released()；
 ## 面向左邊且胃袋空著，開始噴火燒食材，持續到 spit_released()。其他情況沒有效果。
 func spit_pressed() -> void:
-	if state != GameState.PLAYING:
+	if replica or state != GameState.PLAYING:
 		return
 	is_spitting = true
 	if is_stunned():
@@ -225,6 +243,8 @@ func spit_pressed() -> void:
 
 ## 停止喊「吐」。
 func spit_released() -> void:
+	if replica:
+		return
 	is_spitting = false
 	_spit_used_for_pot = false
 
@@ -243,14 +263,14 @@ func is_cooking() -> bool:
 
 ## 火、冰切換（玩家 1 大叫或按 4）。暈眩中不能切換。
 func toggle_element() -> void:
-	if state != GameState.PLAYING or is_stunned():
+	if replica or state != GameState.PLAYING or is_stunned():
 		return
 	_set_element(Element.ICE if element == Element.FIRE else Element.FIRE)
 
 
 ## 龍頭左右切換（玩家 2 按 L）。暈眩中不能轉頭。
 func turn_head() -> void:
-	if state != GameState.PLAYING or is_stunned():
+	if replica or state != GameState.PLAYING or is_stunned():
 		return
 	_set_facing(Facing.RIGHT if facing == Facing.LEFT else Facing.LEFT)
 
@@ -454,6 +474,38 @@ func _end_game(won: bool) -> void:
 		game_lost.emit()
 
 
+## 副本模式的初始狀態：只建立每層的空資料，不排食材、不換小龍（由 GameStateReceiver 依 Host 的狀態填入）。
+func _setup_replica() -> void:
+	lanes.clear()
+	pots.clear()
+	for i in lane_layout.lane_count:
+		lanes.append(LaneState.new())
+		pots.append(PotState.new())
+
+
+## 副本每個 frame 只做預測：食材沿著隊伍走、倒數暈眩與無敵（不發 signal，signal 由 Host 的事件重現）。
+## Host 的快照會校正，所以不需要精確。
+func _process_replica(delta: float) -> void:
+	if state != GameState.PLAYING:
+		return
+	since_last_pot += delta
+	for lane_state in lanes:
+		_advance_queue(lane_state, delta)
+	stun_remaining = maxf(stun_remaining - delta, 0.0)
+	invincible_remaining = maxf(invincible_remaining - delta, 0.0)
+
+
+## 這次按下「吐」是不是已經吐進鍋子（放開前不會接著噴）。Host 的 GameStateSender 要把它傳給 Client。
+func is_spit_used_for_pot() -> bool:
+	return _spit_used_for_pot
+
+
+## 副本模式：設定 Host 傳來的噴吐狀態（is_breathing_fire()、is_cooking() 要用）。
+func apply_replica_spit(spitting: bool, used_for_pot: bool) -> void:
+	is_spitting = spitting
+	_spit_used_for_pot = used_for_pot
+
+
 ## 清掉上一局的所有狀態，重新排好開場隊伍、換上小龍，龍回到中間層。
 func _setup_round() -> void:
 	_round += 1
@@ -522,6 +574,8 @@ func _try_spawn(lane: int, delta: float) -> void:
 
 func _spawn(lane: int, x: float) -> void:
 	var ingredient := IngredientState.new(_pick_type(lane), x)
+	ingredient.id = _next_ingredient_id
+	_next_ingredient_id += 1
 	lanes[lane].queue.append(ingredient)
 	ingredient_spawned.emit(lane, ingredient)
 

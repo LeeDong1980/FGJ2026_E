@@ -30,6 +30,13 @@ signal pitch_received(level: float, lane: int)
 signal slot_assignment_received(host_slot: int)
 ## Host 端：Client 要求交換座位。
 signal slot_swap_requested
+## Client 端：收到 Host 傳來的遊戲狀態（畫面同步）。full 是完整狀態，event 是單一事件，snapshot 是定時快照。
+## 內容的格式見 scenes/game/game_state_sender.gd。
+signal state_full_received(state: Dictionary)
+signal state_event_received(event: Dictionary)
+signal state_snapshot_received(snapshot: Dictionary)
+## Host 端：Client 的遊戲畫面載入完成，要求完整狀態。
+signal state_requested
 ## Client 端：房主暫停或繼續遊戲（暫停時 Host 會忽略 Client 的吸／吐）。
 signal host_pause_changed(paused: bool)
 ## 收到對方（坐玩家 2 的那一位）的吸／吐動作改變（ACTION_INHALE、ACTION_EXHALE、ACTION_NONE）。
@@ -178,6 +185,37 @@ func request_slot_swap() -> void:
 	if not is_online() or is_host():
 		return
 	_rpc_slot_swap_request.rpc_id(1)
+
+
+## Host 把完整遊戲狀態傳給 Client：Client 載入完成要求時、開局時、之後定期補送。可靠傳輸。
+func send_state_full(state: Dictionary) -> void:
+	if not is_host():
+		return
+	for id: int in _accepted_peers:
+		_rpc_state_full.rpc_id(id, state)
+
+
+## Host 把一個遊戲事件傳給 Client（食材生成、計數改變、勝敗…）。可靠傳輸，依序送達。
+func send_state_event(event: Dictionary) -> void:
+	if not is_host():
+		return
+	for id: int in _accepted_peers:
+		_rpc_state_event.rpc_id(id, event)
+
+
+## Host 定時把連續變動的狀態（龍的位置、食材位置與進度）傳給 Client。不可靠傳輸，掉包由下一個快照補上。
+func send_state_snapshot(snapshot: Dictionary) -> void:
+	if not is_host():
+		return
+	for id: int in _accepted_peers:
+		_rpc_state_snapshot.rpc_id(id, snapshot)
+
+
+## Client 的遊戲畫面載入完成，要求 Host 傳完整狀態。
+func request_state() -> void:
+	if not is_online() or is_host():
+		return
+	_rpc_state_request.rpc_id(1)
 
 
 ## Host 暫停或繼續遊戲時通知 Client，讓對方畫面顯示提示。
@@ -438,6 +476,27 @@ func _rpc_slot_swap_request() -> void:
 @rpc("authority", "call_remote", "reliable")
 func _rpc_voice_action_down(action: String) -> void:
 	voice_action_received.emit(1, action)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _rpc_state_full(state: Dictionary) -> void:
+	state_full_received.emit(state)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _rpc_state_event(event: Dictionary) -> void:
+	state_event_received.emit(event)
+
+
+@rpc("authority", "call_remote", "unreliable_ordered")
+func _rpc_state_snapshot(snapshot: Dictionary) -> void:
+	state_snapshot_received.emit(snapshot)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_state_request() -> void:
+	if multiplayer.is_server():
+		state_requested.emit()
 
 
 @rpc("authority", "call_remote", "reliable")

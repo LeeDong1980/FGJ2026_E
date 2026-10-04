@@ -3,6 +3,8 @@ extends RefCounted
 ## 隊伍中一個食材的資料。x 是沿著隊伍的位置，往右（靠近龍）為正。
 
 var type: IngredientType.Type
+## 這一局的唯一編號，由 GameManager 生成食材時指定。連線畫面同步用它對應 Host 與 Client 的同一個食材。
+var id: int = 0
 var x: float
 ## 被噴火燒的進度，0～1，到 1 就燒掉。中途停止噴火不會歸零。
 var burn_progress: float = 0.0
