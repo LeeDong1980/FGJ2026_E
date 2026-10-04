@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Popup/Popup_Bg.Png" id="4_card"]
 [ext_resource type="Texture2D" path="res://scenes/ui/UI/Sprites/Components/Button/Button_Square02_n_Icon.png" id="5_play"]
 [ext_resource type="PackedScene" path="res://scenes/pause_menu/audio_settings_panel.tscn" id="6_audio"]
+[ext_resource type="Theme" path="res://scenes/ui/panel_theme.tres" id="7_panel_theme"]
 
 [sub_resource type="Gradient" id="Gradient_bottom"]
 colors = PackedColorArray(0.043, 0.035, 0.07, 0, 0.043, 0.035, 0.07, 0.85)
@@ -16,10 +17,10 @@ fill_from = Vector2(0, 0)
 fill_to = Vector2(0, 1)
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_card"]
-content_margin_left = 40.0
-content_margin_top = 30.0
-content_margin_right = 40.0
-content_margin_bottom = 36.0
+content_margin_left = 44.0
+content_margin_top = 44.0
+content_margin_right = 44.0
+content_margin_bottom = 44.0
 texture = ExtResource("4_card")
 texture_margin_left = 56.0
 texture_margin_top = 56.0
@@ -116,7 +117,7 @@ layout_mode = 2
 theme_override_constants/line_spacing = 8
 theme_override_font_sizes/font_size = 26
 text = "兩位玩家合作操控中間的大龍
-完成 6 鍋料理就成功
+完成 3 鍋料理就成功
 吐錯食材會打翻鍋子，打翻 3 次就失敗"
 
 [node name="PlayerACard" type="PanelContainer" parent="."]
@@ -265,5 +266,6 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("7_panel_theme")
 theme_override_styles/panel = SubResource("StyleBoxTexture_card")
 show_close_button = true

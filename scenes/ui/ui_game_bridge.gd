@@ -61,6 +61,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	# 玩家 2 還在出聲（語音吸／吐按住中，或按住噴火）時，字音保持亮著。
+	_hud.word_held = game_manager.is_spitting or MicInput.action != &""
 	if game_manager.state != GameManager.GameState.PLAYING:
 		return
 	_hud.set_volume(remote_pitch_level if remote_pitch_level >= 0.0 else _local_pitch_level())
@@ -90,6 +92,7 @@ func _on_game_started() -> void:
 		MicInput.call(&"calibrate")
 	_calibrated = true
 	_read_current_state()
+	_hud.reset_word()
 	ui_root.show_playing()
 
 

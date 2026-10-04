@@ -7,9 +7,9 @@
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frame"]
 content_margin_left = 26.0
-content_margin_top = 16.0
+content_margin_top = 24.0
 content_margin_right = 26.0
-content_margin_bottom = 20.0
+content_margin_bottom = 24.0
 texture = ExtResource("2_frame")
 texture_margin_left = 40.0
 texture_margin_top = 40.0

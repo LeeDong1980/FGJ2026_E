@@ -8,6 +8,11 @@ const CLEARED_WARNING_LEFT := 1
 ## 剩餘秒數低於這個值時，倒數文字變紅色。
 const COUNTDOWN_WARNING_SECONDS := 10.0
 const COUNTDOWN_WARNING_COLOR := Color("ff7a7d")
+## 玩家 2 字音：沒有聲音時顯示的符號與透明度（與連線等候頁相同）。
+const WORD_IDLE := "—"
+const WORD_DIM_ALPHA := 0.45
+## 字音亮起後至少維持的秒數（鍵盤一按就放，也看得到）。
+const WORD_MIN_SHOW := 0.5
 
 ## 鍋子資訊底部到鍋子錨點的距離（像素）。
 @export var pot_info_gap: float = 12.0
@@ -18,6 +23,10 @@ var _camera: Camera3D
 var _pot_anchors: Array[Vector3] = []
 var _cleared_warning := false
 var _word_tween: Tween
+## 玩家 2 是否還在出聲（吸或吐按住中）。由對接腳本每幀設定，放開後字才變淡。
+var word_held := false
+var _word_lit := false
+var _word_lit_time := 0.0
 
 @onready var _completed_label: Label = %CompletedLabel
 @onready var _cleared_label: Label = %ClearedLabel
@@ -28,8 +37,16 @@ var _word_tween: Tween
 @onready var _countdown_label: Label = %CountdownLabel
 
 
-func _process(_delta: float) -> void:
+func _ready() -> void:
+	reset_word()
+
+
+func _process(delta: float) -> void:
 	_layout_pot_infos()
+	if _word_lit:
+		_word_lit_time += delta
+		if not word_held and _word_lit_time >= WORD_MIN_SHOW:
+			_fade_word()
 	if _cleared_warning:
 		_cleared_label.modulate.a = 0.6 + 0.4 * sin(Time.get_ticks_msec() / 1000.0 * TAU * 1.5)
 
@@ -113,10 +130,29 @@ func show_word(word: String) -> void:
 		_word_tween.kill()
 	_word_label.scale = Vector2.ONE * 1.35
 	_word_label.modulate.a = 1.0
-	_word_tween = create_tween().set_parallel()
+	_word_tween = create_tween()
 	_word_tween.tween_property(_word_label, ^"scale", Vector2.ONE, 0.25) \
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_word_tween.tween_property(_word_label, ^"modulate:a", 0.45, 1.2).set_delay(0.3)
+	_word_lit = true
+	_word_lit_time = 0.0
+
+
+## 回到沒有聲音的樣子：淡淡的「—」。
+func reset_word() -> void:
+	if _word_tween:
+		_word_tween.kill()
+	_word_lit = false
+	_word_label.text = WORD_IDLE
+	_word_label.scale = Vector2.ONE
+	_word_label.modulate.a = WORD_DIM_ALPHA
+
+
+func _fade_word() -> void:
+	_word_lit = false
+	if _word_tween:
+		_word_tween.kill()
+	_word_tween = create_tween()
+	_word_tween.tween_property(_word_label, ^"modulate:a", WORD_DIM_ALPHA, 0.6)
 
 
 ## 顯示倒數計時。正式遊戲不限時間，目前只有測試用的控制中心會呼叫。

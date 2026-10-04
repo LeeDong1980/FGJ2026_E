@@ -182,5 +182,4 @@ autowrap_mode = 3
 
 [node name="PlayerPanels" parent="." instance=ExtResource("4_panels")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
