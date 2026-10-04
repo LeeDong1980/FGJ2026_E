@@ -134,7 +134,7 @@ var since_last_pot: float = 0.0
 var state: GameState = GameState.WAITING
 ## 龍頭朝向：LEFT 面向食材（吸、噴火有效），RIGHT 面向鍋子（吐進鍋子有效）。
 var facing: Facing = Facing.LEFT
-## 吐出的元素（玩家 1 大叫或按 4 切換）。
+## 吐出的元素（玩家 2 按 L 切換）。
 var element: Element = Element.FIRE
 ## 玩家正在持續喊「吐」。
 var is_spitting: bool = false
@@ -241,14 +241,14 @@ func is_cooking() -> bool:
 			and facing == Facing.RIGHT and not is_stunned() and _can_cook(dragon.current_lane)
 
 
-## 火、冰切換（玩家 1 大叫或按 4）。暈眩中不能切換。
+## 火、冰切換（玩家 2 按 L）。暈眩中不能切換。
 func toggle_element() -> void:
 	if state != GameState.PLAYING or is_stunned():
 		return
 	_set_element(Element.ICE if element == Element.FIRE else Element.FIRE)
 
 
-## 龍頭左右切換（玩家 2 按 L）。暈眩中不能轉頭。
+## 龍頭左右切換（玩家 1 大叫或按 4）。暈眩中不能轉頭。
 func turn_head() -> void:
 	if state != GameState.PLAYING or is_stunned():
 		return
